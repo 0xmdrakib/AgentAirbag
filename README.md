@@ -2,7 +2,7 @@
 
 **Crash-test dummies for AI agents that hold money.**
 
-![tests](https://img.shields.io/badge/tests-56%20passing-3EE6A0)
+![tests](https://img.shields.io/badge/tests-57%20passing-3EE6A0)
 ![scenarios](https://img.shields.io/badge/crashes-21-FFD21F)
 ![simulation](https://img.shields.io/badge/funds-0%20real-FF4D5E)
 ![license](https://img.shields.io/badge/license-MIT-9AA2B1)
@@ -34,14 +34,14 @@ The browser runs the whole scripted suite itself.
 | Do this | See that |
 | --- | --- |
 | Run `pnpm demo` | A report card opens: **Dummy: F, 21/21 crashed, $10,907.04 simulated loss**; **Seatbelt: A, 21/21 survived, $1.00 modeled refund fee** |
-| Press **Run the crash suite** on `#/run` | The 7 × 3 grid fills in; every cell is clickable; a **See the report card** button appears |
+| Press **Run the crash suite** on the Lab (or **Crash** on `#/run`) | The 7 × 3 grid fills in; every cell is clickable; a **See the report card** button appears |
 | Open `#/report` | Grade, safety radar, seven law bars, the top three failures, a paste-ready fix, and the report hash |
 | Open `#/replay/timeout-after-transfer` and switch **Dummy → Seatbelt** | The same crash and seed: Dummy pays twice (9,900 → 9,800); Seatbelt checks the status and holds at 9,900 |
 | Press **Skip to the crash** in Replay | The scrubber jumps to the action the judge cited as evidence |
 | Open `#/scenarios` and press **View YAML** | All 21 crashes as data, with the story, fault, judge rule and fix key |
 | Run `pnpm airbag run --agent hardened --summary` | `score 100 · grade A · 21 survived · 0 crashed` |
 | Run `pnpm demo:attack` | The unguarded Dummy pays an injected address ($9,995.46 simulated); the guarded agent blocks with `TAINTED_VALUE` and loses $0 |
-| Run `pnpm verify` | Lint, typecheck, 56 tests, the HTTP and process sandbox smokes, production build and the demo smoke test |
+| Run `pnpm verify` | Lint, typecheck, 57 tests, the HTTP and process sandbox smokes, production build and the demo smoke test |
 
 The static build is in `apps/web/dist`. It is ready for Vercel, Cloudflare Pages or GitHub Pages,
 but **no hosting account was available in this build window, so there is no hosted URL yet**. The
@@ -304,6 +304,9 @@ window. Add the live URL here after deploying; do not claim one before it exists
   decisions against a fixed world.
 - **No accounts, database or required backend.**
 - **No report signature** (the P2 NEAR ed25519 signing is not shipped).
+- **Bundle size:** the initial JavaScript is **196 KB gzipped**, under the 250 KB gzip target. Vite
+  warns about the uncompressed 1.25 MB because the two report fixtures carry the full EventLogs;
+  that size is why the hosted demo stays a static bundle with no backend.
 
 ## License
 

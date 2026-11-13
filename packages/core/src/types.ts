@@ -114,6 +114,8 @@ export interface QuoteRequestBody {
   recipient: string;
   recipientType: 'DESTINATION_CHAIN' | 'INTENTS';
   deadline: string;
+  confidentiality?: string;
+  insured?: boolean;
   connectedWallets?: string[];
   sessionId?: string;
   virtualChainRecipient?: string;

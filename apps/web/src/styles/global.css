@@ -1635,6 +1635,28 @@ svg {
   line-height: 1.5;
 }
 
+.run-seed {
+  align-items: center;
+}
+
+.seed-input {
+  width: 156px;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--ink-900);
+  color: var(--text-200);
+  font-size: 9.5px;
+  text-align: right;
+}
+
+.seed-input:focus {
+  border-color: var(--line-strong);
+  outline: 1px solid var(--signal);
+  outline-offset: 1px;
+}
+
 .run-main {
   padding: 20px;
   border: 1px solid var(--line);

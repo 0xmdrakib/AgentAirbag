@@ -22,7 +22,7 @@ Fact, source, date, how verified. Live behavior wins over the prompt when they d
 | Fact | Source | Date | How verified |
 | --- | --- | --- | --- |
 | Base URL is `https://1click.chaindefuser.com` | `https://docs.near-intents.org/near-intents/1click-api` | 2026-11-13 | `GET /v0/tokens` returned 200 |
-| `GET /v0/tokens` returns an array; object fields include `assetId`, `decimals`, `blockchain`, `symbol`, `price`, `priceUpdatedAt`, `contractAddress`, `coingeckoId` | Live response | 2026-11-13 19:14 UTC | Saved `fixtures/tokens.snapshot.json` (58,875 bytes) |
+| `GET /v0/tokens` returns an array; object fields include `assetId`, `decimals`, `blockchain`, `symbol`, `price`, `priceUpdatedAt`, `contractAddress`, `coingeckoId` | Live response | 2026-11-13 19:15 UTC | Saved `fixtures/tokens.snapshot.json` (58,875 bytes, 231 tokens). The sandbox exposes a curated 8-token subset; the rest are in the fixture. |
 | Base USDC is `nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near`, 6 decimals, price 0.999546 | Live token list | 2026-11-13 | Saved snapshot |
 | NEAR wNEAR is `nep141:wrap.near`, 24 decimals, price 3.54 | Live token list | 2026-11-13 | Saved snapshot |
 | Base cbBTC is `nep141:base-0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf.omft.near`, 8 decimals | Live token list | 2026-11-13 | Saved snapshot |

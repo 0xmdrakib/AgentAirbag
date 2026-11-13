@@ -26,6 +26,8 @@ export const quoteRequestSchema = z
     recipient: z.string().min(1),
     recipientType: z.enum(['DESTINATION_CHAIN', 'INTENTS']),
     deadline: z.string().min(1),
+    confidentiality: z.string().optional(),
+    insured: z.boolean().optional(),
     connectedWallets: z.array(z.string()).optional(),
     sessionId: z.string().optional(),
     virtualChainRecipient: z.string().optional(),

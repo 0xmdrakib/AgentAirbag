@@ -74,7 +74,7 @@ and tool name `airbag`.
 - No human yes: the repo is local; nothing is pushed, posted, signed or submitted.
 - No demo video yet. The human records it from `docs/DEMO_SCRIPT.md`.
 
-**02:30 — Current state.** `pnpm lint`, `pnpm typecheck`, `pnpm test` (56), `pnpm build`, and
+**02:30 — Current state.** `pnpm lint`, `pnpm typecheck`, `pnpm test` (57), `pnpm build`, and
 `pnpm demo --smoke` pass. Dummy: F, 21/21 crashed, $10,907.04 simulated loss, 8 false claims.
 Seatbelt: A, 21/21 survived, $1.00 modeled refund fee. Next: final screenshots, git init/tags,
 clean-clone test, README claim audit, then the human’s five steps.

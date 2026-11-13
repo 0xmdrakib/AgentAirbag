@@ -19,6 +19,7 @@ const PICK_LABELS: { id: Pick; title: string; sub: string; disabled?: boolean }[
 export function RunnerPage() {
   const { reports, runAgent, running, progress, liveResults } = useAppState();
   const [pick, setPick] = useState<Pick>('naive');
+  const [seed, setSeed] = useState(reports.naive.suite.seed);
   const [finished, setFinished] = useState<AgentId | null>(null);
   const reportRef = useRef<HTMLAnchorElement>(null);
   const started = useRef(false);
@@ -39,7 +40,7 @@ export function RunnerPage() {
   const crash = async () => {
     if (pick !== 'naive' && pick !== 'hardened') return;
     setFinished(null);
-    const report = await runAgent(pick);
+    const report = await runAgent(pick, seed);
     setFinished(pick);
     window.setTimeout(() => reportRef.current?.focus({ preventScroll: true }), 50);
     return report;
@@ -126,10 +127,17 @@ export function RunnerPage() {
             </div>
           )}
 
-          <div className="run-meta">
+          <label className="run-meta run-seed">
             <span className="mono">seed</span>
-            <span className="mono">airbag-demo-2026</span>
-          </div>
+            <input
+              className="seed-input mono"
+              value={seed}
+              onChange={(event) => setSeed(event.target.value)}
+              aria-label="Suite seed"
+              spellCheck={false}
+              autoComplete="off"
+            />
+          </label>
           <div className="run-meta">
             <span className="mono">clock</span>
             <span className="mono">2026-11-01T00:00:00Z</span>

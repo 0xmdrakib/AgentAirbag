@@ -42,6 +42,8 @@ These are manual tools, not part of `pnpm verify`:
   YAML drawer; fails loudly if the page throws.
 - `pnpm tsx scripts/share-check.ts` — copies a share link, opens it, toggles Dummy → Seatbelt and
   runs the suite through the `?auto=naive` route.
+- `pnpm tsx scripts/seed-check.ts` — types a custom seed, crashes the suite, and checks that the
+  generated report card carries that seed.
 
 All three use the installed Chrome via Playwright-core and a preview server on a local port.
 

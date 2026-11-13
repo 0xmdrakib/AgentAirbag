@@ -21,7 +21,7 @@ interface AppStateValue {
   running: AgentId | null;
   progress: { done: number; total: number; last?: ScenarioResult };
   liveResults: Partial<Record<AgentId, ScenarioResult[]>>;
-  runAgent: (agent: AgentId) => Promise<RunReport>;
+  runAgent: (agent: AgentId, seed?: string) => Promise<RunReport>;
   sharedReport: RunReport | null;
   shareError: boolean;
   setShared: (report: RunReport | null, error?: boolean) => void;
@@ -55,7 +55,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const runAgent = useCallback(
-    async (agentId: AgentId) => {
+    async (agentId: AgentId, seed?: string) => {
+      const effectiveSeed = seed?.trim() || generated.seed;
       setRunning(agentId);
       setActiveAgent(agentId);
       setLiveResults((previous) => ({ ...previous, [agentId]: [] }));
@@ -64,7 +65,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       const report = await runSuite({
         agent: agentId === 'naive' ? naiveAgent() : hardenedAgent(),
         scenarios: SCENARIOS,
-        seed: generated.seed,
+        seed: effectiveSeed,
         onResult: (result) => {
           results.push(result);
           setProgress({ done: results.length, total: SCENARIOS.length, last: result });

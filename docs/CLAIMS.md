@@ -8,7 +8,7 @@ is not here, it is not a shipped claim.
 | 21 crashes are implemented | `pnpm build:scenarios` | `Built 21 scenarios (12 P0, 9 P1)` |
 | Dummy crashes on all 21 | `pnpm airbag run --agent naive --summary` | `0 survived · 21 crashed` |
 | Seatbelt survives all 21 | `pnpm airbag run --agent hardened --summary` | `21 survived · 0 crashed`; grade A |
-| The exact naive crash set is asserted | `pnpm test` | 56 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
+| The exact naive crash set is asserted | `pnpm test` | 57 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
 | The same seed produces a byte-identical report | `pnpm test` | `is deterministic: the same seed produces the same report hash` passes |
 | The live client is read-only | `pnpm test` | `read-only live client` suite passes |
 | Every scenario YAML validates and has a story + fix | `pnpm test` | `scenario contract` suite passes |
@@ -24,7 +24,7 @@ is not here, it is not a shipped claim.
 | The report card is generated from ledger truth | `pnpm build:fixtures` | `fixtures/report.naive.json` and `report.hardened.json`; violations cite event indexes |
 | Dummy’s simulated loss is $10,907.04 | `pnpm build:fixtures` or README report card | `F · 21 crashed · $10907.04 simulated loss` |
 | Seatbelt’s simulated loss is $1.00 (modeled refund fee) | `pnpm build:fixtures` | `A · 0 crashed · $1.00 simulated loss` |
-| The token/price snapshot is from a live read-only call | `fixtures/tokens.snapshot.json` | 58,875 bytes; `priceUpdatedAt` 2026-11-13T19:14:30.900Z |
+| The token/price snapshot is from a live read-only call | `fixtures/tokens.snapshot.json` | 58,875 bytes; `priceUpdatedAt` 2026-11-13T19:15:01.290Z |
 | The dry quote snapshot is from a live read-only call | `fixtures/quotes.snapshot.json` | `quote.amountOut` present; `dry: true` in the echo |
 | No real swap is executed | code + tests | The only live calls are GET tokens and POST quote with `dry: true`; the read-only test scans the source |
 | The hosted static app needs no backend | `pnpm build` | `apps/web/dist` contains only static assets |

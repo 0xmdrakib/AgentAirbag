@@ -19,7 +19,7 @@ leave a retry buffer.
 
 ## Before the human steps
 
-1. `pnpm verify` passes: lint, typecheck, 56 tests, build, demo smoke.
+1. `pnpm verify` passes: lint, typecheck, 57 tests, build, demo smoke.
 2. `pnpm demo` from a clean checkout prints the report URL within 60 seconds.
 3. Run the clean-clone test:
    ```bash
