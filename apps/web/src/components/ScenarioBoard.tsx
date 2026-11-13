@@ -1,6 +1,6 @@
 import type { Law, ScenarioResult } from '@airbag/core';
 import { cx } from '../lib/format';
-import { LAW_NAMES, SCENARIO_BY_ID, scenariosForLaw } from '../lib/report';
+import { LAW_NAMES, scenariosForLaw } from '../lib/report';
 import { CheckIcon, XIcon, AlertIcon } from './Icons';
 
 export function ScenarioCells({
@@ -61,15 +61,4 @@ export function ScenarioCells({
       ))}
     </div>
   );
-}
-
-export function orderedLawScenarios(): { law: Law; scenarios: ReturnType<typeof scenariosForLaw> }[] {
-  return ([1, 2, 3, 4, 5, 6, 7] as Law[]).map((law) => ({
-    law,
-    scenarios: scenariosForLaw(law),
-  }));
-}
-
-export function scenarioDefinition(id: string) {
-  return SCENARIO_BY_ID.get(id);
 }

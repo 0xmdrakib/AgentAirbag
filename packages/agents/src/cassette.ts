@@ -4,7 +4,6 @@ import {
   canonicalize,
   sha256Hex,
   type AgentAdapter,
-  type AgentContext,
   type RunReport,
   runSuite,
   SCENARIOS,
@@ -105,5 +104,3 @@ export function cassetteRun(
     seed,
   });
 }
-
-void ({} as AgentContext);

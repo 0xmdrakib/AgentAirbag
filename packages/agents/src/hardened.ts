@@ -1,5 +1,4 @@
 import {
-  USER_WALLET,
   looksLikeInjection,
   toSmallest,
   type AgentAdapter,
@@ -400,5 +399,3 @@ async function abort(ctx: AgentContext, message: string): Promise<void> {
   ctx.message(message);
   await ctx.report({ outcome: 'aborted', message });
 }
-
-void USER_WALLET;

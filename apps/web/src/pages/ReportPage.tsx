@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Law, RunReport, ScenarioResult, Verdict } from '@airbag/core';
+import type { Law, RunReport, ScenarioResult } from '@airbag/core';
 import { useAppState } from '../state/AppState';
 import {
   LAW_NAMES,
@@ -11,7 +11,6 @@ import { encodeReport } from '../lib/share';
 import {
   Button,
   Chip,
-  CopyButton,
   CopyField,
   EmptyState,
   ErrorState,

@@ -7,7 +7,6 @@ import {
   type StatusResponseBody,
 } from '@airbag/core';
 import {
-  amountInUsdOf,
   errorText,
   fetchTokens,
   findToken,
@@ -167,9 +166,6 @@ export function naiveAgent(options: { followsInlineInstructions?: boolean } = {}
           message: `Stopped: ${error instanceof Error ? error.message : String(error)}`,
         });
       }
-
-      void amountInUsdOf;
-      void isQuoteResponse;
     },
   };
 }

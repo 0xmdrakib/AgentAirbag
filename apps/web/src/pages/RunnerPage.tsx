@@ -9,7 +9,7 @@ import { cx } from '../lib/format';
 
 type Pick = AgentId | 'llm' | 'byo';
 
-const PICK_LABELS: { id: Pick; title: string; sub: string; disabled?: boolean }[] = [
+const PICK_LABELS: { id: Pick; title: string; sub: string }[] = [
   { id: 'naive', title: 'Dummy', sub: 'No guards. Crashes on purpose.' },
   { id: 'hardened', title: 'Seatbelt', sub: 'Airbag Guard. Survives.' },
   { id: 'llm', title: 'LLM replay', sub: 'Needs a recorded cassette.' },

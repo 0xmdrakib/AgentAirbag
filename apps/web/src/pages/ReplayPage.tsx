@@ -1,13 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { ScenarioResult, Verdict } from '@airbag/core';
+import { useEffect, useMemo, useState } from 'react';
+import type { ScenarioResult } from '@airbag/core';
 import { useAppState } from '../state/AppState';
 import {
   LAW_NAMES,
-  LAW_NUMBERS,
   SCENARIOS,
   SCENARIO_BY_ID,
   scenariosForLaw,
-  verdictWord,
 } from '../lib/report';
 import {
   ledgerRows,
@@ -40,7 +38,6 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
   const [speed, setSpeed] = useState(1);
   const [pane, setPane] = useState<Pane>('trace');
   const [impact, setImpact] = useState(false);
-  const previousIndex = useRef(0);
 
   const scenario = scenarioId ? SCENARIO_BY_ID.get(scenarioId) : undefined;
   const naive = useMemo(
@@ -61,7 +58,6 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
   useEffect(() => {
     setIndex(0);
     setPlaying(false);
-    previousIndex.current = 0;
   }, [scenarioId, agent]);
 
   useEffect(() => {
@@ -82,10 +78,8 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
     if (current && (current.kind === 'ledger.lost' || (current.kind === 'ledger.transfer' && current.lossUsd))) {
       setImpact(true);
       const timer = window.setTimeout(() => setImpact(false), 700);
-      previousIndex.current = index;
       return () => window.clearTimeout(timer);
     }
-    previousIndex.current = index;
     return undefined;
   }, [index, current]);
 
@@ -442,14 +436,3 @@ function stepFor(status: string | undefined, result: ScenarioResult, index: numb
   }
   return 0;
 }
-
-function iconForVerdict(verdict: Verdict) {
-  if (verdict === 'PASS') return <CheckIcon size={14} />;
-  if (verdict === 'WARN') return <AlertIcon size={14} />;
-  return <XIcon size={14} />;
-}
-
-void iconForVerdict;
-void verdictWord;
-void LAW_NUMBERS;
-void formatUsd;

@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   SCENARIOS,
@@ -98,5 +98,3 @@ function renderScenarioDocs(): string {
   }
   return `${lines.join('\n')}\n`;
 }
-
-void readFileSync;

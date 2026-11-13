@@ -1,9 +1,8 @@
 import { Command } from 'commander';
-import { mkdirSync, readFileSync, writeFileSync, existsSync, appendFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   SCENARIOS,
-  VIRTUAL_EPOCH_ISO,
   runSuite,
   runReportSchema,
   type RunReport,
@@ -181,6 +180,3 @@ if (process.argv.length <= 2) {
 } else {
   await program.parseAsync(process.argv);
 }
-
-void readFileSync;
-void VIRTUAL_EPOCH_ISO;
