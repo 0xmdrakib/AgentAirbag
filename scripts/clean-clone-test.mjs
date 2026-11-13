@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -10,12 +10,11 @@ const repo = join(target, 'repo');
 console.log(`Clean clone: ${source} -> ${repo}`);
 execFileSync('git', ['clone', '--depth', '1', source, repo], { stdio: 'inherit' });
 
-const run = (command, args) => {
-  console.log(`\n$ ${command} ${args.join(' ')}`);
-  const executable = process.platform === 'win32' && command === 'pnpm' ? 'pnpm.cmd' : command;
-  execFileSync(executable, args, { cwd: repo, stdio: 'inherit' });
+const run = (command) => {
+  console.log(`\n$ ${command}`);
+  execSync(command, { cwd: repo, stdio: 'inherit' });
 };
 
-run('pnpm', ['install', '--frozen-lockfile']);
-run('pnpm', ['demo', '--smoke']);
+run('pnpm install --frozen-lockfile');
+run('pnpm demo --smoke');
 console.log(`\nClean-clone test passed in ${repo}`);
