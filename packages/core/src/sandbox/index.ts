@@ -190,6 +190,15 @@ export class Sandbox {
 
     this.apiCalls += 1;
     this.clock.advance(REQUEST_COST_MS);
+    const requestedAdvance =
+      request.headers?.['x-airbag-advance-ms'] ?? request.headers?.['x-crumple-advance-ms'];
+    if (requestedAdvance) {
+      const ms = Number(requestedAdvance);
+      if (Number.isFinite(ms) && ms > 0 && ms <= 30 * 60 * 1000) {
+        this.clock.advance(ms);
+        this.emit({ kind: 'clock.advance', ms, reason: 'client header' });
+      }
+    }
     this.emit({ kind: 'api.request', path, method, body });
 
     const requestFault = this.faults.run({

@@ -102,6 +102,7 @@ export async function runScenario(options: RunScenarioOptions): Promise<Scenario
   const context: AgentContext = {
     api,
     baseUrl: `http://sandbox.local/r/${scenario.id}`,
+    sandbox,
     wallet: {
       async transfer(to, assetId, amount, memo) {
         const response = await api(`${context.baseUrl}/sandbox/v0/wallet/transfer`, {

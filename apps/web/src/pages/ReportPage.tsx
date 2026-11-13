@@ -33,7 +33,7 @@ import {
 import { cx } from '../lib/format';
 
 export function ReportPage() {
-  const { activeReport, reports, shareError, sharedReport, runAgent, showToast, running, setActiveAgent, setShared } =
+  const { activeReport, reports, shareError, sharedReport, showToast, running, setActiveAgent, setShared } =
     useAppState();
   const report = activeReport;
   const [openLaw, setOpenLaw] = useState<Law | null>(null);
@@ -398,9 +398,11 @@ export function ReportPage() {
             variant="ghost"
             disabled={running !== null}
             onClick={() => {
-              const id = report.agent.kind === 'scripted' && report.agent.id === 'hardened' ? 'hardened' : 'naive';
-              void runAgent(id).then(() => showToast('Suite finished. Fresh report card.'));
-              window.location.hash = '#/run';
+              const id =
+                report.agent.kind === 'scripted' && report.agent.id === 'hardened'
+                  ? 'hardened'
+                  : 'naive';
+              window.location.hash = `#/run?auto=${id}`;
             }}
           >
             Run again
@@ -417,6 +419,7 @@ function FailureCard({ result }: { result: ScenarioResult }) {
     <article className="failure-card">
       <div className="failure-card-head">
         <span className="failure-law mono">LAW {result.law}</span>
+        {result.modeled && <span className="modeled-tag">modeled</span>}
         <span className="failure-loss mono">{formatUsd(result.lossUsd)} lost</span>
       </div>
       <h3 className="h3">{result.title}</h3>

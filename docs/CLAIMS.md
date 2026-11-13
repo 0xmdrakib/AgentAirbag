@@ -18,7 +18,9 @@ is not here, it is not a shipped claim.
 | The attack demo blocks the injected transfer | `pnpm demo:attack` | Unguarded loss `$9995.46`; guarded `PASS · $0.00`; `TAINTED_VALUE` in the log |
 | The demo runs offline after install | `pnpm demo` (disconnect the network after `pnpm install`) | Report card at the printed URL; no API calls |
 | The demo smoke passes | `pnpm demo --smoke` | `Demo smoke passed.` |
-| The whole verification passes | `pnpm verify` | Lint, typecheck, tests, build, demo smoke exit 0 |
+| The whole verification passes | `pnpm verify` | Lint, typecheck, tests, the HTTP sandbox smoke, the process adapter smoke, build, demo smoke exit 0 |
+| A bring-your-own agent can use the HTTP sandbox | `pnpm test:http` | Tokens, quote, transfer, submit, SUCCESS with a destination hash, report accepted |
+| A bring-your-own process runs through the adapter | `pnpm test:process` | `Process agent: verdict PASS, loss $0.00, reported success` |
 | The report card is generated from ledger truth | `pnpm build:fixtures` | `fixtures/report.naive.json` and `report.hardened.json`; violations cite event indexes |
 | Dummy’s simulated loss is $10,907.04 | `pnpm build:fixtures` or README report card | `F · 21 crashed · $10907.04 simulated loss` |
 | Seatbelt’s simulated loss is $1.00 (modeled refund fee) | `pnpm build:fixtures` | `A · 0 crashed · $1.00 simulated loss` |

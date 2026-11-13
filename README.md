@@ -41,7 +41,7 @@ The browser runs the whole scripted suite itself.
 | Open `#/scenarios` and press **View YAML** | All 21 crashes as data, with the story, fault, judge rule and fix key |
 | Run `pnpm airbag run --agent hardened --summary` | `score 100 · grade A · 21 survived · 0 crashed` |
 | Run `pnpm demo:attack` | The unguarded Dummy pays an injected address ($9,995.46 simulated); the guarded agent blocks with `TAINTED_VALUE` and loses $0 |
-| Run `pnpm verify` | Lint, typecheck, 56 tests, production build and the demo smoke test |
+| Run `pnpm verify` | Lint, typecheck, 56 tests, the HTTP and process sandbox smokes, production build and the demo smoke test |
 
 The static build is in `apps/web/dist`. It is ready for Vercel, Cloudflare Pages or GitHub Pages,
 but **no hosting account was available in this build window, so there is no hosted URL yet**. The
@@ -170,6 +170,18 @@ A bring-your-own agent must:
 1. take its deposit path through `POST /sandbox/v0/wallet/transfer`, so the fake ledger moves;
 2. trust the server’s virtual `timestamp` and `Date` header, never its local clock;
 3. post a final report to `/sandbox/v0/report`.
+
+A bring-your-own agent can advance the virtual clock without sleeping by sending
+`x-airbag-advance-ms: 60000`. The older `x-crumple-advance-ms` spelling is accepted as an alias for
+compatibility with the original prompt; new agents should use the Airbag name.
+
+A complete minimal target is [`examples/http-agent.mjs`](examples/http-agent.mjs). The process adapter
+is smoke-tested with it:
+
+```bash
+pnpm test:process
+# Process agent: verdict PASS, loss $0.00, reported success
+```
 
 To reproduce the fresh-clone test:
 

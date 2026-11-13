@@ -319,9 +319,19 @@ export interface RunReport {
   signature?: { alg: 'ed25519'; publicKey: string; sig: string };
 }
 
+export interface SandboxHandle {
+  handle(request: {
+    method: string;
+    path: string;
+    headers?: Record<string, string>;
+    body?: unknown;
+  }): Promise<{ status: number; body: unknown; headers?: Record<string, string> }>;
+}
+
 export interface AgentContext {
   api: typeof fetch;
   baseUrl: string;
+  sandbox?: SandboxHandle;
   wallet: {
     transfer(
       to: string,

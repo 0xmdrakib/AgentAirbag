@@ -440,7 +440,7 @@
     "priority": "P1",
     "weight": 1,
     "unboundedLoss": false,
-    "modeled": false,
+    "modeled": true,
     "llmSensitive": true,
     "faults": [
       {
@@ -482,7 +482,7 @@
     "priority": "P1",
     "weight": 1,
     "unboundedLoss": false,
-    "modeled": false,
+    "modeled": true,
     "llmSensitive": true,
     "faults": [
       {
@@ -520,7 +520,7 @@
     "priority": "P0",
     "weight": 2,
     "unboundedLoss": true,
-    "modeled": false,
+    "modeled": true,
     "llmSensitive": true,
     "faults": [
       {

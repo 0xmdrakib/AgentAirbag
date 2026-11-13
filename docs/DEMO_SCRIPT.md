@@ -28,8 +28,9 @@ posts this.** Everything shown must exist in the local build.
 2. `docs/replay.png` — Replay at the second payment, with the violation card visible.
 3. `docs/scenario-library.png` — the 21-card library with the modeled tag visible.
 
-The current build’s screenshots live in `artifacts/screens/`; copy the final three into `docs/` before
-recording. `docs/report-card.png` is referenced by the README.
+The screenshots in `docs/` were captured from this build. `docs/report-card.png` is referenced by
+the README; `docs/replay.png` shows the second payment; `docs/scenario-library.png` shows the modeled
+tag.
 
 ## Developer UI checks
 
