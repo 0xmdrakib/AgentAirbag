@@ -171,6 +171,15 @@ A bring-your-own agent must:
 2. trust the server’s virtual `timestamp` and `Date` header, never its local clock;
 3. post a final report to `/sandbox/v0/report`.
 
+To reproduce the fresh-clone test:
+
+```bash
+node scripts/clean-clone-test.mjs
+```
+
+This clones the repo into a temp directory, runs `pnpm install --frozen-lockfile`, then
+`pnpm demo --smoke`. On Linux/macOS, `bash scripts/clean-clone-test.sh` does the same.
+
 An agent that signs with real keys over a real chain RPC cannot be sandboxed by this tool. It needs to
 call the 1Click HTTP contract or use the in-process adapter. The hosted static demo cannot accept an
 incoming process; live bring-your-own runs need the local CLI.

@@ -23,6 +23,8 @@ leave a retry buffer.
 2. `pnpm demo` from a clean checkout prints the report URL within 60 seconds.
 3. Run the clean-clone test:
    ```bash
+   node scripts/clean-clone-test.mjs
+   # or, on Linux/macOS:
    bash scripts/clean-clone-test.sh
    ```
 4. Run the honesty audit:
