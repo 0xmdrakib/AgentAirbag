@@ -305,7 +305,7 @@ window. Add the live URL here after deploying; do not claim one before it exists
   decisions against a fixed world.
 - **No accounts, database or required backend.**
 - **No report signature** (the P2 NEAR ed25519 signing is not shipped).
-- **Bundle size:** the initial JavaScript is **196 KB gzipped**, under the 250 KB gzip target. Vite
+- **Bundle size:** the initial JavaScript is **198 KB gzipped**, under the 250 KB gzip target. Vite
   warns about the uncompressed 1.25 MB because the two report fixtures carry the full EventLogs;
   that size is why the hosted demo stays a static bundle with no backend.
 

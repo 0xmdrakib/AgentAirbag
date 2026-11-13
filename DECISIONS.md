@@ -116,6 +116,27 @@ open. Reason: CI and headless machines. `pnpm demo --smoke` never opens a browse
 download. Reason: no extra browser download; Chrome/Edge are present on the build machine. This is a
 development tool, not a runtime dependency.
 
+## UI design system v2
+
+**Rebuild the visual system after the first screenshot review.** Alternatives: patch the v1 CSS.
+Reason: v1 shipped 9–11px text, a flat grey-on-black palette, a radar that was empty for an F grade,
+clipped radar labels and a broken Connect rules box. Patching would not fix a type scale. v2 sets a
+12px floor, a 16px body, a cool blue-black palette with a warm signal glow, layered surfaces and a
+real light theme. Red still means FAIL, green PASS, yellow the brand only.
+
+**Radar labels are HTML, not SVG text.** Alternatives: SVG `<text>`. Reason: SVG text shrinks with
+the viewBox and falls below 12px on phones. The radar also overlays the other agent (Dummy vs
+Seatbelt) so an F grade is not an empty dot. Below 480px of chart width it shows codes and scores only.
+
+**A light theme ships (it was P2).** Alternatives: dark only. Reason: every colour is a token, so the
+second theme cost little and judges open links in light-mode browsers. Dark stays the default; the
+choice persists in `localStorage` and is applied before first paint.
+
+**Responsive is enforced by a script, not by eye.** `pnpm ui:audit` opens six routes at 360, 390,
+768, 1024, 1280, 1440 and 1920 px in both themes and fails on horizontal overflow, text under 12px,
+text past the viewport, small tap targets and console errors. It also tests the mobile menu and the
+theme toggle. It is a manual tool (needs a preview server and a local Chrome), not part of `pnpm verify`.
+
 ## Release and limits
 
 **No hosted deploy, push, post, signature or submission.** Alternatives: none that the agent may do

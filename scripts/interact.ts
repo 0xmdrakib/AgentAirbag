@@ -37,6 +37,11 @@ if (hasReportLink) {
 await page.goto(`${base}#/replay/timeout-after-transfer`, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: /Skip to the crash/ }).click();
 await page.waitForTimeout(400);
+await page.evaluate(() => {
+  (document.activeElement as HTMLElement | null)?.blur();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+});
+await page.waitForTimeout(400);
 await page.screenshot({ path: `${out}/replay-crash.png`, fullPage: true });
 
 // Scenario drawer.

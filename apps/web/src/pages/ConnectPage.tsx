@@ -100,19 +100,26 @@ export function ConnectPage() {
           </div>
           <ol className="limits-list">
             <li>
-              <span className="mono">01</span> Take the deposit path through{' '}
-              <span className="mono">POST /sandbox/v0/wallet/transfer</span>. That is what moves
-              the fake ledger.
+              <span className="limits-num mono">01</span>
+              <p>
+                Take the deposit path through{' '}
+                <code className="mono">POST /sandbox/v0/wallet/transfer</code>. That is what moves
+                the fake ledger.
+              </p>
             </li>
             <li>
-              <span className="mono">02</span> Trust the server’s virtual time. Read the{' '}
-              <span className="mono">timestamp</span> and <span className="mono">Date</span> header,
-              never your local clock.
+              <span className="limits-num mono">02</span>
+              <p>
+                Trust the server’s virtual time. Read the <code className="mono">timestamp</code>{' '}
+                and <code className="mono">Date</code> header, never your local clock.
+              </p>
             </li>
             <li>
-              <span className="mono">03</span> Post a final claim to{' '}
-              <span className="mono">POST /sandbox/v0/report</span>. The judge ignores it and reads
-              the ledger; the report is only a claim to compare.
+              <span className="limits-num mono">03</span>
+              <p>
+                Post a final claim to <code className="mono">POST /sandbox/v0/report</code>. The
+                judge ignores it and reads the ledger; the report is only a claim to compare.
+              </p>
             </li>
           </ol>
           <p className="limits-note">

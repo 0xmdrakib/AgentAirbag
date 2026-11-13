@@ -99,3 +99,8 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 - **Demo video:** record 60–90s from `docs/DEMO_SCRIPT.md`.
 - **Publish/submit:** make the repo public, push, post the X thread, and submit the form only after
   the human’s explicit yes. The payload is in `docs/SUBMISSION.md`.
+
+## 2026-11-14 (UI pass)
+
+**04:35 UTC - UI rebuilt after review.** The first UI had 9-11px text, a flat grey palette, an empty radar on an F grade, clipped radar labels and an overlapping Connect rules box. Rebuilt the design system (12px type floor, blue-black palette, layered surfaces, dark and light themes), a mobile menu, a Dummy-vs-Seatbelt radar overlay, a duel panel on the Lab, and a card layout for the compare table on phones. Added pnpm ui:audit: 6 routes x 7 widths (360-1920) x 2 themes, no overflow, no text under 12px, no console errors; mobile menu and theme toggle pass.
+

@@ -4,6 +4,7 @@ import { useAppState } from '../state/AppState';
 import {
   LAW_NAMES,
   SCENARIOS,
+  gradeTone,
   topFailures,
 } from '../lib/report';
 import { formatUsd, plural } from '../lib/format';
@@ -172,7 +173,20 @@ export function ReportPage() {
             <p className="eyebrow">Safety shape</p>
             <span className="mono muted">seven laws · 0 to 100</span>
           </div>
-          <SafetyRadar laws={report.laws} />
+          <SafetyRadar
+            laws={report.laws}
+            label={report.agent.label}
+            tone={gradeTone(report.overall.grade)}
+            overlay={
+              sharedReport || (report.agent.id !== 'naive' && report.agent.id !== 'hardened')
+                ? undefined
+                : {
+                    label: (report.agent.id === 'hardened' ? reports.naive : reports.hardened).agent
+                      .label,
+                    laws: (report.agent.id === 'hardened' ? reports.naive : reports.hardened).laws,
+                  }
+            }
+          />
         </div>
         <div className="report-law-bars">
           <div className="panel-head">
@@ -191,6 +205,15 @@ export function ReportPage() {
                 >
                   <span className="law-bar-num mono">0{law.law}</span>
                   <span className="law-bar-name">{LAW_NAMES[law.law as Law]}</span>
+                  <span className="law-pips" aria-label={`${law.scenarios.length} crashes`}>
+                    {law.scenarios.map((scenario) => (
+                      <i
+                        key={scenario.id}
+                        className={cx('law-pip', `pip-${scenario.verdict.toLowerCase()}`)}
+                        title={`${scenario.title}: ${scenario.verdict}`}
+                      />
+                    ))}
+                  </span>
                   <span className="law-bar-track" aria-hidden="true">
                     <span
                       className={cx(
@@ -283,20 +306,20 @@ export function ReportPage() {
             <tbody>
               {[reports.naive, reports.hardened].map((row) => (
                 <tr key={row.agent.id} className={row.hash === report.hash ? 'compare-active' : undefined}>
-                  <td>
+                  <td className="compare-cell-agent">
                     <span className="compare-agent">{row.agent.label}</span>
                     <span className="compare-kind mono">{row.agent.kind}</span>
                   </td>
-                  <td>
+                  <td data-label="Grade">
                     <span className={cx('compare-grade', `grade-${row.overall.grade}`)}>
                       {row.overall.grade}
                     </span>
                   </td>
-                  <td className="mono">{row.overall.score}</td>
-                  <td className="mono">{row.overall.passed}/{row.suite.scenarioCount}</td>
-                  <td className="mono">{formatUsd(row.overall.simulatedLossUsd)}</td>
-                  <td className="mono">{row.overall.falseClaims}</td>
-                  <td>
+                  <td className="mono" data-label="Score">{row.overall.score}</td>
+                  <td className="mono" data-label="Survived">{row.overall.passed}/{row.suite.scenarioCount}</td>
+                  <td className="mono" data-label="Simulated loss">{formatUsd(row.overall.simulatedLossUsd)}</td>
+                  <td className="mono" data-label="False claims">{row.overall.falseClaims}</td>
+                  <td className="compare-cell-action">
                     <button
                       type="button"
                       className="compare-link"

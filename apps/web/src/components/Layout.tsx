@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { cx } from '../lib/format';
 import { MarkerLogo } from './MarkerLogo';
 import { SimBanner } from './Primitives';
+import { MenuIcon, MoonIcon, SunIcon, XIcon } from './Icons';
 
 const NAV = [
   { href: '#/', label: 'Lab', path: '/' },
@@ -11,13 +12,52 @@ const NAV = [
   { href: '#/connect', label: 'Connect', path: '/connect' },
 ];
 
-export function Layout({
-  route,
-  children,
-}: {
-  route: string;
-  children: ReactNode;
-}) {
+type Theme = 'dark' | 'light';
+
+function currentTheme(): Theme {
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+}
+
+function ThemeToggle() {
+  const [theme, setTheme] = useState<Theme>(currentTheme);
+  const next: Theme = theme === 'dark' ? 'light' : 'dark';
+  return (
+    <button
+      type="button"
+      className="icon-button"
+      aria-label={`Switch to ${next} theme`}
+      title={`Switch to ${next} theme`}
+      onClick={() => {
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem('airbag-theme', next);
+        } catch {
+          // Storage can be blocked; the theme still applies for this visit.
+        }
+        setTheme(next);
+      }}
+    >
+      {theme === 'dark' ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+    </button>
+  );
+}
+
+export function Layout({ route, children }: { route: string; children: ReactNode }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [route]);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
+
   return (
     <div className="app-shell">
       <a href="#main" className="skip-link">
@@ -26,10 +66,14 @@ export function Layout({
       <header className="app-header">
         <div className="container header-inner">
           <a href="#/" className="brand" aria-label="Airbag home">
-            <MarkerLogo size={30} />
+            <MarkerLogo size={32} />
             <span className="wordmark">airbag</span>
           </a>
-          <nav className="nav" aria-label="Primary">
+          <nav
+            className={cx('nav', menuOpen && 'nav-open')}
+            aria-label="Primary"
+            id="primary-nav"
+          >
             {NAV.map((item) => (
               <a
                 key={item.href}
@@ -43,6 +87,17 @@ export function Layout({
           </nav>
           <div className="header-right">
             <SimBanner compact />
+            <ThemeToggle />
+            <button
+              type="button"
+              className="icon-button menu-button"
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
+              aria-controls="primary-nav"
+              onClick={() => setMenuOpen((value) => !value)}
+            >
+              {menuOpen ? <XIcon size={20} /> : <MenuIcon size={20} />}
+            </button>
           </div>
         </div>
       </header>
@@ -50,19 +105,34 @@ export function Layout({
         {children}
       </main>
       <footer className="app-footer">
-        <div className="container footer-inner">
-          <div className="footer-brand">
-            <MarkerLogo size={24} />
-            <span className="wordmark wordmark-sm">airbag</span>
+        <div className="container footer-grid">
+          <div className="footer-brand-col">
+            <div className="footer-brand">
+              <MarkerLogo size={28} />
+              <span className="wordmark">airbag</span>
+            </div>
+            <p className="footer-note">
+              Crash-test dummies for AI agents that hold money. A fake NEAR Intents where agents can
+              fail safely.
+            </p>
           </div>
-          <p className="footer-note">
-            Crash-test dummies for AI agents that hold money. Everything on this site is simulated.
-          </p>
-          <div className="footer-links">
+          <div className="footer-col">
+            <p className="footer-title">Product</p>
+            <a href="#/run">Suite runner</a>
+            <a href="#/report">Report card</a>
             <a href="#/scenarios">21 crashes</a>
             <a href="#/connect">Bring your own agent</a>
-            <span>Built at NEAR HACKATHON</span>
           </div>
+          <div className="footer-col">
+            <p className="footer-title">Honesty</p>
+            <span>Everything here is simulated</span>
+            <span>No real funds move</span>
+            <span>Modeled behavior is labelled</span>
+          </div>
+        </div>
+        <div className="container footer-bottom">
+          <span>Built at NEAR HACKATHON</span>
+          <span className="mono">MIT licensed</span>
         </div>
       </footer>
     </div>

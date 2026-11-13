@@ -1,42 +1,32 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { RunReport } from '@airbag/core';
-import { formatAmount, formatUsd } from '../lib/format';
+import { formatAmount, formatUsd, cx } from '../lib/format';
 import { resultById, tokenDecimals, tokenSymbol } from '../lib/report';
-import { cx } from '../lib/format';
 import { MarkerLogo } from './MarkerLogo';
-import { Chip } from './Primitives';
+import { CheckIcon, XIcon } from './Icons';
 
 const INITIAL_USD = 10000;
+const LOOP_MS = 8200;
+const PHASE_LABELS = ['Pay', 'Land', 'Timeout', 'Retry', 'Verdict'];
 
 export function HeroCrash({ naive, hardened }: { naive: RunReport; hardened: RunReport }) {
   const data = useMemo(() => {
     const result = resultById(naive, 'timeout-after-transfer');
     const transfers =
-      result?.events.filter(
-        (event) => event.kind === 'ledger.transfer' && event.funding,
-      ) ?? [];
+      result?.events.filter((event) => event.kind === 'ledger.transfer' && event.funding) ?? [];
     const first = transfers[0];
-    const second = transfers[1];
     const assetId =
       first && first.kind === 'ledger.transfer'
         ? first.assetId
         : 'nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near';
     const decimals = tokenDecimals(assetId);
-    const symbol = tokenSymbol(assetId);
-    const amount =
-      first && first.kind === 'ledger.transfer' ? BigInt(first.amount) : 100_000_000n;
-    const loss =
-      result?.lossUsd ??
-      ((Number(amount) / 10 ** decimals) * 1).toFixed(2);
-    const survive = resultById(hardened, 'timeout-after-transfer');
+    const amount = first && first.kind === 'ledger.transfer' ? BigInt(first.amount) : 100_000_000n;
     return {
-      result,
       assetId,
       decimals,
-      symbol,
+      symbol: tokenSymbol(assetId),
       amount,
-      loss,
-      survived: survive?.verdict === 'PASS',
+      loss: result?.lossUsd ?? '0.00',
     };
   }, [naive, hardened]);
 
@@ -46,115 +36,124 @@ export function HeroCrash({ naive, hardened }: { naive: RunReport; hardened: Run
   useEffect(() => {
     if (reduced) {
       setElapsed(6500);
-      return;
+      return undefined;
     }
     const start = performance.now();
     let frame = 0;
     const tick = (now: number) => {
-      setElapsed((now - start) % 8200);
+      setElapsed((now - start) % LOOP_MS);
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
   }, [reduced]);
 
-  const phase = reduced
-    ? 6
-    : elapsed < 1400
-      ? 0
-      : elapsed < 3000
-        ? 1
-        : elapsed < 4300
-          ? 2
-          : elapsed < 6000
-            ? 3
-            : 4;
-  const seatbelt = phase >= 4;
-  const paidTwice = phase >= 3;
-  const paidOnce = phase >= 1;
+  // 0 pay · 1 landed · 2 timeout · 3 paid again · 4 seatbelt verdict
+  const phase =
+    elapsed < 1400 ? 0 : elapsed < 3000 ? 1 : elapsed < 4300 ? 2 : elapsed < 6000 ? 3 : 4;
+  const seatbelt = phase === 4;
+  const paidTwice = phase === 3;
   const amountHuman = Number(data.amount) / 10 ** data.decimals;
-  const balance = seatbelt
-    ? INITIAL_USD - amountHuman
-    : paidTwice
-      ? INITIAL_USD - amountHuman * 2
-      : paidOnce
-        ? INITIAL_USD - amountHuman
-        : INITIAL_USD;
-  const caption =
-    phase === 0
-      ? 'An AI agent swaps 100 USDC.'
-      : phase === 1
-        ? 'The transfer lands. The confirmation call is next.'
-        : phase === 2
-          ? 'The confirmation call times out.'
-          : phase === 3
-            ? 'It pays again.'
-            : 'Seatbelt checks the status first. Same crash, no loss.';
+  const payments = phase === 0 ? 0 : phase === 3 ? 2 : 1;
+  const balance = INITIAL_USD - amountHuman * payments;
+  const caption = [
+    'An AI agent swaps 100 USDC.',
+    'The transfer lands.',
+    'The confirmation call times out.',
+    'It pays again.',
+    'Seatbelt checks the status first. Same crash, no loss.',
+  ][phase];
+  const tone = seatbelt ? 'pass' : paidTwice ? 'fail' : 'neutral';
+  const fmt = (value: number) =>
+    new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+      value,
+    );
+  const unit = formatAmount(data.amount.toString(), data.decimals);
 
   return (
-    <div className={cx('hero-crash', seatbelt && 'hero-crash-safe', paidTwice && !seatbelt && 'hero-crash-impact')}>
+    <div className={cx('hero-crash', `hero-crash-${tone}`)}>
       <div className="hero-crash-bar">
         <span className="hero-crash-title">
-          <MarkerLogo size={18} /> live crash
+          <MarkerLogo size={20} /> Live crash · timeout-after-transfer
         </span>
-        <Chip tone={seatbelt ? 'pass' : paidTwice ? 'fail' : 'warn'}>
+        <span className={cx('chip', seatbelt ? 'chip-pass' : 'chip-fail')}>
           {seatbelt ? 'Seatbelt' : 'Dummy'}
-        </Chip>
+        </span>
       </div>
-      <div className="hero-caption" aria-live="polite">
+
+      <ol className="hero-steps" aria-label="Crash timeline">
+        {PHASE_LABELS.map((step, index) => (
+          <li
+            key={step}
+            className={cx(
+              'hero-step',
+              index < phase && 'hero-step-done',
+              index === phase && 'hero-step-current',
+            )}
+          >
+            <span className="hero-step-dot" />
+            <span className="hero-step-name">{step}</span>
+          </li>
+        ))}
+      </ol>
+
+      <p className="hero-caption" aria-live="polite">
         {caption}
-      </div>
+      </p>
+
       <div className="hero-ledger">
         <div>
           <span className="hero-ledger-label">User wallet</span>
-          <span className={cx('hero-ledger-value mono', paidTwice && !seatbelt && 'flash-fail')}>
-            {formatBalanceNumber(balance)} <small>{data.symbol}</small>
+          <span className={cx('hero-ledger-value mono', paidTwice && 'flash-fail')}>
+            {fmt(balance)} <small>{data.symbol}</small>
           </span>
         </div>
-        <div className="hero-status">
-          <span className={cx('status-dot', seatbelt ? 'dot-pass' : paidTwice ? 'dot-fail' : 'dot-warn')} />
-          {phase === 0
-            ? 'PENDING_DEPOSIT'
-            : phase === 1
-              ? 'PROCESSING'
-              : phase === 2
-                ? '504 GATEWAY TIMEOUT'
-                : phase === 3
-                  ? 'PAID AGAIN'
-                  : 'STATUS CHECKED'}
-        </div>
-      </div>
-      <div className="hero-transfer-row mono">
-        <span>deposit</span>
-        <span>→</span>
-        <span>{formatAmount(data.amount.toString(), data.decimals)} {data.symbol}</span>
-      </div>
-      <div className="hero-loss-row">
-        <span>{seatbelt ? 'Simulated loss' : paidTwice ? 'Simulated loss' : 'Simulated loss so far'}</span>
-        <span className={cx('mono', seatbelt ? 'text-pass' : paidTwice ? 'text-fail' : 'text-muted')}>
-          {formatUsd(seatbelt ? 0 : paidTwice ? Number(data.loss) : 0)}
+        <span className={cx('hero-status', `hero-status-${tone}`)}>
+          {['PENDING_DEPOSIT', 'PROCESSING', '504 TIMEOUT', 'PAID AGAIN', 'STATUS CHECKED'][phase]}
         </span>
       </div>
-      <div className="hero-caption-foot">
-        {seatbelt
-          ? 'Same crash. It asked the status before retrying.'
-          : 'Played from the real EventLog in the Dummy report.'}
+
+      <ul className="hero-flow">
+        <li className={cx('hero-flow-row', phase >= 1 && 'hero-flow-on')}>
+          <CheckIcon size={16} />
+          <span>Payment 1</span>
+          <span className="mono">
+            {unit} {data.symbol}
+          </span>
+        </li>
+        <li className={cx('hero-flow-row hero-flow-warn', phase >= 2 && 'hero-flow-on')}>
+          <XIcon size={16} />
+          <span>Confirmation call</span>
+          <span className="mono">504</span>
+        </li>
+        {seatbelt ? (
+          <li className="hero-flow-row hero-flow-pass hero-flow-on">
+            <CheckIcon size={16} />
+            <span>Status checked, no retry</span>
+            <span className="mono">0 extra</span>
+          </li>
+        ) : (
+          <li className={cx('hero-flow-row hero-flow-fail', phase >= 3 && 'hero-flow-on')}>
+            <XIcon size={16} />
+            <span>Payment 2 (duplicate)</span>
+            <span className="mono">
+              {unit} {data.symbol}
+            </span>
+          </li>
+        )}
+      </ul>
+
+      <div className="hero-loss-row">
+        <span>Simulated loss</span>
+        <strong className={cx('mono', seatbelt ? 'text-pass' : paidTwice ? 'text-fail' : 'text-muted')}>
+          {formatUsd(paidTwice ? Number(data.loss) : 0)}
+        </strong>
       </div>
-      {!seatbelt && <div className="hero-scan" aria-hidden="true" />}
-      {paidTwice && !seatbelt && (
-        <svg className="hero-crack" viewBox="0 0 120 40" aria-hidden="true">
-          <path d="M2 20 L22 14 L38 24 L58 9 L76 25 L98 16 L118 23" />
-        </svg>
-      )}
+      <p className="hero-caption-foot">
+        Played from the real EventLog in the {seatbelt ? 'Seatbelt' : 'Dummy'} report. No funds move.
+      </p>
     </div>
   );
-}
-
-function formatBalanceNumber(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
 }
 
 function usePrefersReducedMotion(): boolean {

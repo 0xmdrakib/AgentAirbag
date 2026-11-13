@@ -43,6 +43,9 @@ pnpm screenshots      # six routes + mobile report -> artifacts/screens
 pnpm ui:interact      # presses Crash, opens the report, skips to the crash, opens YAML
 pnpm ui:share         # share link round-trip, Dummy -> Seatbelt toggle, auto-run
 pnpm ui:seed          # custom seed -> report card shows it
+pnpm ui:audit         # 6 routes x 7 widths (360..1920): overflow, text <12px, tap targets, menu, theme
+AUDIT_THEMES=dark,light pnpm ui:audit   # both themes (PowerShell: $env:AUDIT_THEMES='dark,light')
+pnpm ui:sheet '#/report' 390 4          # slice a long page side by side to read it at full size
 ```
 
 The scripts use `CHROME_PATH` if set, otherwise a local Chrome/Edge path; `AIRBAG_PREVIEW_URL`
