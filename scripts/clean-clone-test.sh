@@ -17,4 +17,10 @@ fi
 pnpm install --frozen-lockfile
 pnpm demo --smoke
 
+if [ -n "$(git status --short)" ]; then
+  echo "Clean-clone test failed: the build dirtied tracked files:"
+  git status --short
+  exit 1
+fi
+
 echo "Clean-clone test passed in $TARGET/repo"

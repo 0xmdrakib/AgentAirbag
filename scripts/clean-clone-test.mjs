@@ -17,4 +17,10 @@ const run = (command) => {
 
 run('pnpm install --frozen-lockfile');
 run('pnpm demo --smoke');
+
+const dirty = execSync('git status --short', { cwd: repo, encoding: 'utf8' }).trim();
+if (dirty) {
+  console.error(`\nClean-clone test failed: the build dirtied tracked files:\n${dirty}`);
+  process.exit(1);
+}
 console.log(`\nClean-clone test passed in ${repo}`);
