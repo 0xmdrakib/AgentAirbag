@@ -11,6 +11,7 @@ is not here, it is not a shipped claim.
 | The exact naive crash set is asserted | `pnpm test` | 57 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
 | The same seed produces a byte-identical report | `pnpm test` | `is deterministic: the same seed produces the same report hash` passes |
 | The live client is read-only | `pnpm test` | `read-only live client` suite passes |
+| The sandbox accepts the exact quoteRequest echoed by the live API | `pnpm test` | `drop-in 1Click quote compatibility` suite passes |
 | Every scenario YAML validates and has a story + fix | `pnpm test` | `scenario contract` suite passes |
 | Every report fixture validates against the schema | `pnpm test` | `report fixtures` suite passes |
 | Guard returns allow / warn / block with reasons | `pnpm test` | `Airbag Guard` suite passes (36 tests) |
