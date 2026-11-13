@@ -1,0 +1,98 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Layout } from './components/Layout';
+import { AppStateProvider, useAppState } from './state/AppState';
+import { decodeReport } from './lib/share';
+import { LabPage } from './pages/LabPage';
+import { RunnerPage } from './pages/RunnerPage';
+import { ReportPage } from './pages/ReportPage';
+import { ReplayPage } from './pages/ReplayPage';
+import { ScenariosPage } from './pages/ScenariosPage';
+import { ConnectPage } from './pages/ConnectPage';
+import { Toast } from './components/Toast';
+
+export interface RouteInfo {
+  path: string;
+  query: URLSearchParams;
+  replayId?: string;
+}
+
+function readRoute(): RouteInfo {
+  const raw = window.location.hash.replace(/^#/, '') || '/';
+  const [pathPart, queryPart] = raw.split('?') as [string, string?];
+  const path = pathPart || '/';
+  if (path.startsWith('/replay/')) {
+    return { path: '/replay', replayId: decodeURIComponent(path.slice('/replay/'.length)), query: new URLSearchParams(queryPart ?? '') };
+  }
+  return { path, query: new URLSearchParams(queryPart ?? '') };
+}
+
+function AppInner() {
+  const [route, setRoute] = useState<RouteInfo>(readRoute);
+  const { setShared, toast } = useAppState();
+
+  useEffect(() => {
+    const onHash = () => {
+      const next = readRoute();
+      setRoute(next);
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  useEffect(() => {
+    const encoded = route.query.get('d');
+    if (route.path === '/report' && encoded) {
+      const report = decodeReport(encoded);
+      if (report) setShared(report, false);
+      else setShared(null, true);
+    } else if (route.path !== '/report') {
+      setShared(null, false);
+    }
+  }, [route, setShared]);
+
+  useEffect(() => {
+    const titles: Record<string, string> = {
+      '/': 'Airbag — crash-test dummies for AI agents that hold money',
+      '/run': 'Crash suite — Airbag',
+      '/report': 'Report card — Airbag',
+      '/replay': 'Crash replay — Airbag',
+      '/scenarios': 'Scenario library — Airbag',
+      '/connect': 'Connect your agent — Airbag',
+    };
+    document.title = titles[route.path] ?? titles['/']!;
+  }, [route.path]);
+
+  const page = useMemo(() => {
+    switch (route.path) {
+      case '/run':
+        return <RunnerPage />;
+      case '/report':
+        return <ReportPage />;
+      case '/replay':
+        return <ReplayPage scenarioId={route.replayId} />;
+      case '/scenarios':
+        return <ScenariosPage />;
+      case '/connect':
+        return <ConnectPage />;
+      case '/':
+      default:
+        return <LabPage />;
+    }
+  }, [route]);
+
+  return (
+    <Layout route={route.path}>
+      {page}
+      <Toast message={toast} />
+    </Layout>
+  );
+}
+
+export function App() {
+  return (
+    <AppStateProvider>
+      <AppInner />
+    </AppStateProvider>
+  );
+}

@@ -1,0 +1,18 @@
+{
+  "name": "@airbag/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./generated/scenarios.json": "./src/generated/scenarios.json",
+    "./generated/tokens.json": "./src/generated/tokens.json",
+    "./generated/report.naive.json": "./src/generated/report.naive.json",
+    "./generated/report.hardened.json": "./src/generated/report.hardened.json"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.4.0",
+    "zod": "^4.6.7"
+  }
+}

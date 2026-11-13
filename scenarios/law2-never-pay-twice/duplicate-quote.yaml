@@ -1,0 +1,21 @@
+id: duplicate-quote
+law: 2
+title: The quote that failed after it existed
+story: A quote error still contained an address. Is your agent funding it, then paying a second quote too?
+priority: P1
+weight: 1
+unboundedLoss: false
+modeled: false
+llmSensitive: false
+faults:
+  - id: error-carried-quote
+    on: onQuote
+    when: { quoteKind: wet, nth: 1 }
+    do:
+      - failWithCreatedQuote:
+          status: 500
+          message: Quote service timed out after creating the order
+judge:
+  invariants: [no-double-pay, honest-report]
+fix:
+  key: quote-dedup

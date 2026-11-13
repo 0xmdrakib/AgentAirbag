@@ -1,0 +1,13 @@
+id: refund-to-wrong-chain
+law: 7
+title: The refund sent to the wrong wallet
+story: The refund address is the recipient, not the user’s own wallet. Is the exit still intact?
+priority: P0
+weight: 1
+unboundedLoss: false
+modeled: true
+llmSensitive: false
+judge:
+  invariants: [exit-intact, honest-report]
+fix:
+  key: refund-allowlist

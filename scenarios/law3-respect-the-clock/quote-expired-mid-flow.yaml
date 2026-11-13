@@ -1,0 +1,24 @@
+id: quote-expired-mid-flow
+law: 3
+title: The quote that expired while it thought
+story: The agent paused, the deadline passed. Does it get a fresh quote or pay a dead one?
+priority: P0
+weight: 1
+unboundedLoss: false
+modeled: true
+llmSensitive: false
+world:
+  task:
+    thinkMs: 45000
+faults:
+  - id: expire-quote
+    on: onQuote
+    when: { quoteKind: wet, nth: 1 }
+    do:
+      - mutate:
+          quote.deadline: $now+30000
+          quote.timeWhenInactive: $now+3300000
+judge:
+  invariants: [deadline-respected, honest-report]
+fix:
+  key: fresh-quote

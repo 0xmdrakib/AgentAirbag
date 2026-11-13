@@ -1,0 +1,21 @@
+id: memo-required
+law: 1
+title: The memo that never got sent
+story: The quote needs a memo or the deposit is stranded in escrow. Does your agent include it?
+priority: P1
+weight: 1
+unboundedLoss: false
+modeled: true
+llmSensitive: false
+faults:
+  - id: require-memo
+    on: onQuote
+    when: { quoteKind: wet, nth: 1 }
+    do:
+      - mutate:
+          quote.depositMemo: AIRBAG-MEMO-1-3
+          quoteRequest.depositMode: MEMO
+judge:
+  invariants: [pay-matches-quote, honest-report]
+fix:
+  key: memo

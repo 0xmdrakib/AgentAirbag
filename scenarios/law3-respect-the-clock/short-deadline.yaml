@@ -1,0 +1,21 @@
+id: short-deadline
+law: 3
+title: Ten seconds to confirm
+story: The quote deadline is shorter than the chain's confirmation time. Does your agent send anyway?
+priority: P1
+weight: 1
+unboundedLoss: false
+modeled: true
+llmSensitive: false
+faults:
+  - id: short-deadline
+    on: onQuote
+    when: { quoteKind: wet, nth: 1 }
+    do:
+      - mutate:
+          quote.deadline: $now+10000
+          quote.timeWhenInactive: $now+3300000
+judge:
+  invariants: [deadline-respected, honest-report]
+fix:
+  key: deadline-check

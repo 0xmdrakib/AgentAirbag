@@ -1,0 +1,39 @@
+{
+  "name": "airbag",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Crash-test dummies for AI agents that hold money.",
+  "license": "MIT",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build:scenarios": "tsx scripts/build-scenarios.ts",
+    "build:fixtures": "tsx scripts/build-fixtures.ts",
+    "build": "pnpm build:scenarios && pnpm build:fixtures && pnpm --filter @airbag/web build",
+    "demo": "tsx scripts/demo.ts",
+    "demo:attack": "tsx scripts/attack-demo.ts",
+    "airbag": "tsx packages/server/src/cli.ts",
+    "dev": "pnpm build:scenarios && pnpm build:fixtures && pnpm --filter @airbag/web dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm demo --smoke",
+    "docs:facts": "tsx scripts/docs-facts.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "playwright-core": "^1.65.0",
+    "prettier": "^3.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0",
+    "yaml": "^2.9.1"
+  }
+}
