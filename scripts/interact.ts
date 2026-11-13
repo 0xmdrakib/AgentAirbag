@@ -1,7 +1,8 @@
 import { chromium } from 'playwright-core';
+import { PREVIEW_URL, chromePath } from './preview';
 import { mkdirSync } from 'node:fs';
 
-const executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const executablePath = chromePath();
 const out = 'artifacts/screens';
 mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ executablePath, headless: true });
@@ -12,7 +13,7 @@ page.on('console', (message) => {
   if (message.type() === 'error') errors.push(message.text());
 });
 
-const base = 'http://localhost:4321/';
+const base = PREVIEW_URL;
 
 // Runner: press Crash, wait for the grid to fill, then open the report.
 await page.goto(`${base}#/run`, { waitUntil: 'networkidle' });

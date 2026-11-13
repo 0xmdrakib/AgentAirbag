@@ -34,16 +34,17 @@ tag.
 
 ## Developer UI checks
 
-These are manual tools, not part of `pnpm verify`:
+These are manual tools, not part of `pnpm verify`. Start a preview server first, then run one:
 
-- `pnpm tsx scripts/screenshot.ts` — captures the six routes and a mobile report from a local
-  preview server (`pnpm --filter @airbag/web preview --port 4321`).
-- `pnpm tsx scripts/interact.ts` — presses Crash, opens the report, skips to the crash and opens a
-  YAML drawer; fails loudly if the page throws.
-- `pnpm tsx scripts/share-check.ts` — copies a share link, opens it, toggles Dummy → Seatbelt and
-  runs the suite through the `?auto=naive` route.
-- `pnpm tsx scripts/seed-check.ts` — types a custom seed, crashes the suite, and checks that the
-  generated report card carries that seed.
+```bash
+pnpm --filter @airbag/web preview --port 4321
+# in another shell:
+pnpm screenshots      # six routes + mobile report -> artifacts/screens
+pnpm ui:interact      # presses Crash, opens the report, skips to the crash, opens YAML
+pnpm ui:share         # share link round-trip, Dummy -> Seatbelt toggle, auto-run
+pnpm ui:seed          # custom seed -> report card shows it
+```
 
-All three use the installed Chrome via Playwright-core and a preview server on a local port.
+The scripts use `CHROME_PATH` if set, otherwise a local Chrome/Edge path; `AIRBAG_PREVIEW_URL`
+overrides `http://localhost:4321/`. They are development tools, not part of the product runtime.
 

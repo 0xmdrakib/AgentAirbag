@@ -1,13 +1,14 @@
 import { chromium } from 'playwright-core';
+import { PREVIEW_URL, chromePath } from './preview';
 import { mkdirSync } from 'node:fs';
 
-const executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const executablePath = chromePath();
 const out = 'artifacts/screens';
 mkdirSync(out, { recursive: true });
 
 const browser = await chromium.launch({ executablePath, headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 980 }, deviceScaleFactor: 1 });
-const base = 'http://localhost:4321/';
+const base = PREVIEW_URL;
 
 const routes: { name: string; hash: string; fullPage?: boolean }[] = [
   { name: 'lab', hash: '#/' },

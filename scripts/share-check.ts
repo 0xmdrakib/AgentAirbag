@@ -1,7 +1,8 @@
 import { chromium } from 'playwright-core';
+import { PREVIEW_URL, chromePath } from './preview';
 
 const browser = await chromium.launch({
-  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  executablePath: chromePath(),
   headless: true,
 });
 const context = await browser.newContext({
@@ -23,7 +24,7 @@ page.on('console', (message) => {
   if (message.type() === 'error') errors.push(message.text());
 });
 
-const base = 'http://localhost:4322/';
+const base = PREVIEW_URL;
 await page.goto(`${base}#/report`, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: 'Share', exact: true }).click();
 await page.waitForTimeout(300);

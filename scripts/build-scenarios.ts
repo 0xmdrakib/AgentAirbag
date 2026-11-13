@@ -24,7 +24,7 @@ const scenarios: ScenarioDefinition[] = [];
 const yamlById: Record<string, string> = {};
 
 for (const file of files) {
-  const raw = readFileSync(file, 'utf8');
+  const raw = readFileSync(file, 'utf8').replace(/\r\n?/g, '\n');
   const parsed = scenarioFileSchema.safeParse(parseYaml(raw));
   if (!parsed.success) {
     console.error(`Invalid scenario: ${relative(root, file)}`);
