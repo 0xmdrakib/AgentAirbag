@@ -15,6 +15,7 @@ is not here, it is not a shipped claim.
 | Every report fixture validates against the schema | `pnpm test` | `report fixtures` suite passes |
 | Guard returns allow / warn / block with reasons | `pnpm test` | `Airbag Guard` suite passes (36 tests) |
 | A cassette response hash drift is caught | `pnpm test` | `fails loudly when a sandbox response drifts from the recording` passes |
+| No known production dependency vulnerabilities | `pnpm audit --prod` | `No known vulnerabilities found` |
 | The attack demo blocks the injected transfer | `pnpm demo:attack` | Unguarded loss `$9995.46`; guarded `PASS · $0.00`; `TAINTED_VALUE` in the log |
 | The demo runs offline after install | `pnpm demo` (disconnect the network after `pnpm install`) | Report card at the printed URL; no API calls |
 | The demo smoke passes | `pnpm demo --smoke` | `Demo smoke passed.` |

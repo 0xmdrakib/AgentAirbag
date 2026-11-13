@@ -74,7 +74,11 @@ and tool name `airbag`.
 - No human yes: the repo is local; nothing is pushed, posted, signed or submitted.
 - No demo video yet. The human records it from `docs/DEMO_SCRIPT.md`.
 
-**02:30 — Current state.** `pnpm lint`, `pnpm typecheck`, `pnpm test` (57), `pnpm build`, and
-`pnpm demo --smoke` pass. Dummy: F, 21/21 crashed, $10,907.04 simulated loss, 8 false claims.
-Seatbelt: A, 21/21 survived, $1.00 modeled refund fee. Next: final screenshots, git init/tags,
-clean-clone test, README claim audit, then the human’s five steps.
+**02:30 — Current state.** `pnpm lint`, `pnpm typecheck`, `pnpm test` (57), `pnpm test:http`,
+`pnpm test:process`, `pnpm build`, and `pnpm demo --smoke` pass. Dummy: F, 21/21 crashed, $10,907.04
+simulated loss, 8 false claims. Seatbelt: A, 21/21 survived, $1.00 modeled refund fee. Next: final
+screenshots, git init/tags, clean-clone test, README claim audit, then the human’s five steps.
+
+**03:10 — Dependency audit.** `@hono/node-server` updated to a patched 2.x release after
+`pnpm audit --prod` reported a moderate static-path advisory. The HTTP and process smokes pass on the
+new version; `pnpm audit --prod` now reports no known vulnerabilities.
