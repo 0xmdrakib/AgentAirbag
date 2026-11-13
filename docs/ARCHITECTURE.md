@@ -101,3 +101,5 @@ Each run lives under `/r/<runId>/...` on the HTTP server. In-process fetch uses 
 - No secret is committed. `.env.example` only; keys are read from the environment and never printed.
 - All modeled behavior is labelled `modeled: true` in YAML, in the UI, and in `docs/SCENARIOS.md`.
 - The report hash is integrity, not a signature. No NEAR key signing is shipped.
+- The quote’s `signature` field is a deterministic simulated placeholder, not a real ed25519
+  signature. No quote is signed by a key.
