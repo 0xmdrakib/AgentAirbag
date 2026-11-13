@@ -43,9 +43,9 @@ The browser runs the whole scripted suite itself.
 | Run `pnpm demo:attack` | The unguarded Dummy pays an injected address ($9,995.46 simulated); the guarded agent blocks with `TAINTED_VALUE` and loses $0 |
 | Run `pnpm verify` | Lint, typecheck, 57 tests, the HTTP and process sandbox smokes, production build and the demo smoke test |
 
-The static build is in `apps/web/dist`. It is ready for Vercel, Cloudflare Pages or GitHub Pages,
-but **no hosting account was available in this build window, so there is no hosted URL yet**. The
-one-command local demo is the reproducible path; see [Deploy](#deploy).
+`pnpm build` writes the static build to `apps/web/dist`. It is ready for Vercel, Cloudflare Pages or
+GitHub Pages, but **no hosting account was available in this build window, so there is no hosted URL
+yet**. The one-command local demo is the reproducible path; see [Deploy](#deploy).
 
 ## What it is
 
