@@ -5,7 +5,7 @@ posts this.** Everything shown must exist in the local build.
 
 | Time | Shot | Caption |
 | --- | --- | --- |
-| 0:00–0:05 | Lab hero, the mini ledger flashes red | This AI agent just lost $100. (Simulated.) |
+| 0:00–0:05 | Lab hero, the mini ledger flashes red | This AI agent just lost $99.95. (Simulated.) |
 | 0:05–0:15 | Lab headline and hero | AI agents swap crypto by themselves. NEAR Intents has no testnet, so they get tested with real money. |
 | 0:15–0:30 | Press **Run the crash suite**; the grid fills; grade F lands | Airbag crashes a scripted agent 21 ways. |
 | 0:30–0:45 | Replay `timeout-after-transfer`, scrub to the second payment | It paid, the call timed out, it paid again. |
@@ -30,3 +30,17 @@ posts this.** Everything shown must exist in the local build.
 
 The current build’s screenshots live in `artifacts/screens/`; copy the final three into `docs/` before
 recording. `docs/report-card.png` is referenced by the README.
+
+## Developer UI checks
+
+These are manual tools, not part of `pnpm verify`:
+
+- `pnpm tsx scripts/screenshot.ts` — captures the six routes and a mobile report from a local
+  preview server (`pnpm --filter @airbag/web preview --port 4321`).
+- `pnpm tsx scripts/interact.ts` — presses Crash, opens the report, skips to the crash and opens a
+  YAML drawer; fails loudly if the page throws.
+- `pnpm tsx scripts/share-check.ts` — copies a share link, opens it, toggles Dummy → Seatbelt and
+  runs the suite through the `?auto=naive` route.
+
+All three use the installed Chrome via Playwright-core and a preview server on a local port.
+

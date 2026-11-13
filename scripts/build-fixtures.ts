@@ -35,7 +35,7 @@ const webGenerated = join('apps/web/src/generated');
 mkdirSync(webGenerated, { recursive: true });
 writeFileSync(
   join(webGenerated, 'reports.json'),
-  `${JSON.stringify({ seed, epoch: VIRTUAL_EPOCH_ISO, generatedAt: new Date().toISOString(), naive, hardened }, null, 2)}\n`,
+  `${JSON.stringify({ seed, epoch: VIRTUAL_EPOCH_ISO, generatedAt: VIRTUAL_EPOCH_ISO, naive, hardened }, null, 2)}\n`,
 );
 writeFileSync(
   join(webGenerated, 'scenarios.json'),

@@ -83,7 +83,7 @@ Count this after filling any human fields; keep it under 2,000 characters.
 ## X thread (the human posts; adapt the URLs and recount to 280)
 
 **Post 1 (video attached):**
-This AI agent just lost $100. (Simulated.) It paid, the confirmation timed out, and it paid again.
+This AI agent just lost $99.95. (Simulated.) It paid, the confirmation timed out, and it paid again.
 Cars get crash-tested before they hit the road. AI agents that move money are not. So I built Airbag at
 NEAR HACKATHON. @NEARProtocol #NEARHackathon
 

@@ -100,7 +100,7 @@ No mainnet transaction, key, signature or real swap is part of this repository.
 | Thing | Real or simulated |
 | --- | --- |
 | The 1Click API contract | Mirrored from `docs.near-intents.org` and checked against live dry-run responses on 13 Nov 2026 |
-| Token list and prices | A real read-only snapshot (`fixtures/tokens.snapshot.json`, 58,875 bytes) |
+| Token list and prices | A real read-only snapshot (`fixtures/tokens.snapshot.json`, 58,875 bytes); the sandbox exposes a curated 8-token subset |
 | Swaps, deposits, refunds and the ledger | **Simulated. No funds move.** |
 | Solver latency, refund penalties, late-deposit handling | **Modeled**, and labelled `modeled: true` in the scenario YAML and `docs/SCENARIOS.md` |
 | Dummy and Seatbelt | Scripted agents; Law 5 results for Dummy are modeled via `followsInlineInstructions` |
