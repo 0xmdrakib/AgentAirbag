@@ -29,7 +29,7 @@ A sandboxed NEAR Intents 1Click API that fails on purpose, 21 scripted crashes, 
 
 ## Contents
 
-| | |
+| Section | What you will find |
 | --- | --- |
 | [Overview](#overview) | The problem, the idea, who it is for |
 | [Results](#results) | Dummy against Seatbelt on the same 21 crashes |
