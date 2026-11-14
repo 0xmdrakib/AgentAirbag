@@ -32,6 +32,7 @@ No API keys are needed for anything below. `NEARAI_API_KEY` is only for the opti
 | `pnpm demo` | Build, then serve the app at http://localhost:4321 |
 | `pnpm build:scenarios`, `pnpm build:fixtures` | Regenerate scenario data and the two golden reports |
 | `pnpm build:api` | Regenerate the committed Vercel function `api/index.js` after editing `packages/server`, `packages/core` or `db/schema.sql`; `--check` fails if it is stale |
+| `pnpm build:site` | Publish the documents next to the app (done by `pnpm build`): `llms.txt`, `AGENTS.md`, `docs/*.md` and the reports are served from the site. `pnpm check:site [url]` verifies them, locally or against a live URL |
 | `pnpm llms` | Regenerate `llms-full.txt` after editing any doc it includes |
 | `pnpm lint`, `pnpm typecheck`, `pnpm format` | Static checks and formatting |
 

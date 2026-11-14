@@ -7,6 +7,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { GENERATED_SITE_FILES, PUBLISHED_FILES, SITE_ORIGIN } from './site-files';
 
 const root = resolve(import.meta.dirname, '..');
 const RAW = 'https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/';
@@ -45,6 +46,13 @@ function deadLinks(): string[] {
   for (const match of text.matchAll(/\]\((https:\/\/[^)\s]+)\)/g)) {
     const url = match[1] ?? '';
     let local: string | null = null;
+    if (url.startsWith(SITE_ORIGIN)) {
+      // A site link must point at a file the site build publishes.
+      const path = url.slice(SITE_ORIGIN.length);
+      if (!PUBLISHED_FILES.includes(path) && !GENERATED_SITE_FILES.includes(path)) dead.push(url);
+      else if (PUBLISHED_FILES.includes(path) && path !== 'llms-full.txt' && !existsSync(resolve(root, path))) dead.push(url);
+      continue;
+    }
     if (url.startsWith(RAW)) local = url.slice(RAW.length);
     else if (url.startsWith(TREE)) local = url.slice(TREE.length);
     if (local === null) continue;

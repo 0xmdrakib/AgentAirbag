@@ -212,6 +212,16 @@ made every shared link look unfinished, and the only cost of clean paths is one 
 navigation, anchors such as `#main` still scroll natively, and an old `/#/report` address is rewritten
 on load. Vite's `base` is now `/`.
 
+## Documents are served by the site
+
+**The agent-facing files are published at the site root, not only in the repository.** `llms.txt`,
+`llms-full.txt`, `AGENTS.md`, the docs, the two reports and the scenarios (as one YAML file) are
+copied into the static build by `pnpm build:site`. Alternatives: link to raw.githubusercontent.com
+only. Reason: `agentairbag.xyz/llms.txt` is the address an agent will try first, and before this the
+SPA rewrite answered it with the app shell and a 200, which is worse than a 404. The rewrite now skips
+paths with a file extension, `vercel.json` sets content types, and `pnpm check:site` (part of
+`verify`) fails if a published file is missing or is the app shell.
+
 ## Wallet picker and provider list
 
 **The hand written Buffer shim was the reason most wallet modules failed.** It lacked

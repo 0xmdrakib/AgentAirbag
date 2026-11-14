@@ -34,6 +34,7 @@ is not here, it is not a shipped claim.
 | No LLM result is claimed | UI Report → Compare | “LLM on NEAR AI Cloud: not recorded” |
 | A hosted demo is live | `curl -sI https://agentairbag.xyz/report` | `200`; the page is the app |
 | The hosted API is connected to Postgres | `curl -s https://agentairbag.xyz/api/health` | `{"ok":true,"db":"neon","network":"mainnet"}` |
+| The documents are served as real files by the site | `pnpm check:site https://agentairbag.xyz/` | `20 published documents are served as real files by https://agentairbag.xyz/` (not the app shell) |
 | `llms.txt` links resolve and `llms-full.txt` is current | `pnpm llms --check` | `llms.txt links resolve and llms-full.txt is current.` |
 | No report signature is claimed | README + report metadata | `signature` is absent; README says so |
 

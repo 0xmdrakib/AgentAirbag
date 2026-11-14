@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Machine-readable documentation for AI agents and crawlers
+# Index:      https://agentairbag.xyz/llms.txt
+# Everything: https://agentairbag.xyz/llms-full.txt

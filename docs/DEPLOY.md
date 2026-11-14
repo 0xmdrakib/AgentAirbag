@@ -170,6 +170,10 @@ To run wallet connect and saved runs in production, serve the static app and the
 process supervision or hardening for public traffic. Use it as the reference for the two-port split,
 not as the deployment itself.
 
+## Published documents
+
+`pnpm build` runs `pnpm build:site`, which copies the documents listed in `scripts/site-files.ts` into `apps/web/public` (generated and gitignored), so the site serves `/llms.txt`, `/llms-full.txt`, `/AGENTS.md`, `/README.md`, `/docs/*.md`, `/fixtures/report.*.json`, `/examples/http-agent.mjs` and `/data/scenarios.yaml` as real files. Relative links inside the copied Markdown are rewritten to absolute URLs. `vercel.json` sets the content types and CORS. A missing path with a file extension returns 404 instead of the app shell. `pnpm check:site` verifies the build, and `pnpm check:site https://agentairbag.xyz/` verifies the live site.
+
 ## Single page app fallback
 
 The app uses clean paths, so opening `/report` directly must return `index.html` and let the app route.

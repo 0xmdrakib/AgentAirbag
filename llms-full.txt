@@ -435,6 +435,7 @@ project: Agent Airbag
 summary: Crash tests for AI agents that move money
 repository: https://github.com/0xmdrakib/AgentAirbag
 live_demo: https://agentairbag.xyz
+llms_txt: https://agentairbag.xyz/llms.txt
 license: MIT
 language: TypeScript
 runtime: Node 22+, pnpm 9+
@@ -452,19 +453,22 @@ results:
 not_built: [llm_run, report_signature]
 ```
 
-Read in this order:
+Every file below is served from the live site as plain text, and the same files are in the repository.
 
-| Need | Read |
+| Need | Endpoint |
 | --- | --- |
-| Index with one-line descriptions | [`llms.txt`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/llms.txt) |
-| Every main document in one file | [`llms-full.txt`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/llms-full.txt) |
-| How to work on this repository | [`AGENTS.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/AGENTS.md) |
-| Claims and proof commands | [`docs/CLAIMS.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/CLAIMS.md) |
-| Design and run lifecycle | [`docs/ARCHITECTURE.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/ARCHITECTURE.md) |
-| All 21 scenarios | [`docs/SCENARIOS.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/SCENARIOS.md) |
-| Deployment and environment | [`docs/DEPLOY.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/DEPLOY.md) |
-| Report data (JSON, with full event logs) | [`report.naive.json`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/fixtures/report.naive.json), [`report.hardened.json`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/fixtures/report.hardened.json) |
-| Documentation map | [`docs/README.md`](docs/README.md) |
+| Index with one-line descriptions | [https://agentairbag.xyz/llms.txt](https://agentairbag.xyz/llms.txt) |
+| Every main document in one file | [https://agentairbag.xyz/llms-full.txt](https://agentairbag.xyz/llms-full.txt) |
+| How to work on this repository | [https://agentairbag.xyz/AGENTS.md](https://agentairbag.xyz/AGENTS.md) |
+| Claims and proof commands | [https://agentairbag.xyz/docs/CLAIMS.md](https://agentairbag.xyz/docs/CLAIMS.md) |
+| Design and run lifecycle | [https://agentairbag.xyz/docs/ARCHITECTURE.md](https://agentairbag.xyz/docs/ARCHITECTURE.md) |
+| All 21 scenarios, as prose | [https://agentairbag.xyz/docs/SCENARIOS.md](https://agentairbag.xyz/docs/SCENARIOS.md) |
+| All 21 scenarios, as YAML | [https://agentairbag.xyz/data/scenarios.yaml](https://agentairbag.xyz/data/scenarios.yaml) |
+| Deployment and environment | [https://agentairbag.xyz/docs/DEPLOY.md](https://agentairbag.xyz/docs/DEPLOY.md) |
+| Report data (JSON, full event logs) | [https://agentairbag.xyz/fixtures/report.naive.json](https://agentairbag.xyz/fixtures/report.naive.json), [https://agentairbag.xyz/fixtures/report.hardened.json](https://agentairbag.xyz/fixtures/report.hardened.json) |
+| A minimal bring-your-own agent | [https://agentairbag.xyz/examples/http-agent.mjs](https://agentairbag.xyz/examples/http-agent.mjs) |
+
+Start with `llms.txt`: it is the index, and every link in it resolves.
 
 ## License
 
@@ -508,6 +512,7 @@ No API keys are needed for anything below. `NEARAI_API_KEY` is only for the opti
 | `pnpm demo` | Build, then serve the app at http://localhost:4321 |
 | `pnpm build:scenarios`, `pnpm build:fixtures` | Regenerate scenario data and the two golden reports |
 | `pnpm build:api` | Regenerate the committed Vercel function `api/index.js` after editing `packages/server`, `packages/core` or `db/schema.sql`; `--check` fails if it is stale |
+| `pnpm build:site` | Publish the documents next to the app (done by `pnpm build`): `llms.txt`, `AGENTS.md`, `docs/*.md` and the reports are served from the site. `pnpm check:site [url]` verifies them, locally or against a live URL |
 | `pnpm llms` | Regenerate `llms-full.txt` after editing any doc it includes |
 | `pnpm lint`, `pnpm typecheck`, `pnpm format` | Static checks and formatting |
 
@@ -931,6 +936,7 @@ is not here, it is not a shipped claim.
 | No LLM result is claimed | UI Report → Compare | “LLM on NEAR AI Cloud: not recorded” |
 | A hosted demo is live | `curl -sI https://agentairbag.xyz/report` | `200`; the page is the app |
 | The hosted API is connected to Postgres | `curl -s https://agentairbag.xyz/api/health` | `{"ok":true,"db":"neon","network":"mainnet"}` |
+| The documents are served as real files by the site | `pnpm check:site https://agentairbag.xyz/` | `20 published documents are served as real files by https://agentairbag.xyz/` (not the app shell) |
 | `llms.txt` links resolve and `llms-full.txt` is current | `pnpm llms --check` | `llms.txt links resolve and llms-full.txt is current.` |
 | No report signature is claimed | README + report metadata | `signature` is absent; README says so |
 
@@ -1140,6 +1146,10 @@ To run wallet connect and saved runs in production, serve the static app and the
 `scripts/demo.ts` is a local demo, not a production server. It binds to `127.0.0.1` and has no TLS,
 process supervision or hardening for public traffic. Use it as the reference for the two-port split,
 not as the deployment itself.
+
+## Published documents
+
+`pnpm build` runs `pnpm build:site`, which copies the documents listed in `scripts/site-files.ts` into `apps/web/public` (generated and gitignored), so the site serves `/llms.txt`, `/llms-full.txt`, `/AGENTS.md`, `/README.md`, `/docs/*.md`, `/fixtures/report.*.json`, `/examples/http-agent.mjs` and `/data/scenarios.yaml` as real files. Relative links inside the copied Markdown are rewritten to absolute URLs. `vercel.json` sets the content types and CORS. A missing path with a file extension returns 404 instead of the app shell. `pnpm check:site` verifies the build, and `pnpm check:site https://agentairbag.xyz/` verifies the live site.
 
 ## Single page app fallback
 

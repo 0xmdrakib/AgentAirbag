@@ -429,6 +429,7 @@ project: Agent Airbag
 summary: Crash tests for AI agents that move money
 repository: https://github.com/0xmdrakib/AgentAirbag
 live_demo: https://agentairbag.xyz
+llms_txt: https://agentairbag.xyz/llms.txt
 license: MIT
 language: TypeScript
 runtime: Node 22+, pnpm 9+
@@ -446,19 +447,22 @@ results:
 not_built: [llm_run, report_signature]
 ```
 
-Read in this order:
+Every file below is served from the live site as plain text, and the same files are in the repository.
 
-| Need | Read |
+| Need | Endpoint |
 | --- | --- |
-| Index with one-line descriptions | [`llms.txt`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/llms.txt) |
-| Every main document in one file | [`llms-full.txt`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/llms-full.txt) |
-| How to work on this repository | [`AGENTS.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/AGENTS.md) |
-| Claims and proof commands | [`docs/CLAIMS.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/CLAIMS.md) |
-| Design and run lifecycle | [`docs/ARCHITECTURE.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/ARCHITECTURE.md) |
-| All 21 scenarios | [`docs/SCENARIOS.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/SCENARIOS.md) |
-| Deployment and environment | [`docs/DEPLOY.md`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/DEPLOY.md) |
-| Report data (JSON, with full event logs) | [`report.naive.json`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/fixtures/report.naive.json), [`report.hardened.json`](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/fixtures/report.hardened.json) |
-| Documentation map | [`docs/README.md`](docs/README.md) |
+| Index with one-line descriptions | [https://agentairbag.xyz/llms.txt](https://agentairbag.xyz/llms.txt) |
+| Every main document in one file | [https://agentairbag.xyz/llms-full.txt](https://agentairbag.xyz/llms-full.txt) |
+| How to work on this repository | [https://agentairbag.xyz/AGENTS.md](https://agentairbag.xyz/AGENTS.md) |
+| Claims and proof commands | [https://agentairbag.xyz/docs/CLAIMS.md](https://agentairbag.xyz/docs/CLAIMS.md) |
+| Design and run lifecycle | [https://agentairbag.xyz/docs/ARCHITECTURE.md](https://agentairbag.xyz/docs/ARCHITECTURE.md) |
+| All 21 scenarios, as prose | [https://agentairbag.xyz/docs/SCENARIOS.md](https://agentairbag.xyz/docs/SCENARIOS.md) |
+| All 21 scenarios, as YAML | [https://agentairbag.xyz/data/scenarios.yaml](https://agentairbag.xyz/data/scenarios.yaml) |
+| Deployment and environment | [https://agentairbag.xyz/docs/DEPLOY.md](https://agentairbag.xyz/docs/DEPLOY.md) |
+| Report data (JSON, full event logs) | [https://agentairbag.xyz/fixtures/report.naive.json](https://agentairbag.xyz/fixtures/report.naive.json), [https://agentairbag.xyz/fixtures/report.hardened.json](https://agentairbag.xyz/fixtures/report.hardened.json) |
+| A minimal bring-your-own agent | [https://agentairbag.xyz/examples/http-agent.mjs](https://agentairbag.xyz/examples/http-agent.mjs) |
+
+Start with `llms.txt`: it is the index, and every link in it resolves.
 
 ## License
 
