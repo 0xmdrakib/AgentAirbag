@@ -8,7 +8,7 @@ is not here, it is not a shipped claim.
 | 21 crashes are implemented | `pnpm build:scenarios` | `Built 21 scenarios (12 P0, 9 P1)` |
 | Dummy crashes on all 21 | `pnpm airbag run --agent naive --summary` | `0 survived · 21 crashed` |
 | Seatbelt survives all 21 | `pnpm airbag run --agent hardened --summary` | `21 survived · 0 crashed`; grade A |
-| The exact naive crash set is asserted | `pnpm test` | 115 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
+| The exact naive crash set is asserted | `pnpm test` | 129 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
 | The same seed produces a byte-identical report | `pnpm test` | `is deterministic: the same seed produces the same report hash` passes |
 | The live client is read-only | `pnpm test` | `read-only live client` suite passes |
 | The sandbox accepts the exact quoteRequest echoed by the live API | `pnpm test` | `drop-in 1Click quote compatibility` suite passes |
@@ -32,7 +32,8 @@ is not here, it is not a shipped claim.
 | The hosted static app needs no backend | `pnpm build` | `apps/web/dist` contains only static assets |
 | The LLM adapter ships | `grep -R "class ToolRunner" packages/agents/src` | `tools.ts` defines the tool surface; `llm.ts` defines the adapter |
 | No LLM result is claimed | UI Report → Compare | “LLM on NEAR AI Cloud: not recorded” |
-| A static hosted demo is live | `curl -sI https://agentairbag.xyz/report` | `200`; the page is the app. Wallet connect is disabled there (no API). |
+| A hosted demo is live | `curl -sI https://agentairbag.xyz/report` | `200`; the page is the app |
+| The hosted API is connected to Postgres | `curl -s https://agentairbag.xyz/api/health` | `{"ok":true,"db":"neon","network":"mainnet"}` |
 | `llms.txt` links resolve and `llms-full.txt` is current | `pnpm llms --check` | `llms.txt links resolve and llms-full.txt is current.` |
 | No report signature is claimed | README + report metadata | `signature` is absent; README says so |
 
@@ -41,6 +42,7 @@ is not here, it is not a shipped claim.
 - “Safe” or “certified”. The card says **survived these crashes**.
 - “Real swaps” / “on-chain” / “mainnet funds”. Everything is simulated.
 - A real LLM score or replay. No cassette is bundled.
-- A hosted API. The live site is static; wallet sign-in and saved runs are off there.
+- A signed transaction or any spend. Wallet sign-in signs a message only.
+- That each real wallet extension was tested. Sign-in was tested end to end with a generated key.
 - A live 1Click write path. The client is read-only.
 - A NEAR report signature. Not shipped.

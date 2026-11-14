@@ -26056,6 +26056,106 @@ function readSessionCookie(cookieHeader) {
   return null;
 }
 
+// packages/server/src/nearKeys.ts
+var DEFAULT_RPC_URLS = {
+  mainnet: "https://rpc.mainnet.near.org",
+  testnet: "https://rpc.testnet.near.org"
+};
+var DEFAULT_TIMEOUT_MS = 8e3;
+var IMPLICIT_ACCOUNT_PATTERN = /^[0-9a-f]{64}$/;
+var MISSING_KEY_NAMES = /* @__PURE__ */ new Set(["UNKNOWN_ACCESS_KEY", "UNKNOWN_ACCOUNT"]);
+function isRecord(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function notOwner() {
+  return {
+    ok: false,
+    reason: "not-owner",
+    message: "That key is not an access key of this NEAR account."
+  };
+}
+function unavailable(detail) {
+  return {
+    ok: false,
+    reason: "unavailable",
+    message: `Could not check the key against the NEAR network: ${detail}`
+  };
+}
+function toHex(bytes) {
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+function checkImplicitAccount(accountId, publicKey) {
+  if (!IMPLICIT_ACCOUNT_PATTERN.test(accountId)) return void 0;
+  const separator = publicKey.indexOf(":");
+  if (separator === -1 || publicKey.slice(0, separator).toLowerCase() !== "ed25519") {
+    return void 0;
+  }
+  let bytes;
+  try {
+    bytes = base58.decode(publicKey.slice(separator + 1));
+  } catch {
+    return notOwner();
+  }
+  return bytes.length === 32 && toHex(bytes) === accountId ? { ok: true } : notOwner();
+}
+function resolveRpcUrl(input2) {
+  if (input2.rpcUrl && input2.rpcUrl.trim().length > 0) return input2.rpcUrl.trim();
+  const fromEnv = process.env.NEAR_RPC_URL;
+  if (fromEnv && fromEnv.trim().length > 0) return fromEnv.trim();
+  return DEFAULT_RPC_URLS[input2.network];
+}
+function errorNames(error62) {
+  const names = [];
+  if (typeof error62["name"] === "string") names.push(error62["name"]);
+  const cause = error62["cause"];
+  if (isRecord(cause) && typeof cause["name"] === "string") names.push(cause["name"]);
+  return names;
+}
+function classifyReply(reply) {
+  if (!isRecord(reply)) return unavailable("the RPC reply was not an object.");
+  const error62 = reply["error"];
+  if (isRecord(error62)) {
+    if (errorNames(error62).some((name) => MISSING_KEY_NAMES.has(name))) return notOwner();
+    return unavailable("the RPC returned an error.");
+  }
+  const result = reply["result"];
+  if (!isRecord(result)) return unavailable("the RPC reply had no result.");
+  const resultError = result["error"];
+  if (typeof resultError === "string") {
+    return /does not exist while viewing/i.test(resultError) ? notOwner() : unavailable("the RPC returned an error.");
+  }
+  if (result["permission"] !== void 0 && result["permission"] !== null) return { ok: true };
+  return unavailable("the RPC reply had no access key permission.");
+}
+async function checkKeyOwnership(input2) {
+  const implicit = checkImplicitAccount(input2.accountId, input2.publicKey);
+  if (implicit) return implicit;
+  const fetchImpl = input2.fetchImpl ?? fetch;
+  const timeoutMs = input2.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  try {
+    const response = await fetchImpl(resolveRpcUrl(input2), {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "airbag",
+        method: "query",
+        params: {
+          request_type: "view_access_key",
+          finality: "final",
+          account_id: input2.accountId,
+          public_key: input2.publicKey
+        }
+      }),
+      signal: AbortSignal.timeout(timeoutMs)
+    });
+    if (!response.ok) return unavailable(`the RPC answered HTTP ${response.status}.`);
+    return classifyReply(await response.json());
+  } catch {
+    return unavailable("the RPC was unreachable or sent an unreadable reply.");
+  }
+}
+
 // packages/server/src/store.ts
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
@@ -31650,13 +31750,13 @@ var LocalStore = class {
 var MAX_REPORT_BYTES = 512 * 1024;
 var MAX_PENDING_NONCES = 1e4;
 var RUNS_LIMIT = 20;
-function isRecord(value) {
+function isRecord2(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 async function readJson(c) {
   try {
     const value = await c.req.json();
-    return isRecord(value) ? value : void 0;
+    return isRecord2(value) ? value : void 0;
   } catch {
     return void 0;
   }
@@ -31701,6 +31801,16 @@ function createApiApp(options = {}) {
   const allowedOrigin = normalizeAllowedOrigin(
     options.allowedOrigin === void 0 ? process.env.AIRBAG_ALLOWED_ORIGIN : options.allowedOrigin
   );
+  const keyCheck = options.keyCheck ?? "rpc";
+  const checkKey = async (accountId, publicKey) => {
+    if (keyCheck === "off") return { ok: true };
+    if (typeof keyCheck === "function") return keyCheck({ accountId, publicKey });
+    return checkKeyOwnership({
+      accountId,
+      publicKey,
+      network: process.env.NEAR_NETWORK === "mainnet" ? "mainnet" : "testnet"
+    });
+  };
   const pendingNonces = /* @__PURE__ */ new Map();
   function pruneNonces(nowMs) {
     for (const [nonce, pending] of pendingNonces) {
@@ -31816,6 +31926,16 @@ function createApiApp(options = {}) {
       callbackUrl
     });
     if (!result.valid) return c.json({ error: result.error }, 401);
+    const ownership = await checkKey(accountId, publicKey);
+    if (!ownership.ok) {
+      if (ownership.reason === "not-owner") {
+        return c.json({ error: "That key is not an access key of this NEAR account." }, 401);
+      }
+      return c.json(
+        { error: "Could not check the key against the NEAR network. Try again in a moment." },
+        503
+      );
+    }
     if (!store.takeNonce) pendingNonces.delete(nonce);
     await store.ensureUser(accountId);
     const session = createSessionToken(time3);

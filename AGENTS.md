@@ -24,7 +24,7 @@ No API keys are needed for anything below. `NEARAI_API_KEY` is only for the opti
 | Command | Purpose |
 | --- | --- |
 | `pnpm verify` | The full gate: lint, typecheck, tests, HTTP and process smokes, attack demo, llms check, build, demo smoke. Run before finishing. |
-| `pnpm test` | Vitest, all packages (115 tests) |
+| `pnpm test` | Vitest, all packages (129 tests) |
 | `pnpm test:api` | Wallet auth and store tests only |
 | `pnpm airbag run --agent naive --summary` | Dummy: expect grade F, 21 crashed |
 | `pnpm airbag run --agent hardened --summary` | Seatbelt: expect grade A, 21 survived |
@@ -65,6 +65,9 @@ scripts/           demo server, builders, smoke tests, UI checks
   `packages/core/src` change only with a `DECISIONS.md` entry and regenerated fixtures.
 - **One real-host file.** Only `packages/server/src/liveProbe.ts` may name the real 1Click host, and
   only for `GET /v0/tokens` and a dry quote. A test scans the source.
+- **Sign-in checks key ownership.** `POST /api/auth/verify` must keep proving that the public key is
+  an access key of the account (`packages/server/src/nearKeys.ts`) and fail closed. A valid signature
+  alone proves nothing about the account name.
 - **Changing a number changes the hash.** If scenarios, the Judge or an agent change, regenerate with
   `pnpm build:fixtures`, update `golden.test.ts` and the figures in README and `docs/`, and explain it
   in `DECISIONS.md`.

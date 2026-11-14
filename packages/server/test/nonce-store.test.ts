@@ -51,7 +51,7 @@ beforeEach(async () => {
       return pending;
     },
   };
-  app = createApiApp({ store, allowedOrigin: null, now: () => clock });
+  app = createApiApp({ store, allowedOrigin: null, now: () => clock, keyCheck: 'off' });
 });
 
 afterEach(async () => {

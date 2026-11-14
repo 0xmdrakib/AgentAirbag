@@ -12,6 +12,7 @@ import {
   sessionCookie,
   verifyNearSignature,
 } from './auth';
+import { checkKeyOwnership, type KeyCheckResult } from './nearKeys';
 import { createStore, type PendingNonce, type RunStore } from './store';
 
 const MAX_REPORT_BYTES = 512 * 1024;
@@ -37,6 +38,14 @@ export interface CreateApiOptions {
   /** Defaults to AIRBAG_ALLOWED_ORIGIN. Pass null to force same-origin only. */
   allowedOrigin?: string | null;
   nonceTtlMs?: number;
+  /**
+   * How sign-in proves the key belongs to the account. "rpc" (default) asks the NEAR JSON-RPC;
+   * "off" skips the check and exists only so tests never touch the network.
+   */
+  keyCheck?:
+    | 'rpc'
+    | 'off'
+    | ((input: { accountId: string; publicKey: string }) => Promise<KeyCheckResult>);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -102,6 +111,17 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
   const allowedOrigin = normalizeAllowedOrigin(
     options.allowedOrigin === undefined ? process.env.AIRBAG_ALLOWED_ORIGIN : options.allowedOrigin,
   );
+
+  const keyCheck = options.keyCheck ?? 'rpc';
+  const checkKey = async (accountId: string, publicKey: string): Promise<KeyCheckResult> => {
+    if (keyCheck === 'off') return { ok: true };
+    if (typeof keyCheck === 'function') return keyCheck({ accountId, publicKey });
+    return checkKeyOwnership({
+      accountId,
+      publicKey,
+      network: process.env.NEAR_NETWORK === 'mainnet' ? 'mainnet' : 'testnet',
+    });
+  };
 
   const pendingNonces = new Map<string, PendingNonce>();
 
@@ -233,6 +253,18 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
       callbackUrl,
     });
     if (!result.valid) return c.json({ error: result.error }, 401);
+
+    // A valid signature only proves the caller holds some private key. Bind it to the account.
+    const ownership = await checkKey(accountId, publicKey);
+    if (!ownership.ok) {
+      if (ownership.reason === 'not-owner') {
+        return c.json({ error: 'That key is not an access key of this NEAR account.' }, 401);
+      }
+      return c.json(
+        { error: 'Could not check the key against the NEAR network. Try again in a moment.' },
+        503,
+      );
+    }
 
     if (!store.takeNonce) pendingNonces.delete(nonce);
     await store.ensureUser(accountId);

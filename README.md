@@ -5,7 +5,7 @@ that fails on purpose, 21 scripted crashes, and a report card scored from ledger
 move.
 
 [![verify](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml/badge.svg)](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml)
-![tests](https://img.shields.io/badge/tests-115%20passing-0d7a4e)
+![tests](https://img.shields.io/badge/tests-129%20passing-0d7a4e)
 ![scenarios](https://img.shields.io/badge/crashes-21-ffd21f)
 ![funds](https://img.shields.io/badge/real%20funds-0-c01f31)
 ![license](https://img.shields.io/badge/license-MIT-6b6b67)
@@ -21,12 +21,12 @@ move.
 | **Result** | A tutorial-grade agent (Dummy) scores **F**: it crashes 21 of 21 and loses **$10,907.04** in simulation. A reference agent built on Agent Airbag Guard (Seatbelt) scores **A**: it survives 21 of 21. |
 | **NEAR role** | Mirrors the documented 1Click API (`/v0/tokens`, `/v0/quote`, `/v0/deposit/submit`, `/v0/status`), seeded from a real read-only token and dry-quote snapshot. Optional NEAR wallet sign-in (NEP-413) saves reports under your account. |
 | **Track** | AI Security & Defense (primary), Open Innovation (secondary) |
-| **Live demo** | [agentairbag.xyz](https://agentairbag.xyz), a static build of `main` on Vercel. The simulator, report card, replay and scenario library work there. Wallet sign-in and saved runs do not (see [Limitations](#limitations)). |
+| **Live demo** | [agentairbag.xyz](https://agentairbag.xyz), a Vercel deployment of `main`. The simulator, report card, replay and scenario library work there, and so does the optional NEAR wallet sign-in with saved runs (Neon Postgres). |
 | **Status** | Also runs locally with one command. No LLM result is claimed. |
 
 ## Verify it yourself
 
-**Just want to look?** Open [agentairbag.xyz](https://agentairbag.xyz). Everything below under "In the browser" works there. To run the commands, clone the repository.
+**Just want to look?** Open [agentairbag.xyz](https://agentairbag.xyz). Everything below under "In the browser" works there, including wallet sign-in. To run the commands, clone the repository.
 
 Requires Node 22+ and pnpm 9+. No API keys, no wallet, no network after install.
 
@@ -42,7 +42,7 @@ pnpm install --frozen-lockfile
 | `pnpm airbag run --agent naive --summary` | `score 0 · grade F · 0 survived · 21 crashed`, `simulated loss $10907.04 · false claims 8` |
 | `pnpm airbag run --agent hardened --summary` | `score 100 · grade A · 21 survived · 0 crashed`, `simulated loss $1.00` (a modeled refund fee) |
 | `pnpm demo:attack` | An unguarded agent obeys an instruction hidden in a token symbol and loses $9,995.46 (simulated). The guarded agent blocks it with `TAINTED_VALUE`, loses $0.00 and still completes the swap. |
-| `pnpm test` | 115 tests pass, including a byte-identical report hash for the same seed |
+| `pnpm test` | 129 tests pass, including a byte-identical report hash for the same seed |
 | `pnpm verify` | Lint, typecheck, tests, HTTP and process sandbox smokes, attack demo, build and a headless-browser demo smoke |
 | `pnpm demo` | Builds everything and serves the app at `http://localhost:4321`. Open it in any browser. |
 
@@ -115,9 +115,10 @@ Each claim below maps to code. Anything not listed is not claimed.
 3. **Why this needs NEAR.** One signed intent and one quote settle a cross-chain swap, and a solver
    network races to fill it. That gives agents real failure modes: quotes expire, statuses lag,
    solvers go quiet, refunds go to the origin chain. Those are the 21 crashes.
-4. **Wallet sign-in (optional).** Connect a NEAR wallet to save and list reports. The server verifies
-   a NEP-413 signature (ed25519 and secp256k1) and stores a hashed session. The simulator does not
-   need it.
+4. **Wallet sign-in (optional).** Connect a NEAR wallet to save and list reports. The wallet signs a
+   message (NEP-413); it never signs a transaction and the site never asks for one. The server verifies
+   the signature (ed25519 and secp256k1), checks through the NEAR RPC that the key belongs to the
+   account, and stores a hashed session. The simulator does not need it.
 5. **NEAR AI Cloud adapter.** An OpenAI-compatible LLM agent and cassette recorder for
    `https://cloud-api.near.ai/v1` ship in `packages/agents`. They have **not been run**: no key was
    available, so no model result exists or is claimed.
@@ -196,24 +197,24 @@ More: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | Dummy and Seatbelt | Scripted agents, not language models |
 | LLM runs | Adapter and recorder ship; **no run or cassette is bundled** |
 | Report hash | sha256 of canonical JSON. **Not a signature.** |
-| NEAR wallet sign-in | Signature flow tested with a generated ed25519 key; see Limitations |
+| NEAR wallet sign-in | Message signing only, on NEAR mainnet. Tested end to end against the live site with a generated key; not yet with each real wallet (see Limitations) |
 
 Every public claim, with the command that proves it: [`docs/CLAIMS.md`](docs/CLAIMS.md).
 
 ## Limitations
 
-- **The hosted demo is static.** [agentairbag.xyz](https://agentairbag.xyz) serves the simulator,
-  report card, replay and scenarios. **Connect wallet** is disabled there, because wallet sign-in and
-  saved runs need the Node API on the same origin and a static host does not provide one. Run
-  `pnpm demo` locally for those. See [`docs/DEPLOY.md`](docs/DEPLOY.md).
+- **Hosting.** [agentairbag.xyz](https://agentairbag.xyz) is a Vercel project built from `main`: the
+  static app plus one serverless function for `/api`, backed by Neon Postgres. A free-tier database
+  can pause when idle, so the first sign-in after a quiet period can be slow. See
+  [`docs/DEPLOY.md`](docs/DEPLOY.md).
 - **No LLM result.** The adapter and recorder are written for NEAR AI Cloud but were never run.
 - **Wallets.** MyNearWallet, Sender, OKX, Nightly, Meteor, Here, Coin98 and Ledger are wired in
-  (Bitget when its extension is present). The signing path was proven with a generated key, not with
-  each real wallet.
+  (Bitget when its extension is present). The sign-in path was proven end to end with a generated
+  ed25519 key; no real wallet extension was available to test, so a wallet-specific quirk is possible.
 - **No report signature.** The hash proves integrity, not authorship.
 - **Known engine edges.** A funded swap still inside the solver window stays in escrow
   (`solver-stall`); `solver-stall` is not yet labelled `modeled`; in-process agents can mutate the
-  task and policy objects; the auth path does not check a public key against the NEAR RPC.
+  task and policy objects.
 - **Not a leaderboard** and not a general LLM red team. It tests a money-moving agent's decisions
   against a fixed, scripted world.
 - **Bundle.** Initial load is 206 KB JavaScript plus 21 KB CSS, gzipped. The wallet SDK loads only

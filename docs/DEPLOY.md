@@ -70,8 +70,27 @@ another port, update this value before starting it.
 | `NEAR_NETWORK`          | API runtime            | `testnet` or `mainnet`                                   | Network reported by `GET /api/health`. Keep it aligned with `VITE_NEAR_NETWORK`. |
 | `AIRBAG_ALLOWED_ORIGIN` | API runtime            | `http://localhost:4321`                                  | Exact browser origin allowed to call the API.                                    |
 | `AIRBAG_AUTH_RECIPIENT` | API runtime            | `agentairbag.xyz`                                        | Recipient signed in the wallet message. Empty uses the request host.             |
+| `NEAR_RPC_URL`          | API runtime            | `https://rpc.testnet.near.org`                           | Optional. NEAR JSON-RPC endpoint for the access key check. Empty uses the public RPC for `NEAR_NETWORK`. |
 | `AIRBAG_DATA_DIR`       | API runtime            | `.data`                                                  | Directory for the local JSON store when `DATABASE_URL` is unset.                 |
 | `VITE_NEAR_NETWORK`     | Web build              | `testnet` or `mainnet`                                   | Network compiled into the browser app. Keep it equal to `NEAR_NETWORK`.          |
+
+## Access key ownership check
+
+A NEP-413 signature only proves the caller holds some private key. So after the signature is valid
+and before a session is created, `POST /api/auth/verify` checks that the public key is an access key
+of the account:
+
+- **Implicit accounts** (64 lowercase hex characters) are owned by the ed25519 key whose bytes spell
+  the account id. No network call is made.
+- **Named accounts** are checked with the NEAR JSON-RPC `query` method (`view_access_key`,
+  `finality: final`). Full access keys and function-call keys both count. The RPC is
+  `https://rpc.mainnet.near.org` when `NEAR_NETWORK=mainnet` and `https://rpc.testnet.near.org`
+  otherwise; set `NEAR_RPC_URL` (a plain URL, not a secret) to use another endpoint.
+- **A key that is not on the account** gets `401`. **An RPC that cannot be reached, times out after
+  8 seconds or sends an unreadable reply** gets `503` and no session: the check fails closed.
+
+The check needs outbound HTTPS from the API to the RPC. Tests replace it with a stub and never touch
+the network.
 
 ## Create a Neon database
 
@@ -132,6 +151,7 @@ Set these in the Vercel project settings (Production). Nothing in the repository
 | `VITE_NEAR_NETWORK`     | no     | Network compiled into the web app at build time. Keep equal to `NEAR_NETWORK`. |
 | `AIRBAG_ALLOWED_ORIGIN` | no     | Exact public origin, for example `https://agentairbag.xyz`. Same origin works without it. |
 | `AIRBAG_AUTH_RECIPIENT` | no     | Recipient signed in the wallet message. Empty uses the request host.           |
+| `NEAR_RPC_URL`          | no     | NEAR RPC endpoint for the key ownership check. Empty uses the public RPC.      |
 
 Check it after a deploy with `GET /api/health`, which reports `"db": "neon"` when `DATABASE_URL` is
 read.

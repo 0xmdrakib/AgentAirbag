@@ -241,6 +241,21 @@ function through `includeFiles`, and `readSchemaStatements` falls back to the wo
 the source-relative path is missing. The SPA rewrite now skips `/api/`. No report, scenario or Judge
 number changed.
 
+## Access key ownership check
+
+**Sign-in now checks that the signing key belongs to the claimed account.** The NEP-413 signature
+proved only that the caller held some private key, so anyone could sign in as any account name with a
+fresh key and read that account's saved runs. `POST /api/auth/verify` now calls
+`checkKeyOwnership` (`packages/server/src/nearKeys.ts`) after the signature and before the session.
+Implicit accounts are checked locally (the hex of the ed25519 key must equal the account id); named
+accounts use the NEAR JSON-RPC `view_access_key` query, accepting full access and function-call
+keys. Alternatives: trust the signature alone (rejected, it is the hole), or require full access keys
+only (rejected, wallets often sign with a function-call key). It fails closed: an unreachable,
+timed-out or unreadable RPC returns 503 and no session. `NEAR_RPC_URL` optionally overrides the public
+endpoint. An implicit account that later added other keys can only sign in with its own key; that is
+the stricter reading and is deliberate. Tests pass `keyCheck: 'off'` or a stub and never use the
+network.
+
 ## Name: Agent Airbag
 
 **The product name is Agent Airbag; Airbag is the short form.** The maintainer chose it with the

@@ -46,7 +46,7 @@ afterAll(() => {
 beforeEach(async () => {
   dataDir = await mkdtemp(join(tmpdir(), 'airbag-api-'));
   store = createStore({ databaseUrl: null, dataDir, quiet: true });
-  app = createApiApp({ store, allowedOrigin: null, now: () => TEST_NOW });
+  app = createApiApp({ store, allowedOrigin: null, now: () => TEST_NOW, keyCheck: 'off' });
 });
 
 afterEach(async () => {
@@ -262,6 +262,7 @@ describe('CORS', () => {
       store,
       allowedOrigin: 'https://app.example',
       now: () => TEST_NOW,
+      keyCheck: 'off',
     });
     const response = await configured.request('/api/health', {
       method: 'OPTIONS',

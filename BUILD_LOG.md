@@ -140,3 +140,6 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 
 **2026-11-15 (hosting).** Switched to clean URLs (History API) and deployed the static build to Vercel from the GitHub repository; the project domain agentairbag.xyz serves it. Wallet connect is disabled on that host because no API runs there. The UI audit skips the wallet picker check on hosts without the API.
 
+
+**2026-11-15 (wallet API and database).** Created a new Neon project and set the Vercel environment variables as non-sensitive config values at the maintainer's instruction. The wallet API now runs as one Vercel function (api/index.js, a committed esbuild bundle) with sign-in nonces in Postgres. A live end-to-end test found that nested /api paths were not routed; a rewrite fixed it.
+
