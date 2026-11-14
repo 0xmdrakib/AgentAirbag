@@ -57,6 +57,11 @@ export function Layout({ route, children }: { route: string; children: ReactNode
           </nav>
           <div className="header-right">
             <SimBanner compact />
+            {route !== '/run' && (
+              <a href="#/run?auto=naive" className="btn btn-primary btn-sm header-cta">
+                Run the suite
+              </a>
+            )}
             <button
               type="button"
               className="icon-button menu-button"

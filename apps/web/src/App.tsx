@@ -72,7 +72,7 @@ function AppInner() {
       case '/replay':
         return <ReplayPage scenarioId={route.replayId} />;
       case '/scenarios':
-        return <ScenariosPage />;
+        return <ScenariosPage lawParam={route.query.get('law')} />;
       case '/connect':
         return <ConnectPage />;
       case '/':

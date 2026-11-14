@@ -3166,12 +3166,17 @@ pre,
 }
 
 .code-line {
-  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.code-line .copy-button {
+  flex: 0 0 auto;
 }
 
 .code-line code {
   min-width: 0;
-  flex: 1 1 200px;
+  flex: 1 1 0;
+  padding-top: 5px;
   color: var(--text);
   font-size: 14px;
   white-space: pre-wrap;
@@ -4063,6 +4068,118 @@ pre,
   border-color: var(--fail-line);
 }
 
+/* ---------- UX polish ---------- */
+
+.header-cta {
+  white-space: nowrap;
+}
+
+/* Scenario library: search first, then law filters, and every card says which law it tests. */
+.library-toolbar {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.library-toolbar .search-field {
+  order: -1;
+  width: min(100%, 440px);
+  min-width: 0;
+}
+
+.library-card-top {
+  margin-bottom: 14px;
+}
+
+.library-law {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.library-law-num {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface-3);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.library-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.library-priority {
+  margin-left: 0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.priority-p0 {
+  background: var(--signal-soft);
+  color: var(--signal-text);
+}
+
+.library-tags .library-id {
+  margin-top: 0;
+  flex-basis: 100%;
+}
+
+/* Report: panels line up and fill their column. */
+.report-law-bars {
+  display: flex;
+  flex-direction: column;
+}
+
+.report-law-bars .law-bar-wrap {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.report-law-bars .law-bar {
+  flex: 1 1 auto;
+}
+
+.failure-grid {
+  align-items: stretch;
+}
+
+.failure-card .fix {
+  flex: 1 1 auto;
+}
+
+.sample-code pre {
+  max-height: none;
+}
+
+.run-after-card .code-line {
+  margin-top: 12px;
+}
+
+.run-after-card p {
+  margin-top: 6px;
+}
+
 /* ---------- Responsive ---------- */
 
 @media (min-width: 1700px) {
@@ -4487,7 +4604,8 @@ pre,
     padding: 20px;
   }
   .connect-step {
-    gap: 14px;
+    flex-direction: column;
+    gap: 12px;
   }
   .meta-grid {
     grid-template-columns: 1fr 1fr;
@@ -4524,6 +4642,12 @@ pre,
   .ledger-row,
   .pane-head {
     padding-inline: 14px;
+  }
+}
+
+@media (max-width: 700px) {
+  .header-cta {
+    display: none;
   }
 }
 

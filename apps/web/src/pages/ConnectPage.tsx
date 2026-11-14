@@ -146,9 +146,25 @@ export function ConnectPage() {
         </div>
       </section>
 
+      <section className="section">
+        <SectionHead
+          eyebrow="What you will see"
+          title="Run it, then read the report."
+          body="Example terminal session. The Dummy and Seatbelt lines are the bundled reference agents; your agent gets its own row."
+        />
+        <div className="terminal-card">
+          <div className="terminal-head">
+            <TerminalIcon size={16} /> <span className="mono">terminal</span>
+          </div>
+          <pre className="mono">
+            <code>{`$ pnpm install\n$ pnpm airbag serve\nAirbag sandbox listening on http://localhost:4321\nDefault run: http://localhost:4321/r/demo\n$ pnpm airbag run --cmd "node my-agent.js"\n\nDummy (no guards)      0 survived · 21 crashed · $10,907.04 simulated loss\nSeatbelt (Guard)      21 survived · 0 crashed · $1.00 simulated loss`}</code>
+          </pre>
+        </div>
+      </section>
+
       <section className="section connect-cta">
         <div>
-          <p className="eyebrow">On this page</p>
+          <p className="eyebrow">No install needed to look around</p>
           <h2 className="h2">The static demo runs the scripted suites in your browser.</h2>
           <p className="section-sub">
             Live bring-your-own runs need the local CLI because a static page cannot accept an
@@ -162,17 +178,6 @@ export function ConnectPage() {
           <LinkButton href="#/scenarios" variant="secondary">
             Browse the crashes
           </LinkButton>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="terminal-card">
-          <div className="terminal-head">
-            <TerminalIcon size={16} /> <span className="mono">terminal</span>
-          </div>
-          <pre className="mono">
-            <code>{`$ pnpm install\n$ pnpm airbag serve\nAirbag sandbox listening on http://localhost:4321\nDefault run: http://localhost:4321/r/demo\n$ pnpm airbag run --cmd "node my-agent.js"\n\nDummy (no guards)      0 survived · 21 crashed · $10,907.04 simulated loss\nSeatbelt (Guard)      21 survived · 0 crashed · $1.00 simulated loss`}</code>
-          </pre>
         </div>
       </section>
     </div>

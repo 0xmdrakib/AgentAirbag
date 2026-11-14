@@ -1,15 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Law } from '@airbag/core';
+import { LAW_SHORT } from '@airbag/core';
 import { LAW_NAMES, SCENARIOS } from '../lib/report';
 import scenarioYaml from '../generated/scenario-yaml.json';
-import { Chip, CopyButton, LawBadge } from '../components/Primitives';
+import { Chip, CopyButton } from '../components/Primitives';
 import { ArrowRightIcon, CodeIcon, SearchIcon, XIcon } from '../components/Icons';
 import { cx } from '../lib/format';
 
 const YAML = scenarioYaml as Record<string, string>;
 
-export function ScenariosPage() {
-  const [law, setLaw] = useState<Law | 0>(0);
+function parseLaw(value: string | null | undefined): Law | 0 {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 1 && n <= 7 ? (n as Law) : 0;
+}
+
+export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
+  const [law, setLaw] = useState<Law | 0>(() => parseLaw(lawParam));
+
+  useEffect(() => {
+    setLaw(parseLaw(lawParam));
+  }, [lawParam]);
   const [query, setQuery] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -68,7 +78,8 @@ export function ScenariosPage() {
               onClick={() => setLaw(value)}
               aria-pressed={law === value}
             >
-              L{value} <span className="filter-label">{LAW_NAMES[value]}</span>
+              <span className="mono">L{value}</span>{' '}
+              <span className="filter-label">{LAW_SHORT[value]}</span>
             </button>
           ))}
         </div>
@@ -92,14 +103,21 @@ export function ScenariosPage() {
         {filtered.map((scenario) => (
           <article className="library-card" key={scenario.id}>
             <div className="library-card-top">
-              <LawBadge law={scenario.law} short />
-              <span className="mono library-priority">{scenario.priority}</span>
-              {scenario.modeled && <span className="modeled-tag">modeled</span>}
-              {scenario.llmSensitive && <span className="llm-tag">LLM-sensitive</span>}
+              <span className="library-law">
+                <span className="library-law-num mono">{scenario.law}</span>
+                <span className="library-law-name">{LAW_NAMES[scenario.law as Law]}</span>
+              </span>
             </div>
             <h2 className="h3">{scenario.title}</h2>
             <p className="library-story">{scenario.story}</p>
-            <p className="library-id mono">{scenario.id}</p>
+            <div className="library-tags">
+              <span className={cx('library-priority mono', `priority-${scenario.priority.toLowerCase()}`)}>
+                {scenario.priority}
+              </span>
+              {scenario.modeled && <span className="modeled-tag">modeled</span>}
+              {scenario.llmSensitive && <span className="llm-tag">LLM-sensitive</span>}
+              <span className="library-id mono">{scenario.id}</span>
+            </div>
             <div className="library-actions">
               <a href={`#/replay/${scenario.id}`} className="library-watch">
                 Watch Dummy crash <ArrowRightIcon size={14} />

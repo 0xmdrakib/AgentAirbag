@@ -3,7 +3,7 @@ import type { ScenarioResult } from '@airbag/core';
 import { useAppState, type AgentId } from '../state/AppState';
 import { SCENARIOS, verdictWord } from '../lib/report';
 import { ScenarioCells } from '../components/ScenarioBoard';
-import { Button, Chip, LinkButton, VerdictPill } from '../components/Primitives';
+import { Button, Chip, CopyButton, LinkButton, VerdictPill } from '../components/Primitives';
 import { ArrowRightIcon, PlayIcon, ShieldIcon, TerminalIcon } from '../components/Icons';
 import { cx } from '../lib/format';
 
@@ -203,7 +203,12 @@ export function RunnerPage() {
           <TerminalIcon size={18} />
           <div>
             <h2 className="h3">The same suite, from a terminal</h2>
-            <p className="mono run-command">pnpm airbag run --agent naive</p>
+            <p>Offline after install, and it prints the same report card.</p>
+            <div className="code-line run-code">
+              <span className="mono code-prompt">$</span>
+              <code className="mono">pnpm airbag run --agent naive</code>
+              <CopyButton value="pnpm airbag run --agent naive" />
+            </div>
           </div>
         </div>
         <div className="run-after-card">

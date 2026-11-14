@@ -107,3 +107,6 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 
 **2026-11-14 (light only).** Removed dark mode on request: dark tokens, theme toggle, pre-paint theme script and localStorage key are gone; the UI is light only. ui:audit now runs one light pass and asserts no toggle is rendered. Fixed leftover Crumple names in og.svg and mark.svg.
 
+
+**2026-11-14 (UX pass 1).** Walked every page and fixed layout and wording: header Run-the-suite CTA; Lab order is now hero, proof, how it works, injected-token duel, seven laws, CTA; law cards deep-link to the filtered library; library cards name their law and show P0/P1 and modeled tags together; Report law list and failure cards fill their columns; Connect shows the example terminal session right after the steps, shows the full sample, and keeps Copy beside each command on phones; Runner terminal command has Copy. ui:audit clean.
+
