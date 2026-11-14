@@ -128,20 +128,11 @@ export function ReportPage() {
             Report card · {report.agent.label} · {report.suite.scenarioCount} crashes
           </p>
           <h1 className="h1">{sentence}</h1>
-          <div className="report-hero-meta">
-            <Chip tone={report.overall.failed === 0 ? 'pass' : 'fail'}>
-              {report.overall.failed} crashed
-            </Chip>
-            <Chip tone={report.overall.passed > 0 ? 'pass' : 'neutral'}>
-              {report.overall.passed} survived
-            </Chip>
-            <Chip tone={report.overall.falseClaims > 0 ? 'fail' : 'neutral'}>
-              {plural(report.overall.falseClaims, 'false claim')}
-            </Chip>
-            {report.overall.cappedBy?.length ? (
-              <Chip tone="warn">capped at {report.overall.grade}</Chip>
-            ) : null}
-          </div>
+          {report.overall.cappedBy?.length ? (
+            <div className="report-hero-meta">
+              <Chip tone="warn">Grade capped at {report.overall.grade} by a false claim</Chip>
+            </div>
+          ) : null}
         </div>
         <div className="report-hero-money">
           <MoneyMeter value={report.overall.simulatedLossUsd} size="lg" />
@@ -160,9 +151,9 @@ export function ReportPage() {
       </header>
 
       <div className="report-stats">
-        <Stat label="Survived" value={report.overall.passed} tone="pass" />
-        <Stat label="Wobbled" value={report.overall.warned} tone="warn" />
-        <Stat label="Crashed" value={report.overall.failed} tone="fail" />
+        <Stat label="Survived" value={report.overall.passed} tone={report.overall.passed > 0 ? 'pass' : undefined} />
+        <Stat label="Wobbled" value={report.overall.warned} tone={report.overall.warned > 0 ? 'warn' : undefined} />
+        <Stat label="Crashed" value={report.overall.failed} tone={report.overall.failed > 0 ? 'fail' : undefined} />
         <Stat label="False claims" value={report.overall.falseClaims} tone={report.overall.falseClaims > 0 ? 'fail' : undefined} />
         <Stat label="Score" value={`${report.overall.score}/100`} />
       </div>
@@ -249,11 +240,10 @@ export function ReportPage() {
 
       <section className="section report-failures">
         <SectionHead
-          eyebrow="The loud part"
-          title={failures.length ? 'The top three failures' : 'No invariant violated'}
+          title={failures.length ? 'Costliest failures' : 'No invariant violated'}
           body={
             failures.length
-              ? 'Each card shows the story, the broken invariant, the simulated loss and a fix you can paste into the agent.'
+              ? 'The three crashes that lost the most. Each shows what went wrong, the law it broke and a fix you can paste into the agent.'
               : 'This agent survived these crashes. That is not a claim that it is safe; it is a claim about this suite.'
           }
           right={
@@ -286,9 +276,8 @@ export function ReportPage() {
 
       <section className="section compare-section">
         <SectionHead
-          eyebrow="Compare"
-          title="The same suite, three agents."
-          body="Dummy is the tutorial-grade agent. Seatbelt is the reference implementation of the seven laws. The LLM row is empty until a real recording exists."
+          title="Compare agents"
+          body="Same suite, same seed. Dummy follows the tutorial and has no guards; Seatbelt applies all seven laws. The LLM row stays empty until a real recording exists."
         />
         <div className="compare-table-wrap">
           <table className="compare-table">

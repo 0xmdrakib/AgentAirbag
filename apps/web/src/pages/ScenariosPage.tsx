@@ -47,17 +47,12 @@ export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
     <div className="page container page-scenarios">
       <div className="page-head">
         <div>
-          <p className="eyebrow">Scenario library</p>
-          <h1 className="h1">{SCENARIOS.length} crashes, 7 laws.</h1>
+          <h1 className="h1">Scenario library</h1>
           <p className="page-sub">
-            Each crash is one YAML file with a story, a fault, a judge rule and a fix. Add a new one
-            in about twenty minutes; the build fails on an unknown key.
+            {SCENARIOS.length} crashes across seven laws. Each is one YAML file with a story, the
+            fault Airbag injects, the check the judge runs and a fix.
           </p>
         </div>
-        <Chip tone="signal">
-          {SCENARIOS.filter((scenario) => scenario.priority === 'P0').length} P0 ·{' '}
-          {SCENARIOS.filter((scenario) => scenario.priority === 'P1').length} P1
-        </Chip>
       </div>
 
       <div className="library-toolbar">

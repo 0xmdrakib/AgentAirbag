@@ -282,7 +282,7 @@ window. Add the live URL here after deploying; do not claim one before it exists
   [`DECISIONS.md`](DECISIONS.md).
 - **No pre-existing product code.** The repo started empty. Libraries and tools used: pnpm,
   TypeScript, Zod, `@noble/hashes`, Hono, `@hono/node-server`, `commander`, `execa`, the OpenAI SDK,
-  React, Vite, `lz-string`, Fontsource (Bricolage Grotesque, Inter, JetBrains Mono), `yaml`, Vitest,
+  React, Vite, `lz-string`, Fontsource (Inter, JetBrains Mono), `yaml`, Vitest,
   Playwright-core (screenshots only), ESLint, Prettier.
 - **Templates:** none. Vite’s React template conventions were used for the app shell; all product
   code, scenarios, copy and design are written in the window.
@@ -305,7 +305,7 @@ window. Add the live URL here after deploying; do not claim one before it exists
   decisions against a fixed world.
 - **No accounts, database or required backend.**
 - **No report signature** (the P2 NEAR ed25519 signing is not shipped).
-- **Bundle size:** the initial JavaScript is **198 KB gzipped**, under the 250 KB gzip target. Vite
+- **Bundle size:** the initial JavaScript is **197 KB gzipped**, under the 250 KB gzip target. Vite
   warns about the uncompressed 1.25 MB because the two report fixtures carry the full EventLogs;
   that size is why the hosted demo stays a static bundle with no backend.
 

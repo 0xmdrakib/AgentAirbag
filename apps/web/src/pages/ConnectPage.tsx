@@ -49,14 +49,13 @@ export function ConnectPage() {
     <div className="page container page-connect">
       <div className="page-head">
         <div>
-          <p className="eyebrow">Bring your own agent</p>
-          <h1 className="h1">Three steps. No real keys.</h1>
+          <h1 className="h1">Test your own agent</h1>
           <p className="page-sub">
-            Airbag is a drop-in base URL change. If your agent follows the 1Click docs and sends
-            its deposit through the sandbox wallet, it can run the whole suite.
+            Change one base URL. If your agent follows the 1Click docs and sends its deposit through
+            the sandbox wallet, it can run the whole suite. Live runs use the local CLI; this page
+            only shows the steps.
           </p>
         </div>
-        <Chip tone="warn">static demo · live runs need the CLI</Chip>
       </div>
 
       <div className="connect-grid">
@@ -96,7 +95,7 @@ export function ConnectPage() {
         <aside className="limits-card">
           <div className="limits-head">
             <ShieldIcon size={18} />
-            <h2 className="h3">Three rules, or it is not a sandbox</h2>
+            <h2 className="h3">What your agent must do</h2>
           </div>
           <ol className="limits-list">
             <li>
@@ -131,8 +130,7 @@ export function ConnectPage() {
 
       <section className="section">
         <SectionHead
-          eyebrow="A minimal target"
-          title="A mock agent is a dozen HTTP calls."
+          title="A minimal agent to start from"
           body="The sample below is deliberately naive: it reports “pending” instead of guessing. Swap in your own agent and let the crashes find the gaps."
         />
         <div className="sample-code">
@@ -148,8 +146,7 @@ export function ConnectPage() {
 
       <section className="section">
         <SectionHead
-          eyebrow="What you will see"
-          title="Run it, then read the report."
+          title="What a run looks like"
           body="Example terminal session. The Dummy and Seatbelt lines are the bundled reference agents; your agent gets its own row."
         />
         <div className="terminal-card">
@@ -164,8 +161,7 @@ export function ConnectPage() {
 
       <section className="section connect-cta">
         <div>
-          <p className="eyebrow">No install needed to look around</p>
-          <h2 className="h2">The static demo runs the scripted suites in your browser.</h2>
+          <h2 className="h2">No install needed to look around</h2>
           <p className="section-sub">
             Live bring-your-own runs need the local CLI because a static page cannot accept an
             incoming process. The CLI is one command and works offline after install.

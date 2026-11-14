@@ -127,6 +127,16 @@ clipped radar labels and a broken Connect rules box. Patching would not fix a ty
 the viewBox and falls below 12px on phones. The radar also overlays the other agent (Dummy vs
 Seatbelt) so an F grade is not an empty dot. Below 480px of chart width it shows codes and scores only.
 
+**Design system v3: editorial instead of template.** The owner judged v2 as looking like a generic
+AI-generated page. The tells were real: a grid background with colour glows, mono uppercase labels on
+every section, gradient cards with big radii and hover lifts, a highlighter on the headline, boxed
+01/02/03 numerals, chips everywhere and slogan headlines ("Point, crash, read."). v3 removes all of
+them. Warm neutral palette, ink-black primary buttons, hairline borders, 6 to 14px radii, one sans
+(Inter) for display and UI, mono only for code and API values, money in tabular Inter numerals.
+Crash-test yellow is a marker only: the logo, the simulation dot, the final call to action and fault
+highlights in the replay. Headlines are plain descriptions. Duplicated numbers were removed (Lab stats
+row, Report hero chips). Bricolage Grotesque was dropped.
+
 **Light theme only.** v2 first shipped dark-first with a light toggle. The owner then asked for light
 mode only, so the dark tokens, the toggle, the pre-paint theme script and the `localStorage` key were
 removed. Alternatives: keep both themes. Reason: one theme means one palette to keep accessible and

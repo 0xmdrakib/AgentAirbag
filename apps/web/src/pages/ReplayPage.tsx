@@ -16,7 +16,7 @@ import {
 import { cx, formatAmount, formatUsd, isTypingTarget } from '../lib/format';
 import { EventRow } from '../components/EventRow';
 import { FixSnippet } from '../components/FixSnippet';
-import { LawBadge, VerdictPill } from '../components/Primitives';
+import { VerdictPill } from '../components/Primitives';
 import {
   AlertIcon,
   ArrowRightIcon,
@@ -172,8 +172,7 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
           <div className="replay-title-row">
             <div>
               <div className="replay-kicker">
-                <LawBadge law={result.law} short />
-                <span className="mono">Law {result.law} · {LAW_NAMES[result.law as 1]}</span>
+                <span>Law {result.law} · {LAW_NAMES[result.law as 1]}</span>
                 {result.modeled && <span className="modeled-tag">modeled</span>}
               </div>
               <h1 className="h1">{result.title}</h1>

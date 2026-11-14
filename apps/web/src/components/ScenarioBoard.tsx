@@ -3,6 +3,11 @@ import { cx } from '../lib/format';
 import { LAW_NAMES, scenariosForLaw } from '../lib/report';
 import { CheckIcon, XIcon, AlertIcon } from './Icons';
 
+function sentenceCase(id: string): string {
+  const words = id.replaceAll('-', ' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 export function ScenarioCells({
   results,
   onSelect,
@@ -19,7 +24,7 @@ export function ScenarioCells({
       {([1, 2, 3, 4, 5, 6, 7] as Law[]).map((law) => (
         <div className="scenario-row" key={law}>
           <div className="scenario-row-label">
-            <span className="scenario-law-num">L{law}</span>
+            <span className="scenario-law-num">Law {law}</span>
             <span className="scenario-law-name">{LAW_NAMES[law]}</span>
           </div>
           <div className="scenario-cells">
@@ -47,11 +52,9 @@ export function ScenarioCells({
                       <AlertIcon size={14} />
                     ) : result?.verdict === 'FAIL' ? (
                       <XIcon size={14} />
-                    ) : (
-                      <span>·</span>
-                    )}
+                    ) : null}
                   </span>
-                  <span className="cell-id">{scenario.id.replaceAll('-', ' ')}</span>
+                  <span className="cell-id">{sentenceCase(scenario.id)}</span>
                   {result?.modeled && <span className="cell-modeled">modeled</span>}
                 </button>
               );

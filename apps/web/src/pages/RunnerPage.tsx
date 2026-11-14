@@ -60,14 +60,12 @@ export function RunnerPage() {
     <div className="page container page-run">
       <div className="page-head">
         <div>
-          <p className="eyebrow">Suite runner</p>
-          <h1 className="h1">Crash the agent. Watch the grid fill.</h1>
+          <h1 className="h1">Run the crash suite</h1>
           <p className="page-sub">
-            The whole suite runs in your browser. No keys, no network calls, no real funds. The
-            virtual clock makes every run reproducible.
+            Pick an agent and run all {SCENARIOS.length} scenarios in your browser. No keys and no
+            network calls. A virtual clock makes every run reproducible from its seed.
           </p>
         </div>
-        <Chip tone="signal">{SCENARIOS.length} scenarios</Chip>
       </div>
 
       <div className="run-layout">

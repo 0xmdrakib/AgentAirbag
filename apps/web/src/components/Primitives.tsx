@@ -104,7 +104,7 @@ export function SimBanner({ compact = false }: { compact?: boolean }) {
   return (
     <span className={cx('sim-banner', compact && 'sim-compact')} title="No real funds move">
       <span className="sim-dot" />
-      {compact ? 'SIMULATION' : 'SIMULATION · no real funds'}
+      {compact ? 'Simulation' : 'Simulation · no real funds'}
     </span>
   );
 }

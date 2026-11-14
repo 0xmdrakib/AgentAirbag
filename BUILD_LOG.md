@@ -110,3 +110,6 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 
 **2026-11-14 (UX pass 1).** Walked every page and fixed layout and wording: header Run-the-suite CTA; Lab order is now hero, proof, how it works, injected-token duel, seven laws, CTA; law cards deep-link to the filtered library; library cards name their law and show P0/P1 and modeled tags together; Report law list and failure cards fill their columns; Connect shows the example terminal session right after the steps, shows the full sample, and keeps Copy beside each command on phones; Runner terminal command has Copy. ui:audit clean.
 
+
+**2026-11-14 (design system v3).** Owner said the UI read as cheap and AI-generated. Removed the template tells (grid and glow background, mono caps labels, gradient cards, hover lifts, headline highlighter, boxed numerals, slogan headlines, duplicate stat rows and chips). New warm neutral palette, ink buttons, hairlines, smaller radii, Inter only, tabular money figures, plain-language headlines, laws as an editorial list. Dropped Bricolage Grotesque. ui:audit, interact, share and seed checks clean.
+
