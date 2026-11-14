@@ -206,6 +206,7 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
           </button>
         </header>
 
+        <div className="wallet-picker-body">
         {loadState === 'loading' && (
           <>
             <p className="sr-only" role="status">
@@ -304,6 +305,7 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
             )}
           </>
         )}
+        </div>
 
         <p className="wallet-picker-footnote">
           New to NEAR? MyNearWallet works in any browser, no extension needed.
