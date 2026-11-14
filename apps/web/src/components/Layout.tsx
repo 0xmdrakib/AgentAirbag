@@ -39,9 +39,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
         <div className="container header-inner">
           <a href="#/" className="brand" aria-label="Agent Airbag home">
             <MarkerLogo size={28} />
-            <span className="wordmark">
-              <span className="wordmark-agent">agent</span> airbag
-            </span>
+            <span className="wordmark">Agent Airbag</span>
           </a>
           <nav
             className={cx('nav', menuOpen && 'nav-open')}
@@ -89,9 +87,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
           <div className="footer-brand-col">
             <a href="#/" className="footer-brand" aria-label="Agent Airbag home">
               <MarkerLogo size={22} />
-              <span className="wordmark">
-                <span className="wordmark-agent">agent</span> airbag
-              </span>
+              <span className="wordmark">Agent Airbag</span>
             </a>
             <p className="footer-note">
               A crash-test lab for AI agents that move money. Everything here is simulated; no

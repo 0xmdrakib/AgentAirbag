@@ -274,11 +274,6 @@ pre,
   flex: 0 0 auto;
 }
 
-.wordmark-agent {
-  font-weight: 450;
-  color: var(--text-3, #6b7280);
-}
-
 .wordmark {
   font-family: var(--font-display);
   white-space: nowrap;
@@ -7086,5 +7081,34 @@ h2.eyebrow {
 @media (max-width: 340px) {
   .app-header .wordmark {
     font-size: 17px;
+  }
+}
+
+/* Keep the wallet icon from being squeezed on the narrowest phones. */
+.wallet-button svg {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 340px) {
+  .app-header .wordmark {
+    font-size: 16px;
+  }
+
+  .app-header .brand {
+    gap: 6px;
+  }
+
+  .app-header .header-right {
+    gap: 6px;
+  }
+
+  .app-header .wallet-button {
+    padding-inline: 10px;
+    gap: 6px;
+  }
+
+  .app-header .menu-button {
+    width: 38px;
+    min-width: 38px;
   }
 }

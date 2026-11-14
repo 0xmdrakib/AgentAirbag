@@ -23,7 +23,6 @@ const html = `<!doctype html>
 body { width: 1200px; height: 630px; background: #fafaf9; font-family: Inter, sans-serif; color: #121212; position: relative; overflow: hidden; }
 .frame { position: absolute; inset: 28px; border: 1px solid #d3d2cd; border-radius: 18px; padding: 52px 60px; background: #fff; }
 .brand { display: flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 650; letter-spacing: -0.03em; }
-.brand .agent { font-weight: 450; color: #6b6b67; }
 h1 { margin-top: 64px; font-size: 64px; line-height: 1.06; font-weight: 680; letter-spacing: -0.04em; max-width: 640px; }
 h1 mark { background: linear-gradient(transparent 62%, #ffd21f 62%); color: inherit; }
 .sub { margin-top: 30px; font-family: JB, monospace; font-size: 22px; color: #484846; }
@@ -39,7 +38,7 @@ h1 mark { background: linear-gradient(transparent 62%, #ffd21f 62%); color: inhe
 <div class="frame">
   <div class="brand">
     <svg width="40" height="40" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#0F1114" stroke="#FFD21F" stroke-width="2"/><path d="M32 32 L32 2 A30 30 0 0 1 62 32 Z" fill="#FFD21F"/><path d="M32 32 L32 62 A30 30 0 0 1 2 32 Z" fill="#FFD21F"/><path d="M32 32 L62 32 A30 30 0 0 1 32 62 Z" fill="#2E3541"/><path d="M32 32 L2 32 A30 30 0 0 1 32 2 Z" fill="#2E3541"/><circle cx="32" cy="32" r="3" fill="#0F1114" stroke="#FFD21F" stroke-width="1.5"/></svg>
-    <span><span class="agent">agent</span> airbag</span>
+    <span>Agent Airbag</span>
   </div>
   <h1>Crash-test your AI agent <mark>before</mark> it touches real money.</h1>
   <div class="sub">21 crashes · 7 laws · 0 real dollars</div>
