@@ -1,6 +1,7 @@
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';
 import { PREVIEW_URL, chromePath } from './preview';
+import { settle } from './settle';
 
 /**
  * Responsive audit. For every route at every width it checks:
@@ -61,7 +62,7 @@ for (const theme of themes) {
             if (visible && parseFloat(style.fontSize) < 12) {
               small.push(`${style.fontSize} "${text.slice(0, 32)}"`);
             }
-            if (visible && box.right > doc.clientWidth + 1 && !el.closest('pre, .timeline-wrap, .drawer, .code-line, .trace-list, .compare-table-wrap, .filter-chips')) {
+            if (visible && box.right > doc.clientWidth + 1 && !el.closest('pre, .timeline-wrap, .drawer, .code-line, .trace-list, .compare-table-wrap, .filter-chips, .section-nav')) {
               clipped.push(`"${text.slice(0, 32)}" right=${Math.round(box.right)}`);
             }
           }
@@ -83,6 +84,7 @@ for (const theme of themes) {
       if (result.clipped.length) problems.push(`${label}: text past viewport → ${result.clipped.slice(0, 3).join(' | ')}`);
       if (result.tiny.length) problems.push(`${label}: tap targets <36px → ${result.tiny.slice(0, 3).join(' | ')}`);
       if (shots) {
+        await settle(page);
         await page.screenshot({
           path: `artifacts/audit/${theme}/${route.name}-${width}.png`,
           fullPage: true,

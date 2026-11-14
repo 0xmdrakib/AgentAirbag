@@ -122,3 +122,6 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 
 **2026-11-14 (landing and information architecture).** Rebuilt the landing page around one question per section: what it is (centered hero, one sentence, two actions), proof (one Dummy vs Seatbelt panel), how it works (three steps), what it catches (seven laws), what is real vs simulated, and one call to action. Removed the animated hero card, the fact row, the duplicate results strip and the duplicate token duel. Header is now logo, Report, Scenarios, Connect and one Run the suite button; the footer is one row. Removed duplicates elsewhere: Runner avatar letters and the policy-engine card, Report provenance action buttons, the Connect bottom CTA.
 
+
+**2026-11-14 (depth and performance).** Landing hero now has faint radar arcs and the 21/7/$0 facts; sections reveal once on scroll with a no-JS and reduced-motion safe fallback (visible by default, reveal-ready class gate, 2.5s failsafe). Report gained an in-page nav (Safety shape, Failures, Compare, Provenance) with scroll spy. Added Back to top, hairline link hovers. Report, Replay and Scenarios pages are lazy chunks: first-load JS 197 -> 184 KB gzipped. Screenshot, sheet and audit scripts settle the page (scroll through) before capture.
+

@@ -1,6 +1,7 @@
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';
 import { PREVIEW_URL, chromePath } from './preview';
+import { settle } from './settle';
 
 /**
  * Contact sheet: cuts a long page into equal slices and lays them side by side so a
@@ -17,6 +18,7 @@ const context = await browser.newContext({ viewport: { width, height: 844 } });
 const page = await context.newPage();
 await page.goto(`${PREVIEW_URL}${hash}`, { waitUntil: 'networkidle' });
 await page.waitForTimeout(300);
+await settle(page);
 
 const images: string[] = [];
 for (let index = 0; index < slices; index += 1) {

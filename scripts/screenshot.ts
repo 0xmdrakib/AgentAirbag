@@ -1,5 +1,6 @@
 import { chromium } from 'playwright-core';
 import { PREVIEW_URL, chromePath } from './preview';
+import { settle } from './settle';
 import { mkdirSync } from 'node:fs';
 
 const executablePath = chromePath();
@@ -21,7 +22,8 @@ const routes: { name: string; hash: string; fullPage?: boolean }[] = [
 
 for (const route of routes) {
   await page.goto(`${base}${route.hash}`, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(400);
+  await settle(page);
   await page.screenshot({ path: `${out}/${route.name}.png`, fullPage: route.fullPage ?? true });
   console.log(`captured ${route.name}`);
 }

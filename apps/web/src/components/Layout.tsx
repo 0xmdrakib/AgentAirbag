@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { cx } from '../lib/format';
 import { MarkerLogo } from './MarkerLogo';
-import { MenuIcon, XIcon } from './Icons';
+import { ArrowUpIcon, MenuIcon, XIcon } from './Icons';
 
 const NAV = [
   { href: '#/report', label: 'Report', path: '/report' },
@@ -96,8 +96,10 @@ export function Layout({ route, children }: { route: string; children: ReactNode
           </nav>
         </div>
         <div className="container footer-bottom">
-          <span>Built on NEAR</span>
-          <span>MIT licensed</span>
+          <span>Built on NEAR · MIT licensed</span>
+          <a href="#main" className="to-top">
+            Back to top <ArrowUpIcon size={14} />
+          </a>
         </div>
       </footer>
     </div>

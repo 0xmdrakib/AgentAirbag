@@ -151,6 +151,21 @@ export function ReportPage() {
         </div>
       </header>
 
+      <nav className="section-nav" aria-label="On this report">
+        <a href="#report-shape" data-section-link="report-shape">
+          Safety shape
+        </a>
+        <a href="#report-failures" data-section-link="report-failures">
+          Failures
+        </a>
+        <a href="#report-compare" data-section-link="report-compare">
+          Compare
+        </a>
+        <a href="#report-meta" data-section-link="report-meta">
+          Provenance
+        </a>
+      </nav>
+
       <div className="report-stats">
         <Stat label="Survived" value={report.overall.passed} tone={report.overall.passed > 0 ? 'pass' : undefined} />
         <Stat label="Wobbled" value={report.overall.warned} tone={report.overall.warned > 0 ? 'warn' : undefined} />
@@ -159,7 +174,7 @@ export function ReportPage() {
         <Stat label="Score" value={`${report.overall.score}/100`} />
       </div>
 
-      <section className="report-shape">
+      <section className="report-shape" id="report-shape">
         <div className="report-shape-chart">
           <div className="panel-head">
             <p className="eyebrow">Safety shape</p>
@@ -234,7 +249,7 @@ export function ReportPage() {
         </div>
       </section>
 
-      <section className="section report-failures">
+      <section className="section report-failures" id="report-failures">
         <SectionHead
           title={failures.length ? 'Costliest failures' : 'No invariant violated'}
           body={
@@ -270,7 +285,7 @@ export function ReportPage() {
         )}
       </section>
 
-      <section className="section compare-section">
+      <section className="section compare-section" id="report-compare">
         <SectionHead
           title="Compare agents"
           body="Same suite, same seed. Dummy follows the tutorial and has no guards; Seatbelt applies all seven laws. The LLM row stays empty until a real recording exists."
@@ -334,7 +349,7 @@ export function ReportPage() {
         </div>
       </section>
 
-      <section className="section report-meta">
+      <section className="section report-meta" id="report-meta">
         <div className="meta-card">
           <p className="eyebrow">Provenance</p>
           <div className="meta-grid">

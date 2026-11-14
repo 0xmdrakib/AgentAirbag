@@ -66,6 +66,14 @@ export function ArrowRightIcon(props: IconProps) {
   );
 }
 
+export function ArrowUpIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 20V5M6 11l6-6 6 6" />
+    </svg>
+  );
+}
+
 export function CopyIcon(props: IconProps) {
   return (
     <svg {...base(props)}>

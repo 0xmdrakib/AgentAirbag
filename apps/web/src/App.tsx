@@ -1,14 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Layout } from './components/Layout';
 import { AppStateProvider, useAppState } from './state/AppState';
 import { decodeReport } from './lib/share';
 import { LabPage } from './pages/LabPage';
 import { RunnerPage } from './pages/RunnerPage';
-import { ReportPage } from './pages/ReportPage';
-import { ReplayPage } from './pages/ReplayPage';
-import { ScenariosPage } from './pages/ScenariosPage';
 import { ConnectPage } from './pages/ConnectPage';
+
+// The replay trace and the scenario YAML are the two heavy pages; they load on first visit.
+const ReportPage = lazy(() => import('./pages/ReportPage').then((m) => ({ default: m.ReportPage })));
+const ReplayPage = lazy(() => import('./pages/ReplayPage').then((m) => ({ default: m.ReplayPage })));
+const ScenariosPage = lazy(() =>
+  import('./pages/ScenariosPage').then((m) => ({ default: m.ScenariosPage })),
+);
 import { Toast } from './components/Toast';
+import { useScrollReveal, useSectionSpy } from './components/Motion';
 
 export interface RouteInfo {
   path: string;
@@ -29,6 +34,8 @@ function readRoute(): RouteInfo {
 function AppInner() {
   const [route, setRoute] = useState<RouteInfo>(readRoute);
   const { setShared, toast } = useAppState();
+  useScrollReveal(route.path);
+  useSectionSpy(route.path);
 
   useEffect(() => {
     const onHash = () => {
@@ -83,7 +90,15 @@ function AppInner() {
 
   return (
     <Layout route={route.path}>
-      {page}
+      <Suspense
+        fallback={
+          <div className="container page-loading" role="status" aria-live="polite">
+            Loading…
+          </div>
+        }
+      >
+        {page}
+      </Suspense>
       <Toast message={toast} />
     </Layout>
   );

@@ -66,9 +66,23 @@ export function LabPage() {
           </LinkButton>
         </div>
         <p className="landing-note">Runs in your browser · No keys · No real funds</p>
+        <dl className="hero-facts landing-facts">
+          <div>
+            <dt>Crash scenarios</dt>
+            <dd>{SCENARIOS.length}</dd>
+          </div>
+          <div>
+            <dt>Safety laws</dt>
+            <dd>7</dd>
+          </div>
+          <div>
+            <dt>Real funds at risk</dt>
+            <dd>$0</dd>
+          </div>
+        </dl>
       </section>
 
-      <section className="container landing-proof" aria-labelledby="proof-title">
+      <section className="container landing-proof" data-reveal aria-labelledby="proof-title">
         <div className="proof-panel">
           <div className="proof-head">
             <h2 className="proof-title" id="proof-title">
@@ -114,7 +128,7 @@ export function LabPage() {
         </div>
       </section>
 
-      <section className="container section" aria-labelledby="how-title">
+      <section className="container section" aria-labelledby="how-title" data-reveal>
         <h2 className="h2 landing-h2" id="how-title">
           How it works
         </h2>
@@ -129,7 +143,7 @@ export function LabPage() {
         </ol>
       </section>
 
-      <section className="container section" aria-labelledby="laws-title">
+      <section className="container section" aria-labelledby="laws-title" data-reveal>
         <div className="landing-section-head">
           <div>
             <h2 className="h2 landing-h2" id="laws-title">
@@ -159,7 +173,7 @@ export function LabPage() {
         </ol>
       </section>
 
-      <section className="container section" aria-labelledby="truth-title">
+      <section className="container section" aria-labelledby="truth-title" data-reveal>
         <div className="truth-block">
           <div>
             <h2 className="h2 landing-h2" id="truth-title">
@@ -180,7 +194,7 @@ export function LabPage() {
         </div>
       </section>
 
-      <section className="container section">
+      <section className="container section" data-reveal>
         <div className="cta-band">
           <div>
             <h2 className="h2">Would your agent pay a scammer because a token’s name told it to?</h2>
