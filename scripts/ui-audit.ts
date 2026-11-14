@@ -103,9 +103,9 @@ for (const theme of themes) {
   if (!navHidden) problems.push('menu: nav should be collapsed on mobile');
   await page.getByRole('button', { name: 'Open menu' }).click();
   if (!(await page.locator('#primary-nav').isVisible())) problems.push('menu: did not open');
-  await page.locator('#primary-nav').getByRole('link', { name: 'Runner', exact: true }).click();
+  await page.locator('#primary-nav').getByRole('link', { name: 'Report', exact: true }).click();
   await page.waitForTimeout(200);
-  if (!page.url().endsWith('#/run')) problems.push(`menu: Runner link went to ${page.url()}`);
+  if (!page.url().endsWith('#/report')) problems.push(`menu: Report link went to ${page.url()}`);
   if (await page.locator('#primary-nav').isVisible()) problems.push('menu: did not close after navigation');
 
   // Light only: there must be no theme toggle left in the header.

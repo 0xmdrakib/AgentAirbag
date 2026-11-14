@@ -119,3 +119,6 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 
 **2026-11-14 (fluid sizing).** Owner reported the UI did not adapt across PCs, laptops, mini PCs and phones. Added fluid type, gutters and section rhythm that scale with viewport width and height; a compact hero card on short desktop screens; a compact Runner sidebar so Crash stays on the first screen; grade beside the headline on phone report cards; a one-row sticky replay player on phones; a sideways-scrolling law filter row. New pnpm ui:devices checks the first screen on 10 real viewports (360x640 to 2560x1300): primary action above the fold and no overflow on all of them. Footer now reads Built on NEAR.
 
+
+**2026-11-14 (landing and information architecture).** Rebuilt the landing page around one question per section: what it is (centered hero, one sentence, two actions), proof (one Dummy vs Seatbelt panel), how it works (three steps), what it catches (seven laws), what is real vs simulated, and one call to action. Removed the animated hero card, the fact row, the duplicate results strip and the duplicate token duel. Header is now logo, Report, Scenarios, Connect and one Run the suite button; the footer is one row. Removed duplicates elsewhere: Runner avatar letters and the policy-engine card, Report provenance action buttons, the Connect bottom CTA.
+

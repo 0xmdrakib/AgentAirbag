@@ -36,7 +36,7 @@ for (const device of DEVICES) {
   await page.goto(`${PREVIEW_URL}${hash}`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(250);
   const fold = await page.evaluate(() => {
-    const cta = document.querySelector<HTMLElement>('.hero-actions .btn, .page-head ~ * .btn-primary');
+    const cta = document.querySelector<HTMLElement>('.landing-actions .btn, .page-head ~ * .crash-button');
     const box = cta?.getBoundingClientRect();
     return {
       ctaBottom: box ? Math.round(box.bottom) : null,

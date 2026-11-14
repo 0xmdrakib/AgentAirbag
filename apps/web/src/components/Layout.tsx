@@ -4,8 +4,6 @@ import { MarkerLogo } from './MarkerLogo';
 import { MenuIcon, XIcon } from './Icons';
 
 const NAV = [
-  { href: '#/', label: 'Lab', path: '/' },
-  { href: '#/run', label: 'Runner', path: '/run' },
   { href: '#/report', label: 'Report', path: '/report' },
   { href: '#/scenarios', label: 'Scenarios', path: '/scenarios' },
   { href: '#/connect', label: 'Connect', path: '/connect' },
@@ -35,7 +33,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
       <header className="app-header">
         <div className="container header-inner">
           <a href="#/" className="brand" aria-label="Airbag home">
-            <MarkerLogo size={32} />
+            <MarkerLogo size={28} />
             <span className="wordmark">airbag</span>
           </a>
           <nav
@@ -55,11 +53,13 @@ export function Layout({ route, children }: { route: string; children: ReactNode
             ))}
           </nav>
           <div className="header-right">
-            {route !== '/run' && (
-              <a href="#/run?auto=naive" className="btn btn-primary btn-sm header-cta">
-                Run the suite
-              </a>
-            )}
+            <a
+              href="#/run"
+              className={cx('btn btn-primary btn-sm header-cta', route === '/run' && 'header-cta-current')}
+              aria-current={route === '/run' ? 'page' : undefined}
+            >
+              Run the suite
+            </a>
             <button
               type="button"
               className="icon-button menu-button"
@@ -77,34 +77,27 @@ export function Layout({ route, children }: { route: string; children: ReactNode
         {children}
       </main>
       <footer className="app-footer">
-        <div className="container footer-grid">
+        <div className="container footer-main">
           <div className="footer-brand-col">
-            <div className="footer-brand">
-              <MarkerLogo size={28} />
+            <a href="#/" className="footer-brand" aria-label="Airbag home">
+              <MarkerLogo size={22} />
               <span className="wordmark">airbag</span>
-            </div>
+            </a>
             <p className="footer-note">
-              Crash-test dummies for AI agents that hold money. A fake NEAR Intents where agents can
-              fail safely.
+              A crash-test lab for AI agents that move money. Everything here is simulated; no
+              real funds move.
             </p>
           </div>
-          <div className="footer-col">
-            <p className="footer-title">Product</p>
-            <a href="#/run">Suite runner</a>
-            <a href="#/report">Report card</a>
-            <a href="#/scenarios">21 crashes</a>
-            <a href="#/connect">Bring your own agent</a>
-          </div>
-          <div className="footer-col">
-            <p className="footer-title">Honesty</p>
-            <span>Everything here is simulated</span>
-            <span>No real funds move</span>
-            <span>Modeled behavior is labelled</span>
-          </div>
+          <nav className="footer-links" aria-label="Footer">
+            <a href="#/run">Run the suite</a>
+            <a href="#/report">Report</a>
+            <a href="#/scenarios">Scenarios</a>
+            <a href="#/connect">Connect</a>
+          </nav>
         </div>
         <div className="container footer-bottom">
           <span>Built on NEAR</span>
-          <span className="mono">MIT licensed</span>
+          <span>MIT licensed</span>
         </div>
       </footer>
     </div>

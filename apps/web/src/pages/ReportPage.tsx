@@ -34,7 +34,7 @@ import {
 import { cx } from '../lib/format';
 
 export function ReportPage() {
-  const { activeReport, reports, shareError, sharedReport, showToast, running, setActiveAgent, setShared } =
+  const { activeReport, reports, shareError, sharedReport, showToast, setActiveAgent, setShared } =
     useAppState();
   const report = activeReport;
   const [openLaw, setOpenLaw] = useState<Law | null>(null);
@@ -385,36 +385,6 @@ export function ReportPage() {
             not have. It is never presented as a mainnet result. No funds moved.
           </p>
         </div>
-        <div className="meta-actions">
-          <Button variant="primary" onClick={() => void share()}>
-            <ShareIcon size={15} /> Copy share link
-          </Button>
-          <Button variant="secondary" onClick={download}>
-            <DownloadIcon size={15} /> Download JSON
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => {
-              void navigator.clipboard.writeText(badge);
-              showToast(`Copied “${badge}”`);
-            }}
-          >
-            Copy README badge
-          </Button>
-          <Button
-            variant="ghost"
-            disabled={running !== null}
-            onClick={() => {
-              const id =
-                report.agent.kind === 'scripted' && report.agent.id === 'hardened'
-                  ? 'hardened'
-                  : 'naive';
-              window.location.hash = `#/run?auto=${id}`;
-            }}
-          >
-            Run again
-          </Button>
-        </div>
       </section>
     </div>
   );
@@ -425,7 +395,7 @@ function FailureCard({ result }: { result: ScenarioResult }) {
   return (
     <article className="failure-card">
       <div className="failure-card-head">
-        <span className="failure-law mono">LAW {result.law}</span>
+        <span className="failure-law">Law {result.law}</span>
         {result.modeled && <span className="modeled-tag">modeled</span>}
         <span className="failure-loss mono">{formatUsd(result.lossUsd)} lost</span>
       </div>
@@ -440,7 +410,6 @@ function FailureCard({ result }: { result: ScenarioResult }) {
         <a href={`#/replay/${result.id}`} className="failure-watch">
           Watch the crash <ArrowRightIcon size={14} />
         </a>
-        {result.fix && <a href={`#/replay/${result.id}`} className="failure-fix-link">Fix</a>}
       </div>
       {result.fix && <FixSnippet fix={result.fix} compact />}
     </article>

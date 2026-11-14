@@ -3,7 +3,7 @@ import type { Law } from '@airbag/core';
 import { LAW_SHORT } from '@airbag/core';
 import { LAW_NAMES, SCENARIOS } from '../lib/report';
 import scenarioYaml from '../generated/scenario-yaml.json';
-import { Chip, CopyButton } from '../components/Primitives';
+import { CopyButton } from '../components/Primitives';
 import { ArrowRightIcon, CodeIcon, SearchIcon, XIcon } from '../components/Icons';
 import { cx } from '../lib/format';
 

@@ -1,5 +1,5 @@
-import { Chip, CopyButton, LinkButton, SectionHead } from '../components/Primitives';
-import { ArrowRightIcon, ShieldIcon, TerminalIcon } from '../components/Icons';
+import { CopyButton, SectionHead } from '../components/Primitives';
+import { ShieldIcon, TerminalIcon } from '../components/Icons';
 
 const SERVE = 'pnpm airbag serve';
 const ENV = `export ONECLICK_BASE_URL=http://localhost:4321/r/demo
@@ -159,23 +159,6 @@ export function ConnectPage() {
         </div>
       </section>
 
-      <section className="section connect-cta">
-        <div>
-          <h2 className="h2">No install needed to look around</h2>
-          <p className="section-sub">
-            Live bring-your-own runs need the local CLI because a static page cannot accept an
-            incoming process. The CLI is one command and works offline after install.
-          </p>
-        </div>
-        <div className="cta-actions">
-          <LinkButton href="#/run" variant="primary">
-            Run a scripted suite <ArrowRightIcon size={16} />
-          </LinkButton>
-          <LinkButton href="#/scenarios" variant="secondary">
-            Browse the crashes
-          </LinkButton>
-        </div>
-      </section>
     </div>
   );
 }

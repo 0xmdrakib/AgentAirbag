@@ -4,7 +4,7 @@ import { useAppState, type AgentId } from '../state/AppState';
 import { SCENARIOS, verdictWord } from '../lib/report';
 import { ScenarioCells } from '../components/ScenarioBoard';
 import { Button, Chip, CopyButton, LinkButton, VerdictPill } from '../components/Primitives';
-import { ArrowRightIcon, PlayIcon, ShieldIcon, TerminalIcon } from '../components/Icons';
+import { ArrowRightIcon, PlayIcon, ShieldIcon } from '../components/Icons';
 import { cx } from '../lib/format';
 
 type Pick = AgentId | 'llm' | 'byo';
@@ -84,9 +84,7 @@ export function RunnerPage() {
                   setFinished(null);
                 }}
               >
-                <span className="agent-option-mark">
-                  {item.id === 'naive' ? 'D' : item.id === 'hardened' ? 'S' : item.id === 'llm' ? 'L' : 'Y'}
-                </span>
+                <span className="agent-radio" aria-hidden="true" />
                 <span>
                   <span className="agent-option-title">{item.title}</span>
                   <span className="agent-option-sub">{item.sub}</span>
@@ -126,7 +124,7 @@ export function RunnerPage() {
           )}
 
           <label className="run-meta run-seed">
-            <span className="mono">seed</span>
+            <span>Seed</span>
             <input
               className="seed-input mono"
               value={seed}
@@ -137,7 +135,7 @@ export function RunnerPage() {
             />
           </label>
           <div className="run-meta">
-            <span className="mono">clock</span>
+            <span>Virtual clock</span>
             <span className="mono">2026-11-01T00:00:00Z</span>
           </div>
           <p className="run-small">
@@ -148,7 +146,6 @@ export function RunnerPage() {
         <section className="run-main" aria-label="Crash suite">
           <div className="run-main-head">
             <div>
-              <p className="label">The board</p>
               <p className="run-ticker" aria-live="polite">
                 {running
                   ? last
@@ -196,31 +193,14 @@ export function RunnerPage() {
         </section>
       </div>
 
-      <section className="run-after">
-        <div className="run-after-card">
-          <TerminalIcon size={18} />
-          <div>
-            <h2 className="h3">The same suite, from a terminal</h2>
-            <p>Offline after install, and it prints the same report card.</p>
-            <div className="code-line run-code">
-              <span className="mono code-prompt">$</span>
-              <code className="mono">pnpm airbag run --agent naive</code>
-              <CopyButton value="pnpm airbag run --agent naive" />
-            </div>
-          </div>
+      <div className="run-terminal">
+        <span>Same suite from a terminal</span>
+        <div className="code-line">
+          <span className="mono code-prompt">$</span>
+          <code className="mono">pnpm airbag run --agent naive</code>
+          <CopyButton value="pnpm airbag run --agent naive" />
         </div>
-        <div className="run-after-card">
-          <ShieldIcon size={18} />
-          <div>
-            <h2 className="h3">The fix is a policy engine</h2>
-            <p>
-              Airbag Guard returns <span className="mono">allow</span>,{' '}
-              <span className="mono">warn</span> or <span className="mono">block</span> with
-              reasons. Seatbelt is its reference implementation.
-            </p>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
