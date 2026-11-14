@@ -5,7 +5,7 @@ export function MarkerLogo({ size = 28 }: { size?: number }) {
       height={size}
       viewBox="0 0 64 64"
       role="img"
-      aria-label="Airbag mark"
+      aria-label="Agent Airbag mark"
       focusable="false"
     >
       <circle cx="32" cy="32" r="30" fill="#0F1114" stroke="#FFD21F" strokeWidth="2" />

@@ -99,7 +99,7 @@ export function issueNonce(options: IssueNonceOptions): IssuedNonce {
   const nonce = randomBytes(32).toString('base64');
   const accountLine = options.accountId ? ` for the account ${options.accountId}` : '';
   const message = [
-    'Airbag authentication request',
+    'Agent Airbag authentication request',
     '',
     `Sign this message to authenticate${accountLine}.`,
     `Recipient: ${recipient}`,

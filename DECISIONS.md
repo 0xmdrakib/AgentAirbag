@@ -215,3 +215,14 @@ old dialog after the picker closed, which produced a confusing second modal and 
 closed" message. The custom picker is the only chooser now. Wallet errors render through a portal
 to `document.body` as a bottom toast, because the header's backdrop-filter traps fixed children.
 Cancelling a wallet prompt is silent; only real failures show a message.
+
+## Name: Agent Airbag
+
+**The product name is Agent Airbag; Airbag is the short form.** The maintainer chose it with the
+domain `agentairbag.xyz`. The full name appears in the page titles, header and footer wordmark,
+social metadata, preview image, README title, sandbox page, CLI banner and the wallet sign-in
+message. Running prose and error messages keep the short form. Internal identifiers stay as they
+are: the `@airbag/*` packages, the `pnpm airbag` command, `AIRBAG_*` variables, the
+`airbag_session` cookie and the `tool` field inside report JSON, so no report hash changed. The
+social preview is `apps/web/public/og.png` (1200x630), rendered by `pnpm og`, because X and most
+unfurlers ignore SVG.

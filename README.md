@@ -1,4 +1,4 @@
-# Airbag
+# Agent Airbag
 
 **Crash-test dummies for AI agents that hold money.**
 
@@ -9,11 +9,11 @@
 
 > **The working name in the original build prompt was Crumple.** A Phase 0 name check found
 > [crumple.priberry.com](https://crumple.priberry.com/), an existing “crash test for AI coding
-> agents”. The prompt’s rule is to rename on a clash, so the shipped product is **Airbag**. The saved
+> agents”. The prompt’s rule is to rename on a clash, so the shipped product is **Agent Airbag**, called Airbag for short. The saved
 > prompt at [`docs/MASTER_PROMPT.md`](docs/MASTER_PROMPT.md) is verbatim and still says Crumple.
 
 AI agents now swap and send crypto on their own. NEAR Intents has no testnet, so the only way to test
-one today is with real money. Airbag replaces the NEAR Intents 1Click API with a drop-in sandbox,
+one today is with real money. Agent Airbag replaces the NEAR Intents 1Click API with a drop-in sandbox,
 then crashes the agent 21 ways before it touches a wallet. **No real funds move.**
 
 ## Why NEAR
@@ -291,7 +291,7 @@ docs/              master prompt, verified facts, claims, scenarios, demo script
 | [AttackBench](https://near.ai/blog/ai-agents-have-a-security-problem-were-fixing-it) (NEAR AI + FailSafe) | Open-source benchmark of adaptive attacks on agent frameworks; found “field-content trust”. | Airbag tests the **money lifecycle** on a NEAR Intents sandbox. Injection through API fields is one of seven laws. Complementary; cite it as motivation. |
 | [Argus Agent Test Lab](https://www.producthunt.com/products/argus-agent-test-lab) | Black-box adversarial tests for money-moving agents against real external systems. | Airbag is zero-funds, deterministic, open-source, runs locally or in the browser, and models NEAR Intents specifically. |
 | [Agent Money Benchmark](https://agentmoneybench.com/) (BlockRun) | Real USDC on Solana; 156 payment tasks per model. | Airbag is a sandbox and a scenario suite, not a model leaderboard. No real funds. |
-| [crumple](https://crumple.priberry.com/) (priberry) | Crash tests for AI **coding** agents: traps, canaries, sandboxed shells. | Different domain (no money, no NEAR Intents). This is the name clash that made us rename to Airbag. |
+| [crumple](https://crumple.priberry.com/) (priberry) | Crash tests for AI **coding** agents: traps, canaries, sandboxed shells. | Different domain (no money, no NEAR Intents). This is the name clash that made us rename to Agent Airbag. |
 | CrashTest (Devfolio) | Crash-tests phone and social-engineering agents. | Different domain. |
 | Generic agent simulators (WireMock, ToolSimulator) | Mock tool responses. | No money invariants, no NEAR Intents semantics, no scoring. |
 

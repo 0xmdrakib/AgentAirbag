@@ -135,3 +135,5 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 **2026-11-14 (wallet polish).** Icons moved to Lucide across the app. Wallet connect offers MyNearWallet, Sender, OKX Wallet, Nightly and Bitget (when installed), with a custom picker and a More wallets toggle. Wallet errors show as a dismissible toast instead of covering the report, and the save control aligns with the report actions.
 
 **2026-11-14 (wallet providers).** Replaced the hand written Buffer shim with the real buffer package, which fixed Meteor, Here, Coin98 and Ledger. The picker shows four primary wallets and a More wallets list with the rest. Removed the upstream modal and its fallback, so closing the picker no longer reopens an old dialog. Wallet errors are portal toasts at the bottom; cancel is silent.
+
+**2026-11-15 (name and preview).** Renamed the product to Agent Airbag and added the 1200x630 `og.png` generator (`pnpm og`), replacing the SVG preview. Report hashes are unchanged.

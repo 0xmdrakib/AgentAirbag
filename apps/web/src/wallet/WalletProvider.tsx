@@ -218,7 +218,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const wallet = await selector.wallet(state.selectedWalletId ?? walletId);
         if (!wallet.signMessage) {
           throw new Error(
-            'This wallet cannot sign the Airbag login message. Try another NEAR wallet.',
+            'This wallet cannot sign the Agent Airbag login message. Try another NEAR wallet.',
           );
         }
 

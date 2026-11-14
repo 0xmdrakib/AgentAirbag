@@ -55,7 +55,7 @@ export function LabPage() {
         </p>
         <h1 className="landing-title">Crash-test your AI agent before it touches real money.</h1>
         <p className="landing-sub">
-          Airbag is a simulated version of the NEAR Intents 1Click swap API that fails on
+          Agent Airbag is a simulated version of the NEAR Intents 1Click swap API that fails on
           purpose. Run your agent through {SCENARIOS.length} crash scenarios and see what it would
           have lost, and how to fix it.
         </p>

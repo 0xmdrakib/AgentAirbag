@@ -274,8 +274,14 @@ pre,
   flex: 0 0 auto;
 }
 
+.wordmark-agent {
+  font-weight: 450;
+  color: var(--text-3, #6b7280);
+}
+
 .wordmark {
   font-family: var(--font-display);
+  white-space: nowrap;
   font-size: 24px;
   font-weight: 650;
   letter-spacing: -0.03em;
@@ -7062,5 +7068,23 @@ h2.eyebrow {
 @media (max-width: 860px) {
   .header-right {
     margin-left: auto;
+  }
+}
+
+/* The full name "agent airbag" is longer than the old wordmark; shrink it on narrow phones so the
+   header keeps the brand, Connect and the menu on one row with no horizontal scroll. */
+@media (max-width: 400px) {
+  .app-header .wordmark {
+    font-size: 19px;
+  }
+
+  .app-header .brand {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 340px) {
+  .app-header .wordmark {
+    font-size: 17px;
   }
 }

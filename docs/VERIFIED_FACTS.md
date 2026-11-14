@@ -78,7 +78,7 @@ Fact, source, date, how verified. Live behavior wins over the prompt when they d
 3. **JWT fee:** 0.1% (docs page) vs 0.2% (HACKATHON.md). Irrelevant here; no real swap.
 4. **Refund fee:** the live quote returns `refundFee: "2400"` while the sandbox models a 1% refund
    penalty for the late-deposit scenarios. The difference is labeled `modeled`.
-5. **Name:** the prompt’s working name was taken; Airbag is the shipped name.
+5. **Name:** the prompt’s working name was taken; Agent Airbag is the shipped name (Airbag for short).
 6. **Definition-of-done item 3:** no LLM cassette is bundled because no key was available. The code
    ships, but the claim is not made.
 7. **Definition-of-done item 4:** no hosted demo is deployed because no hosting account was

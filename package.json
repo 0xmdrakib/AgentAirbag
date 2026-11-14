@@ -34,7 +34,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:api && pnpm test:http && pnpm test:process && pnpm build && pnpm demo --smoke",
-    "docs:facts": "tsx scripts/docs-facts.ts"
+    "docs:facts": "tsx scripts/docs-facts.ts",
+    "og": "tsx scripts/make-og.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

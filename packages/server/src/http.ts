@@ -111,7 +111,7 @@ export function createApp(): AirbagApp {
       .join('');
     const demoUrl = escapeHtml(`${origin}/r/demo`);
     return c.html(`<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>Airbag sandbox</title>
+<html lang="en"><head><meta charset="utf-8"><title>Agent Airbag sandbox</title>
 <style>body{font-family:ui-sans-serif,system-ui;background:#0F1114;color:#F5F6F8;max-width:760px;margin:48px auto;padding:0 24px;line-height:1.6}
 a{color:#FFD21F}code{background:#171B20;padding:2px 6px;border-radius:6px}li{margin:8px 0}.muted{color:#9AA2B1}</style></head>
 <body><h1>airbag sandbox</h1>

@@ -133,7 +133,7 @@ program
   .option('--port <port>', 'preferred port', '4321')
   .action(async (options: { port: string }) => {
     const server = await startServer({ port: Number(options.port) });
-    console.log(`Airbag sandbox listening on http://localhost:${server.port}`);
+    console.log(`Agent Airbag sandbox listening on http://localhost:${server.port}`);
     console.log(`Run list: http://localhost:${server.port}/`);
     console.log(`Default run: http://localhost:${server.port}/r/demo`);
     console.log('Point ONECLICK_BASE_URL at the run URL. No real funds move. Ctrl+C to stop.');

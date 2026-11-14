@@ -97,7 +97,7 @@ export function ReportPage() {
     showToast('Report JSON downloaded.');
   };
 
-  const badge = `Airbag: ${report.overall.grade} (${report.overall.passed}/${total})`;
+  const badge = `Agent Airbag: ${report.overall.grade} (${report.overall.passed}/${total})`;
   const sentence = sentenceFor(report);
 
   return (
@@ -407,7 +407,7 @@ export function ReportPage() {
             </div>
             <div>
               <span className="label">Tool</span>
-              <p className="mono">airbag {report.tool.version}</p>
+              <p className="mono">Agent Airbag {report.tool.version}</p>
             </div>
             <div>
               <span className="label">Modeled scenarios</span>

@@ -74,12 +74,12 @@ function AppInner() {
 
   useEffect(() => {
     const titles: Record<string, string> = {
-      '/': 'Airbag · crash-test lab for AI agents that move money',
-      '/run': 'Crash suite · Airbag',
-      '/report': 'Report card · Airbag',
-      '/replay': 'Crash replay · Airbag',
-      '/scenarios': 'Scenario library · Airbag',
-      '/connect': 'Connect your agent · Airbag',
+      '/': 'Agent Airbag · crash-test lab for AI agents that move money',
+      '/run': 'Crash suite · Agent Airbag',
+      '/report': 'Report card · Agent Airbag',
+      '/replay': 'Crash replay · Agent Airbag',
+      '/scenarios': 'Scenario library · Agent Airbag',
+      '/connect': 'Connect your agent · Agent Airbag',
     };
     document.title = titles[route.path] ?? titles['/']!;
     // Announce the new page to screen readers without stealing focus.

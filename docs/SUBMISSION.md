@@ -45,7 +45,7 @@ leave a retry buffer.
 ```json
 {
   "requestId": "<UUID generated once and reused on retries>",
-  "projectName": "Airbag",
+  "projectName": "Agent Airbag",
   "leadName": "<2–80 chars, from the human>",
   "email": "<max 160 chars, from the human>",
   "size": "1",
@@ -66,7 +66,7 @@ leave a retry buffer.
 
 ## “What did you build?” (draft, honest)
 
-Airbag is a crash-test lab for AI agents that move money. NEAR Intents has no testnet, so agent
+Agent Airbag is a crash-test lab for AI agents that move money. NEAR Intents has no testnet, so agent
 builders test swap agents with real funds. Airbag replaces the 1Click Swap API with a drop-in sandbox:
 change one base URL and the agent runs in a simulated world with a ledger, a virtual clock and no real
 funds. We crash it 21 ways across seven laws: pay only what you quoted, never pay twice, respect the
@@ -84,11 +84,11 @@ Count this after filling any human fields; keep it under 2,000 characters.
 
 **Post 1 (video attached):**
 This AI agent just lost $99.95. (Simulated.) It paid, the confirmation timed out, and it paid again.
-Cars get crash-tested before they hit the road. AI agents that move money are not. So I built Airbag at
+Cars get crash-tested before they hit the road. AI agents that move money are not. So I built Agent Airbag at
 NEAR HACKATHON. @NEARProtocol #NEARHackathon
 
 **Post 2:**
-Airbag is a fake NEAR Intents. Change one base URL and your agent runs in a simulated world with a
+Agent Airbag is a fake NEAR Intents. Change one base URL and your agent runs in a simulated world with a
 ledger and a clock. Then we crash it 21 ways across 7 laws: pay only what you quoted, never pay twice,
 respect the clock, verify, do not obey data, stay in limits, keep an exit.
 

@@ -14,7 +14,7 @@ import type { LlmCassette } from './llm';
 export function loadCassette(path: string): LlmCassette {
   const parsed = JSON.parse(readFileSync(path, 'utf8')) as LlmCassette;
   if (parsed.version !== 1 || !Array.isArray(parsed.turns)) {
-    throw new Error(`Not a Airbag cassette: ${path}`);
+    throw new Error(`Not an Agent Airbag cassette: ${path}`);
   }
   return parsed;
 }
