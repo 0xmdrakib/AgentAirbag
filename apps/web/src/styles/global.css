@@ -1,56 +1,8 @@
-/* Airbag design system v2 — calm lab, loud impact.
-   Dark first, with a full light theme. Red means FAIL or loss, green means PASS,
-   signal yellow is the brand. No text below 12px anywhere. */
+/* Airbag design system v2 — calm lab, loud impact. Light theme only.
+   Red means FAIL or loss, green means PASS, signal yellow is the brand.
+   No text below 12px anywhere. */
 
-:root,
-:root[data-theme='dark'] {
-  color-scheme: dark;
-
-  --bg: #07090d;
-  --bg-elev: #0b0e14;
-  --surface: #0f131a;
-  --surface-2: #151a23;
-  --surface-3: #1c222d;
-  --code-bg: #0a0d12;
-
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.16);
-
-  --text: #f3f5f8;
-  --text-2: #bcc3d0;
-  --text-3: #8e97a8;
-
-  --signal: #ffd21f;
-  --signal-ink: #16130a;
-  --signal-text: #ffd21f;
-  --signal-soft: rgba(255, 210, 31, 0.1);
-  --signal-line: rgba(255, 210, 31, 0.34);
-
-  --info: #8fb4ff;
-
-  --pass: #35d8a0;
-  --pass-soft: rgba(53, 216, 160, 0.13);
-  --pass-line: rgba(53, 216, 160, 0.38);
-  --pass-ink: #04130c;
-  --warn: #ffa24a;
-  --warn-soft: rgba(255, 162, 74, 0.13);
-  --warn-line: rgba(255, 162, 74, 0.38);
-  --warn-ink: #1a0d00;
-  --fail: #ff5c6c;
-  --fail-soft: rgba(255, 92, 108, 0.13);
-  --fail-line: rgba(255, 92, 108, 0.4);
-  --fail-ink: #1c0407;
-
-  --glow-1: rgba(255, 210, 31, 0.075);
-  --glow-2: rgba(105, 140, 255, 0.09);
-  --grid-line: rgba(255, 255, 255, 0.035);
-  --hl: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --shadow-card: 0 14px 34px -18px rgba(0, 0, 0, 0.7);
-  --shadow-pop: 0 24px 64px rgba(0, 0, 0, 0.55);
-  --header-bg: rgba(7, 9, 13, 0.78);
-}
-
-:root[data-theme='light'] {
+:root {
   color-scheme: light;
 
   --bg: #f4f5f8;
@@ -196,12 +148,8 @@ pre,
 }
 
 :focus-visible {
-  outline: 2px solid var(--signal);
+  outline: 2px solid #1b3fa0;
   outline-offset: 2px;
-}
-
-:root[data-theme='light'] :focus-visible {
-  outline-color: #1b3fa0;
 }
 
 .sr-only {

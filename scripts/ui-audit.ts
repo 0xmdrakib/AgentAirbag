@@ -18,7 +18,7 @@ const ROUTES = [
   { name: 'scenarios', hash: '#/scenarios' },
   { name: 'connect', hash: '#/connect' },
 ];
-const themes = (process.env.AUDIT_THEMES ?? 'dark').split(',');
+const themes = ['light']; // the UI ships a single light theme
 const shots = process.env.AUDIT_SHOTS !== '0';
 
 const browser = await chromium.launch({ executablePath: chromePath(), headless: true });
@@ -27,7 +27,6 @@ const problems: string[] = [];
 for (const theme of themes) {
   mkdirSync(`artifacts/audit/${theme}`, { recursive: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await context.addInitScript((value) => localStorage.setItem('airbag-theme', value), theme);
   const page = await context.newPage();
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -95,7 +94,7 @@ for (const theme of themes) {
   await context.close();
 }
 
-// Behaviour checks: mobile menu and theme toggle.
+// Behaviour checks: mobile menu.
 {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
@@ -109,13 +108,10 @@ for (const theme of themes) {
   if (!page.url().endsWith('#/run')) problems.push(`menu: Runner link went to ${page.url()}`);
   if (await page.locator('#primary-nav').isVisible()) problems.push('menu: did not close after navigation');
 
-  const before = await page.evaluate(() => document.documentElement.dataset.theme);
-  await page.getByRole('button', { name: /Switch to (light|dark) theme/ }).click();
-  const after = await page.evaluate(() => document.documentElement.dataset.theme);
-  if (before === after) problems.push('theme: toggle did not change the theme');
-  await page.reload({ waitUntil: 'networkidle' });
-  const persisted = await page.evaluate(() => document.documentElement.dataset.theme);
-  if (persisted !== after) problems.push(`theme: ${after} did not persist (got ${persisted})`);
+  // Light only: there must be no theme toggle left in the header.
+  if ((await page.getByRole('button', { name: /theme/i }).count()) > 0) {
+    problems.push('theme: a theme toggle is still rendered');
+  }
   await context.close();
 }
 
@@ -125,4 +121,4 @@ if (problems.length) {
   for (const problem of problems) console.log(` - ${problem}`);
   process.exit(1);
 }
-console.log(`UI audit clean: ${ROUTES.length} routes × ${WIDTHS.length} widths × ${themes.length} theme(s).`);
+console.log(`UI audit clean: ${ROUTES.length} routes × ${WIDTHS.length} widths (light only).`);

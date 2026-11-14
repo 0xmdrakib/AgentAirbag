@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { cx } from '../lib/format';
 import { MarkerLogo } from './MarkerLogo';
 import { SimBanner } from './Primitives';
-import { MenuIcon, MoonIcon, SunIcon, XIcon } from './Icons';
+import { MenuIcon, XIcon } from './Icons';
 
 const NAV = [
   { href: '#/', label: 'Lab', path: '/' },
@@ -11,36 +11,6 @@ const NAV = [
   { href: '#/scenarios', label: 'Scenarios', path: '/scenarios' },
   { href: '#/connect', label: 'Connect', path: '/connect' },
 ];
-
-type Theme = 'dark' | 'light';
-
-function currentTheme(): Theme {
-  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
-}
-
-function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(currentTheme);
-  const next: Theme = theme === 'dark' ? 'light' : 'dark';
-  return (
-    <button
-      type="button"
-      className="icon-button"
-      aria-label={`Switch to ${next} theme`}
-      title={`Switch to ${next} theme`}
-      onClick={() => {
-        document.documentElement.dataset.theme = next;
-        try {
-          localStorage.setItem('airbag-theme', next);
-        } catch {
-          // Storage can be blocked; the theme still applies for this visit.
-        }
-        setTheme(next);
-      }}
-    >
-      {theme === 'dark' ? <SunIcon size={18} /> : <MoonIcon size={18} />}
-    </button>
-  );
-}
 
 export function Layout({ route, children }: { route: string; children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -87,7 +57,6 @@ export function Layout({ route, children }: { route: string; children: ReactNode
           </nav>
           <div className="header-right">
             <SimBanner compact />
-            <ThemeToggle />
             <button
               type="button"
               className="icon-button menu-button"

@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0A0B0D" />
+    <meta name="theme-color" content="#F4F5F8" />
+    <meta name="color-scheme" content="light" />
     <title>Airbag — crash-test dummies for AI agents that hold money</title>
     <meta
       name="description"
@@ -16,16 +17,6 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./og.svg" />
-    <script>
-      (function () {
-        try {
-          var stored = localStorage.getItem('airbag-theme');
-          document.documentElement.dataset.theme = stored === 'light' ? 'light' : 'dark';
-        } catch (error) {
-          document.documentElement.dataset.theme = 'dark';
-        }
-      })();
-    </script>
     <link rel="icon" href="./mark.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./mark.svg" />
   </head>

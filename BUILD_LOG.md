@@ -104,3 +104,6 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 
 **04:35 UTC - UI rebuilt after review.** The first UI had 9-11px text, a flat grey palette, an empty radar on an F grade, clipped radar labels and an overlapping Connect rules box. Rebuilt the design system (12px type floor, blue-black palette, layered surfaces, dark and light themes), a mobile menu, a Dummy-vs-Seatbelt radar overlay, a duel panel on the Lab, and a card layout for the compare table on phones. Added pnpm ui:audit: 6 routes x 7 widths (360-1920) x 2 themes, no overflow, no text under 12px, no console errors; mobile menu and theme toggle pass.
 
+
+**2026-11-14 (light only).** Removed dark mode on request: dark tokens, theme toggle, pre-paint theme script and localStorage key are gone; the UI is light only. ui:audit now runs one light pass and asserts no toggle is rendered. Fixed leftover Crumple names in og.svg and mark.svg.
+

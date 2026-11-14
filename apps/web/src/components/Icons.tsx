@@ -164,23 +164,6 @@ export function ExternalIcon(props: IconProps) {
   );
 }
 
-export function SunIcon(props: IconProps) {
-  return (
-    <svg {...base(props)}>
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6" />
-    </svg>
-  );
-}
-
-export function MoonIcon(props: IconProps) {
-  return (
-    <svg {...base(props)}>
-      <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />
-    </svg>
-  );
-}
-
 export function MenuIcon(props: IconProps) {
   return (
     <svg {...base(props)}>

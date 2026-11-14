@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#0A0B0D"/>
-  <circle cx="1050" cy="90" r="180" fill="none" stroke="#232831" stroke-width="1"/>
-  <circle cx="1050" cy="90" r="120" fill="none" stroke="#232831" stroke-width="1"/>
-  <circle cx="1050" cy="90" r="60" fill="#FFD21F" opacity="0.9"/>
-  <text x="80" y="120" font-family="system-ui, sans-serif" font-size="26" fill="#9AA2B1" letter-spacing="4">CRUMPLE</text>
-  <text x="80" y="270" font-family="system-ui, sans-serif" font-size="62" font-weight="700" fill="#F5F6F8">Crash-test your AI agent</text>
-  <text x="80" y="345" font-family="system-ui, sans-serif" font-size="62" font-weight="700" fill="#F5F6F8">before it touches real money.</text>
-  <text x="80" y="430" font-family="system-ui, sans-serif" font-size="28" fill="#9AA2B1">21 crashes · 7 laws · 0 real dollars</text>
+  <rect width="1200" height="630" fill="#F4F5F8"/>
+  <circle cx="1050" cy="90" r="180" fill="none" stroke="#D5D9E2" stroke-width="1"/>
+  <circle cx="1050" cy="90" r="120" fill="none" stroke="#D5D9E2" stroke-width="1"/>
+  <circle cx="1050" cy="90" r="60" fill="#FFD21F"/>
+  <text x="80" y="120" font-family="system-ui, sans-serif" font-size="26" fill="#596274" letter-spacing="4">AIRBAG</text>
+  <text x="80" y="270" font-family="system-ui, sans-serif" font-size="62" font-weight="700" fill="#0E1116">Crash-test your AI agent</text>
+  <text x="80" y="345" font-family="system-ui, sans-serif" font-size="62" font-weight="700" fill="#0E1116">before it touches real money.</text>
+  <text x="80" y="430" font-family="system-ui, sans-serif" font-size="28" fill="#3B4352">21 crashes · 7 laws · 0 real dollars</text>
   <rect x="80" y="500" width="330" height="64" rx="8" fill="#FFD21F"/>
   <text x="245" y="541" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" font-weight="600" fill="#16130A">SIMULATION · no real funds</text>
 </svg>
