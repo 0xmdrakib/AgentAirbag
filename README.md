@@ -112,21 +112,12 @@ In the app, open `/replay/timeout-after-transfer` and switch **Dummy** to **Seat
 
 ```mermaid
 flowchart LR
-    agent["Agent under test<br/>HTTP, process or in-process"]
-    sandbox["Sandbox<br/>1Click API replica"]
-    faults["Scenario runtime<br/>injects scripted faults"]
-    ledger[("Ledger and<br/>virtual clock")]
-    judge["Judge<br/>reads the event log and ledger"]
-    report["Report card<br/>grade, loss, evidence, hash"]
-    guard["Agent Airbag Guard<br/>allow, warn or block"]
-
-    agent -->|"1Click calls"| sandbox
-    faults -->|"rewrite, delay or fail responses"| sandbox
-    sandbox --> ledger
+    guard["Guard<br/>allow, warn, block"] -.-> agent["Agent<br/>under test"]
+    agent -->|"1Click calls"| sandbox["Sandbox<br/>1Click replica<br/>plus scripted faults"]
+    sandbox --> ledger[("Ledger and<br/>virtual clock")]
+    sandbox -->|"event log"| judge["Judge"]
     ledger --> judge
-    sandbox -->|"event log"| judge
-    judge --> report
-    guard -.->|"policy checks"| agent
+    judge --> report["Report card<br/>grade, loss, evidence"]
 ```
 
 One crash from start to verdict, `timeout-after-transfer`:
