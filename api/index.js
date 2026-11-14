@@ -31885,8 +31885,23 @@ function createApiApp(options = {}) {
 
 // packages/server/src/vercel.ts
 var app = createApiApp();
+var PATH_PARAM = "__p";
 var vercel_default = {
-  fetch: (request) => app.fetch(request)
+  async fetch(request) {
+    const url2 = new URL(request.url);
+    const forwarded = url2.searchParams.get(PATH_PARAM);
+    if (forwarded === null) return app.fetch(request);
+    url2.searchParams.delete(PATH_PARAM);
+    url2.pathname = `/api/${forwarded.replace(/^\/+/, "")}`;
+    const hasBody = request.method !== "GET" && request.method !== "HEAD";
+    return app.fetch(
+      new Request(url2, {
+        method: request.method,
+        headers: request.headers,
+        body: hasBody ? await request.arrayBuffer() : void 0
+      })
+    );
+  }
 };
 export {
   vercel_default as default

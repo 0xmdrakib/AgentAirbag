@@ -107,7 +107,7 @@ Delete the directory to reset the local data.
 This is how it is set up. It is a description of the configuration, not a statement that a given
 deployment is live.
 
-- **The function.** `api/[...path].js` is a single self-contained ESM bundle of
+- **The function.** `api/index.js` is a single self-contained ESM bundle of
   `packages/server/src/vercel.ts` (the Hono app from `createApiApp()`), built by esbuild. Regenerate
   it with `pnpm build:api` after changing `packages/server`, `packages/core` or `db/schema.sql`.
   It is committed on purpose, because Vercel detects functions from the repository, not from build

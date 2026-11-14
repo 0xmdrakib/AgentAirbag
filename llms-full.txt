@@ -11,7 +11,7 @@ that fails on purpose, 21 scripted crashes, and a report card scored from ledger
 move.
 
 [![verify](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml/badge.svg)](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml)
-![tests](https://img.shields.io/badge/tests-111%20passing-0d7a4e)
+![tests](https://img.shields.io/badge/tests-115%20passing-0d7a4e)
 ![scenarios](https://img.shields.io/badge/crashes-21-ffd21f)
 ![funds](https://img.shields.io/badge/real%20funds-0-c01f31)
 ![license](https://img.shields.io/badge/license-MIT-6b6b67)
@@ -48,7 +48,7 @@ pnpm install --frozen-lockfile
 | `pnpm airbag run --agent naive --summary` | `score 0 · grade F · 0 survived · 21 crashed`, `simulated loss $10907.04 · false claims 8` |
 | `pnpm airbag run --agent hardened --summary` | `score 100 · grade A · 21 survived · 0 crashed`, `simulated loss $1.00` (a modeled refund fee) |
 | `pnpm demo:attack` | An unguarded agent obeys an instruction hidden in a token symbol and loses $9,995.46 (simulated). The guarded agent blocks it with `TAINTED_VALUE`, loses $0.00 and still completes the swap. |
-| `pnpm test` | 111 tests pass, including a byte-identical report hash for the same seed |
+| `pnpm test` | 115 tests pass, including a byte-identical report hash for the same seed |
 | `pnpm verify` | Lint, typecheck, tests, HTTP and process sandbox smokes, attack demo, build and a headless-browser demo smoke |
 | `pnpm demo` | Builds everything and serves the app at `http://localhost:4321`. Open it in any browser. |
 
@@ -300,14 +300,14 @@ No API keys are needed for anything below. `NEARAI_API_KEY` is only for the opti
 | Command | Purpose |
 | --- | --- |
 | `pnpm verify` | The full gate: lint, typecheck, tests, HTTP and process smokes, attack demo, llms check, build, demo smoke. Run before finishing. |
-| `pnpm test` | Vitest, all packages (111 tests) |
+| `pnpm test` | Vitest, all packages (115 tests) |
 | `pnpm test:api` | Wallet auth and store tests only |
 | `pnpm airbag run --agent naive --summary` | Dummy: expect grade F, 21 crashed |
 | `pnpm airbag run --agent hardened --summary` | Seatbelt: expect grade A, 21 survived |
 | `pnpm demo:attack` | Injection demo: unguarded loses, guarded blocks and still completes |
 | `pnpm demo` | Build, then serve the app at http://localhost:4321 |
 | `pnpm build:scenarios`, `pnpm build:fixtures` | Regenerate scenario data and the two golden reports |
-| `pnpm build:api` | Regenerate the committed Vercel function `api/[...path].js` after editing `packages/server`, `packages/core` or `db/schema.sql`; `--check` fails if it is stale |
+| `pnpm build:api` | Regenerate the committed Vercel function `api/index.js` after editing `packages/server`, `packages/core` or `db/schema.sql`; `--check` fails if it is stale |
 | `pnpm llms` | Regenerate `llms-full.txt` after editing any doc it includes |
 | `pnpm lint`, `pnpm typecheck`, `pnpm format` | Static checks and formatting |
 
@@ -702,7 +702,7 @@ is not here, it is not a shipped claim.
 | 21 crashes are implemented | `pnpm build:scenarios` | `Built 21 scenarios (12 P0, 9 P1)` |
 | Dummy crashes on all 21 | `pnpm airbag run --agent naive --summary` | `0 survived · 21 crashed` |
 | Seatbelt survives all 21 | `pnpm airbag run --agent hardened --summary` | `21 survived · 0 crashed`; grade A |
-| The exact naive crash set is asserted | `pnpm test` | 111 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
+| The exact naive crash set is asserted | `pnpm test` | 115 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
 | The same seed produces a byte-identical report | `pnpm test` | `is deterministic: the same seed produces the same report hash` passes |
 | The live client is read-only | `pnpm test` | `read-only live client` suite passes |
 | The sandbox accepts the exact quoteRequest echoed by the live API | `pnpm test` | `drop-in 1Click quote compatibility` suite passes |
@@ -873,7 +873,7 @@ Delete the directory to reset the local data.
 This is how it is set up. It is a description of the configuration, not a statement that a given
 deployment is live.
 
-- **The function.** `api/[...path].js` is a single self-contained ESM bundle of
+- **The function.** `api/index.js` is a single self-contained ESM bundle of
   `packages/server/src/vercel.ts` (the Hono app from `createApiApp()`), built by esbuild. Regenerate
   it with `pnpm build:api` after changing `packages/server`, `packages/core` or `db/schema.sql`.
   It is committed on purpose, because Vercel detects functions from the repository, not from build

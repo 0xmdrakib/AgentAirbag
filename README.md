@@ -5,7 +5,7 @@ that fails on purpose, 21 scripted crashes, and a report card scored from ledger
 move.
 
 [![verify](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml/badge.svg)](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml)
-![tests](https://img.shields.io/badge/tests-111%20passing-0d7a4e)
+![tests](https://img.shields.io/badge/tests-115%20passing-0d7a4e)
 ![scenarios](https://img.shields.io/badge/crashes-21-ffd21f)
 ![funds](https://img.shields.io/badge/real%20funds-0-c01f31)
 ![license](https://img.shields.io/badge/license-MIT-6b6b67)
@@ -42,7 +42,7 @@ pnpm install --frozen-lockfile
 | `pnpm airbag run --agent naive --summary` | `score 0 · grade F · 0 survived · 21 crashed`, `simulated loss $10907.04 · false claims 8` |
 | `pnpm airbag run --agent hardened --summary` | `score 100 · grade A · 21 survived · 0 crashed`, `simulated loss $1.00` (a modeled refund fee) |
 | `pnpm demo:attack` | An unguarded agent obeys an instruction hidden in a token symbol and loses $9,995.46 (simulated). The guarded agent blocks it with `TAINTED_VALUE`, loses $0.00 and still completes the swap. |
-| `pnpm test` | 111 tests pass, including a byte-identical report hash for the same seed |
+| `pnpm test` | 115 tests pass, including a byte-identical report hash for the same seed |
 | `pnpm verify` | Lint, typecheck, tests, HTTP and process sandbox smokes, attack demo, build and a headless-browser demo smoke |
 | `pnpm demo` | Builds everything and serves the app at `http://localhost:4321`. Open it in any browser. |
 

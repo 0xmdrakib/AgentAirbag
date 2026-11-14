@@ -4,5 +4,8 @@
   "outputDirectory": "apps/web/dist",
   "framework": null,
   "functions": { "api/**/*.js": { "includeFiles": "db/schema.sql" } },
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index?__p=$1" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
 }

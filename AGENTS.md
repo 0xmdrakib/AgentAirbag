@@ -24,14 +24,14 @@ No API keys are needed for anything below. `NEARAI_API_KEY` is only for the opti
 | Command | Purpose |
 | --- | --- |
 | `pnpm verify` | The full gate: lint, typecheck, tests, HTTP and process smokes, attack demo, llms check, build, demo smoke. Run before finishing. |
-| `pnpm test` | Vitest, all packages (111 tests) |
+| `pnpm test` | Vitest, all packages (115 tests) |
 | `pnpm test:api` | Wallet auth and store tests only |
 | `pnpm airbag run --agent naive --summary` | Dummy: expect grade F, 21 crashed |
 | `pnpm airbag run --agent hardened --summary` | Seatbelt: expect grade A, 21 survived |
 | `pnpm demo:attack` | Injection demo: unguarded loses, guarded blocks and still completes |
 | `pnpm demo` | Build, then serve the app at http://localhost:4321 |
 | `pnpm build:scenarios`, `pnpm build:fixtures` | Regenerate scenario data and the two golden reports |
-| `pnpm build:api` | Regenerate the committed Vercel function `api/[...path].js` after editing `packages/server`, `packages/core` or `db/schema.sql`; `--check` fails if it is stale |
+| `pnpm build:api` | Regenerate the committed Vercel function `api/index.js` after editing `packages/server`, `packages/core` or `db/schema.sql`; `--check` fails if it is stale |
 | `pnpm llms` | Regenerate `llms-full.txt` after editing any doc it includes |
 | `pnpm lint`, `pnpm typecheck`, `pnpm format` | Static checks and formatting |
 
