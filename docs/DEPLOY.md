@@ -11,7 +11,8 @@ without a wallet, an account, a database or any API keys.
   handles wallet sessions and saved runs.
 - **Local demo:** `scripts/demo.ts` serves the static app and proxies `/api` to a second port on
   `127.0.0.1`, so browser cookies stay on one origin.
-- **Vercel:** static only in this repository. See [Vercel](#vercel) below.
+- **Vercel:** the static app plus the API as one serverless function on the same origin. See
+  [Vercel with the API](#vercel-with-the-api) below.
 
 ## Run locally with wallet and Neon
 
@@ -68,6 +69,7 @@ another port, update this value before starting it.
 | `DATABASE_URL`          | API runtime, migration | `postgresql://user:password@host/airbag?sslmode=require` | Neon Postgres connection string.                                                 |
 | `NEAR_NETWORK`          | API runtime            | `testnet` or `mainnet`                                   | Network reported by `GET /api/health`. Keep it aligned with `VITE_NEAR_NETWORK`. |
 | `AIRBAG_ALLOWED_ORIGIN` | API runtime            | `http://localhost:4321`                                  | Exact browser origin allowed to call the API.                                    |
+| `AIRBAG_AUTH_RECIPIENT` | API runtime            | `agentairbag.xyz`                                        | Recipient signed in the wallet message. Empty uses the request host.             |
 | `AIRBAG_DATA_DIR`       | API runtime            | `.data`                                                  | Directory for the local JSON store when `DATABASE_URL` is unset.                 |
 | `VITE_NEAR_NETWORK`     | Web build              | `testnet` or `mainnet`                                   | Network compiled into the browser app. Keep it equal to `NEAR_NETWORK`.          |
 
@@ -100,20 +102,39 @@ machine, but the data is local to that directory and is not shared with another 
 
 Delete the directory to reset the local data.
 
-## Vercel
+## Vercel with the API
 
-`vercel.json` keeps the static deployment: `pnpm build` writes `apps/web/dist`, and Vercel serves it
-with no serverless function.
+This is how it is set up. It is a description of the configuration, not a statement that a given
+deployment is live.
 
-A same-origin API on Vercel would need two things that are not in this repository:
+- **The function.** `api/[...path].js` is a single self-contained ESM bundle of
+  `packages/server/src/vercel.ts` (the Hono app from `createApiApp()`), built by esbuild. Regenerate
+  it with `pnpm build:api` after changing `packages/server`, `packages/core` or `db/schema.sql`.
+  It is committed on purpose, because Vercel detects functions from the repository, not from build
+  output. `pnpm build:api --check` (part of `pnpm verify`) fails if the committed file is stale.
+- **The static app.** `pnpm build` writes `apps/web/dist`, which Vercel serves as before.
+- **The rewrite.** `vercel.json` sends every path except `/api/...` to `/index.html`, so API paths
+  reach the function instead of the app shell. Files that exist still win.
+- **The schema file.** `vercel.json` ships `db/schema.sql` with the function (`includeFiles`). The
+  function applies it on the first request that touches the database, so no separate migration is
+  needed there; `pnpm db:migrate` remains a useful preflight.
+- **Nonces.** With `DATABASE_URL` set, sign-in nonces are stored in the `auth_nonces` table and
+  consumed atomically, because the instance that issues a nonce may not be the one that verifies it.
+  Without `DATABASE_URL` the API falls back to the local JSON store and an in-memory nonce map, which
+  is only suitable for a single process and is not a serverless setup.
 
-1. A serverless entry point, for example `api/index.ts`, that adapts `createApiApp()` to the Vercel
-   Node handler signature.
-2. A rewrite from `/api/*` to that function.
+Set these in the Vercel project settings (Production). Nothing in the repository contains a value.
 
-Adding only `functions` or `rewrites` to `vercel.json` cannot create that entry point. This repository
-therefore does not configure one, and the Vercel deployment has no API. The simulator, report card
-and replay work there. Wallet connect and saving runs do not.
+| Variable                | Needed | Purpose                                                                        |
+| ----------------------- | ------ | ------------------------------------------------------------------------------ |
+| `DATABASE_URL`          | yes    | Neon Postgres connection string; sessions, runs and nonces live here.          |
+| `NEAR_NETWORK`          | no     | Network reported by `GET /api/health`. Empty means `testnet`.                  |
+| `VITE_NEAR_NETWORK`     | no     | Network compiled into the web app at build time. Keep equal to `NEAR_NETWORK`. |
+| `AIRBAG_ALLOWED_ORIGIN` | no     | Exact public origin, for example `https://agentairbag.xyz`. Same origin works without it. |
+| `AIRBAG_AUTH_RECIPIENT` | no     | Recipient signed in the wallet message. Empty uses the request host.           |
+
+Check it after a deploy with `GET /api/health`, which reports `"db": "neon"` when `DATABASE_URL` is
+read.
 
 ## Node host path
 
@@ -135,7 +156,7 @@ The app uses clean paths, so opening `/report` directly must return `index.html`
 
 | Host | What to do |
 | --- | --- |
-| Vercel | Nothing. `vercel.json` has a rewrite of every path to `/index.html`; real files still win. |
+| Vercel | Nothing. `vercel.json` rewrites every path except `/api/...` to `/index.html`; real files still win. |
 | Cloudflare Pages | Nothing. A project without a top-level `404.html` is treated as a single page app. |
 | GitHub Pages | Copy `index.html` to `404.html` in the published folder. Pages serves it for unknown paths. |
 | `pnpm demo` | Nothing. The demo server falls back to `index.html`. |
@@ -156,9 +177,9 @@ URLs first.
 
 ## What is not built
 
-- **No hosted API.** The live site is static, so `GET /api/me` returns the app shell and the app
-  disables **Connect wallet**. Wallet sign-in and saved runs work only with the Node API.
-- **No Vercel function for the API.** The Vercel configuration is static only.
+- **No claim that the hosted API is live.** The Vercel function is configured as described above;
+  without `DATABASE_URL` it falls back to a process-local store that does not suit serverless. When
+  `GET /api/me` returns the app shell instead of JSON, the app disables **Connect wallet**.
 - **No production host configuration.** There is no Dockerfile, Terraform, or managed host setup for
   the Node path.
 - **No credentials are included.** Neon, wallet and network settings are supplied by the operator.

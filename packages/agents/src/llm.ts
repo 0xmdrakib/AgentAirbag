@@ -63,7 +63,7 @@ export function llmAgent(options: LlmAgentOptions = {}): AgentAdapter {
           'NEARAI_API_KEY is not set. The LLM agent needs a NEAR AI Cloud key; use the cassette agent for offline replay.',
         );
       }
-      const baseURL = (options.baseURL ?? process.env.NEARAI_BASE_URL ?? BASE_URL).replace(/\/$/, '');
+      const baseURL = (options.baseURL ?? (process.env.NEARAI_BASE_URL || BASE_URL)).replace(/\/$/, '');
       resolvedModel = resolvedModel ?? (await pickModel(baseURL, apiKey));
       adapter.model = resolvedModel;
       recordedAt = new Date().toISOString();

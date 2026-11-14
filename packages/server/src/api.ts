@@ -12,7 +12,7 @@ import {
   sessionCookie,
   verifyNearSignature,
 } from './auth';
-import { createStore, type RunStore } from './store';
+import { createStore, type PendingNonce, type RunStore } from './store';
 
 const MAX_REPORT_BYTES = 512 * 1024;
 const MAX_PENDING_NONCES = 10_000;
@@ -37,13 +37,6 @@ export interface CreateApiOptions {
   /** Defaults to AIRBAG_ALLOWED_ORIGIN. Pass null to force same-origin only. */
   allowedOrigin?: string | null;
   nonceTtlMs?: number;
-}
-
-interface PendingNonce {
-  accountId?: string;
-  recipient: string;
-  message: string;
-  expiresAt: number;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -153,7 +146,7 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
   };
 
   api.get('/health', (c) =>
-    c.json({ ok: true, db: store.backend, network: process.env.NEAR_NETWORK ?? 'testnet' }),
+    c.json({ ok: true, db: store.backend, network: process.env.NEAR_NETWORK || 'testnet' }),
   );
 
   api.post('/auth/nonce', async (c) => {
@@ -175,13 +168,18 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
       ttlMs: nonceTtlMs,
     });
     const expiresAt = Date.parse(issued.expiresAt);
-    pruneNonces(time.getTime());
-    pendingNonces.set(issued.nonce, {
+    const pending: PendingNonce = {
       accountId,
       recipient: issued.recipient,
       message: issued.message,
       expiresAt,
-    });
+    };
+    if (store.saveNonce) {
+      await store.saveNonce(issued.nonce, pending);
+    } else {
+      pruneNonces(time.getTime());
+      pendingNonces.set(issued.nonce, pending);
+    }
     return c.json(issued);
   });
 
@@ -212,9 +210,10 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
     const callbackUrl = typeof rawCallbackUrl === 'string' ? rawCallbackUrl : undefined;
 
     const time = now();
-    const pending = pendingNonces.get(nonce);
+    // A shared store consumes the nonce atomically here; the in-memory path deletes it on success.
+    const pending = store.takeNonce ? await store.takeNonce(nonce) : pendingNonces.get(nonce);
     if (!pending || pending.expiresAt <= time.getTime()) {
-      pendingNonces.delete(nonce);
+      if (!store.takeNonce) pendingNonces.delete(nonce);
       return c.json({ error: 'Nonce is unknown or expired. Request a new one.' }, 400);
     }
     if (pending.accountId !== undefined && pending.accountId !== accountId) {
@@ -235,7 +234,7 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
     });
     if (!result.valid) return c.json({ error: result.error }, 401);
 
-    pendingNonces.delete(nonce);
+    if (!store.takeNonce) pendingNonces.delete(nonce);
     await store.ensureUser(accountId);
     const session = createSessionToken(time);
     await store.createSession(accountId, session.tokenHash, session.expiresAt);

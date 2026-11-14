@@ -26,6 +26,16 @@ CREATE TABLE IF NOT EXISTS runs (
   report jsonb NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS auth_nonces (
+  nonce text PRIMARY KEY,
+  account_id text,
+  recipient text NOT NULL,
+  message text NOT NULL,
+  expires_at timestamptz NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS sessions_account_id_idx ON sessions (account_id);
+
+CREATE INDEX IF NOT EXISTS auth_nonces_expires_idx ON auth_nonces (expires_at);
 
 CREATE INDEX IF NOT EXISTS runs_account_created_idx ON runs (account_id, created_at DESC);

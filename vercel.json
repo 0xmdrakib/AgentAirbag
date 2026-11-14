@@ -3,5 +3,6 @@
   "buildCommand": "pnpm build",
   "outputDirectory": "apps/web/dist",
   "framework": null,
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "functions": { "api/**/*.js": { "includeFiles": "db/schema.sql" } },
+  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
 }

@@ -23,8 +23,23 @@ export interface SavedRun {
   report: RunReportInput;
 }
 
+export interface PendingNonce {
+  accountId?: string;
+  recipient: string;
+  message: string;
+  /** Epoch milliseconds. */
+  expiresAt: number;
+}
+
 export interface RunStore {
   readonly backend: StoreBackend;
+  /**
+   * Optional shared nonce storage for hosts where one instance may issue a nonce and another
+   * verify it (serverless). When absent, the API keeps nonces in process memory.
+   */
+  saveNonce?(nonce: string, pending: PendingNonce): Promise<void>;
+  /** Atomically removes and returns a nonce, so it is single use. */
+  takeNonce?(nonce: string): Promise<PendingNonce | null>;
   ensureUser(accountId: string): Promise<void>;
   createSession(accountId: string, tokenHash: string, expiresAt: string): Promise<void>;
   /** Returns the account id for a live session, or null when missing/expired. */
@@ -51,7 +66,7 @@ export function createStore(options: CreateStoreOptions = {}): RunStore {
     return new NeonStore(databaseUrl.trim());
   }
 
-  const dataDir = options.dataDir ?? process.env.AIRBAG_DATA_DIR ?? '.data';
+  const dataDir = options.dataDir ?? (process.env.AIRBAG_DATA_DIR || '.data');
   return new LocalStore(dataDir, options.quiet === true);
 }
 
@@ -65,7 +80,15 @@ export function createStore(options: CreateStoreOptions = {}): RunStore {
  * SQL or semicolons inside literals.
  */
 export async function readSchemaStatements(): Promise<string[]> {
-  const schema = await readFile(new URL('../../../db/schema.sql', import.meta.url), 'utf8');
+  let schema: string;
+  try {
+    schema = await readFile(new URL('../../../db/schema.sql', import.meta.url), 'utf8');
+  } catch (error) {
+    // A bundled build (the Vercel function) has no source tree next to it; the file ships with
+    // the function and sits under the working directory.
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+    schema = await readFile(resolve(process.cwd(), 'db', 'schema.sql'), 'utf8');
+  }
   return schema
     .split('\n')
     .filter((line) => !line.trimStart().startsWith('--'))
@@ -122,6 +145,13 @@ interface SessionRow {
   account_id: string;
 }
 
+interface NonceRow {
+  account_id: string | null;
+  recipient: string;
+  message: string;
+  expires_at: unknown;
+}
+
 class NeonStore implements RunStore {
   readonly backend = 'neon' as const;
   private readonly sql: SqlClient;
@@ -147,6 +177,39 @@ class NeonStore implements RunStore {
       'INSERT INTO users (account_id) VALUES ($1) ON CONFLICT (account_id) DO NOTHING',
       [accountId],
     );
+  }
+
+  async saveNonce(nonce: string, pending: PendingNonce): Promise<void> {
+    await this.ready();
+    await this.sql.query('DELETE FROM auth_nonces WHERE expires_at < now()');
+    await this.sql.query(
+      `INSERT INTO auth_nonces (nonce, account_id, recipient, message, expires_at)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [
+        nonce,
+        pending.accountId ?? null,
+        pending.recipient,
+        pending.message,
+        new Date(pending.expiresAt).toISOString(),
+      ],
+    );
+  }
+
+  async takeNonce(nonce: string): Promise<PendingNonce | null> {
+    await this.ready();
+    const rows = (await this.sql.query(
+      `DELETE FROM auth_nonces WHERE nonce = $1
+       RETURNING account_id, recipient, message, expires_at`,
+      [nonce],
+    )) as unknown as NonceRow[];
+    const row = rows[0];
+    if (!row) return null;
+    return {
+      accountId: row.account_id ?? undefined,
+      recipient: row.recipient,
+      message: row.message,
+      expiresAt: Date.parse(toIso(row.expires_at)),
+    };
   }
 
   async createSession(accountId: string, tokenHash: string, expiresAt: string): Promise<void> {

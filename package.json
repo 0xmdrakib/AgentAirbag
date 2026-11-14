@@ -30,6 +30,7 @@
   "scripts": {
     "build:scenarios": "tsx scripts/build-scenarios.ts",
     "build:fixtures": "tsx scripts/build-fixtures.ts",
+    "build:api": "tsx scripts/build-api.ts",
     "build": "pnpm build:scenarios && pnpm build:fixtures && pnpm --filter @airbag/web build",
     "demo": "tsx scripts/demo.ts",
     "demo:attack": "tsx scripts/attack-demo.ts",
@@ -51,13 +52,14 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:api && pnpm test:http && pnpm test:process && pnpm demo:attack && pnpm llms --check && pnpm build && pnpm demo --smoke",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:api && pnpm test:http && pnpm test:process && pnpm demo:attack && pnpm llms --check && pnpm build:api --check && pnpm build && pnpm demo --smoke",
     "docs:facts": "tsx scripts/docs-facts.ts",
     "og": "tsx scripts/make-og.ts",
     "llms": "tsx scripts/build-llms.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "playwright-core": "^1.65.0",
     "prettier": "^3.10.1",

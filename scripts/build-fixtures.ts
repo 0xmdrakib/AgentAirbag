@@ -9,7 +9,7 @@ import {
 } from '../packages/core/src/index';
 import { naiveAgent, hardenedAgent } from '../packages/agents/src/index';
 
-const seed = process.env.AIRBAG_SEED ?? 'airbag-demo-2026';
+const seed = process.env.AIRBAG_SEED || 'airbag-demo-2026';
 
 console.log('Running Dummy…');
 const naive = await runSuite({ agent: naiveAgent(), scenarios: SCENARIOS, seed });
