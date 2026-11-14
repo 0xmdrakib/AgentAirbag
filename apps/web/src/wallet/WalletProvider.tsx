@@ -198,7 +198,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       try {
         const { selector } = await loadWallet();
-        let accounts = (await tryDirectSignIn(selector, walletId)).filter((account) =>
+        const accounts = (await tryDirectSignIn(selector, walletId)).filter((account) =>
           Boolean(account.accountId),
         );
 
