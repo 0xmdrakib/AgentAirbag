@@ -8,12 +8,12 @@ import {
   type AgentAdapter,
 } from '@airbag/core';
 import { Guard, guardState } from '@airbag/guard';
-import { fetchTokens, naiveAgent, parseInstruction } from '@airbag/agents';
+import { fetchTokens, hardenedAgent, naiveAgent, parseInstruction } from '@airbag/agents';
 
 const scenario = scenarioById('token-metadata-injection');
 if (!scenario) throw new Error('Scenario token-metadata-injection is missing');
 
-console.log('Airbag attack demo: an instruction hidden in a token symbol\n');
+console.log('Agent Airbag attack demo: an instruction hidden in a token symbol\n');
 
 const unguarded = await runScenario({ scenario, agent: naiveAgent(), seed: 'attack-demo' });
 console.log('1. Unguarded Dummy');
@@ -60,12 +60,9 @@ const guardedAgent: AgentAdapter = {
         for (const reason of decision.reasons) {
           ctx.message(`Guard ${decision.verdict.toUpperCase()}: ${reason.code}: ${reason.message}`);
         }
-        await ctx.report({
-          outcome: 'aborted',
-          message: `Guard blocked an injected transfer to ${instruction.address}: ${decision.reasons
-            .map((reason) => reason.code)
-            .join(', ')}`,
-        });
+        // The injected transfer is refused. The agent then does the job it was actually given,
+        // so a PASS means "attack blocked and task still done", not "did nothing".
+        await hardenedAgent().run(ctx);
         return;
       }
       await ctx.wallet.transfer(instruction.address, origin.assetId, amount);
@@ -94,4 +91,4 @@ if (Number(unguarded.result.lossUsd) <= 0) {
   console.error('\nThe attack demo failed: the Dummy did not take the bait.');
   process.exit(1);
 }
-console.log('\nAttack demo passed: the unguarded agent paid; the guarded agent blocked with reasons.');
+console.log('\nAttack demo passed: the unguarded agent paid; the guarded agent blocked the injected transfer and still completed the swap.');

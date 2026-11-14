@@ -8,16 +8,16 @@ is not here, it is not a shipped claim.
 | 21 crashes are implemented | `pnpm build:scenarios` | `Built 21 scenarios (12 P0, 9 P1)` |
 | Dummy crashes on all 21 | `pnpm airbag run --agent naive --summary` | `0 survived · 21 crashed` |
 | Seatbelt survives all 21 | `pnpm airbag run --agent hardened --summary` | `21 survived · 0 crashed`; grade A |
-| The exact naive crash set is asserted | `pnpm test` | 57 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
+| The exact naive crash set is asserted | `pnpm test` | 107 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
 | The same seed produces a byte-identical report | `pnpm test` | `is deterministic: the same seed produces the same report hash` passes |
 | The live client is read-only | `pnpm test` | `read-only live client` suite passes |
 | The sandbox accepts the exact quoteRequest echoed by the live API | `pnpm test` | `drop-in 1Click quote compatibility` suite passes |
 | Every scenario YAML validates and has a story + fix | `pnpm test` | `scenario contract` suite passes |
 | Every report fixture validates against the schema | `pnpm test` | `report fixtures` suite passes |
-| Guard returns allow / warn / block with reasons | `pnpm test` | `Airbag Guard` suite passes (36 tests) |
+| Guard returns allow / warn / block with reasons | `pnpm test` | `Airbag Guard` suite passes (41 tests in `packages/guard`) |
 | A cassette response hash drift is caught | `pnpm test` | `fails loudly when a sandbox response drifts from the recording` passes |
 | No known production dependency vulnerabilities | `pnpm audit --prod` | `No known vulnerabilities found` |
-| The attack demo blocks the injected transfer | `pnpm demo:attack` | Unguarded loss `$9995.46`; guarded `PASS · $0.00`; `TAINTED_VALUE` in the log |
+| The attack demo blocks the injected transfer | `pnpm demo:attack` | Unguarded loss `$9995.46`; guarded blocks with `TAINTED_VALUE`, still completes the swap and ends `PASS · $0.00` |
 | The demo runs offline after install | `pnpm demo` (disconnect the network after `pnpm install`) | Report card at the printed URL; no API calls |
 | The demo smoke passes | `pnpm demo --smoke` | `Demo smoke passed.` |
 | The whole verification passes | `pnpm verify` | Lint, typecheck, tests, the HTTP sandbox smoke, the process adapter smoke, build, demo smoke exit 0 |
@@ -32,7 +32,8 @@ is not here, it is not a shipped claim.
 | The hosted static app needs no backend | `pnpm build` | `apps/web/dist` contains only static assets |
 | The LLM adapter ships | `grep -R "class ToolRunner" packages/agents/src` | `tools.ts` defines the tool surface; `llm.ts` defines the adapter |
 | No LLM result is claimed | UI Report → Compare | “LLM on NEAR AI Cloud: not recorded” |
-| No hosted demo is claimed | README | “not deployed” in the Deploy section |
+| No hosted demo is claimed | README | “No hosted demo” in Limitations |
+| `llms.txt` links resolve and `llms-full.txt` is current | `pnpm llms --check` | `llms.txt links resolve and llms-full.txt is current.` |
 | No report signature is claimed | README + report metadata | `signature` is absent; README says so |
 
 ## Claims deliberately not made

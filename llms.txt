@@ -1,0 +1,35 @@
+# Agent Airbag
+
+> Crash tests for AI agents that move money. A sandboxed copy of the NEAR Intents 1Click swap API that fails on purpose, 21 scripted crashes (three for each of seven laws), and a report card scored from ledger truth. No real funds move. Built at NEAR HACKATHON, November 2026. MIT licensed.
+
+Status: runs locally with `pnpm demo`; no hosted URL and no LLM result are claimed. Results are simulated and labelled as such (seed `airbag-demo-2026`): the Dummy agent grades F (21 of 21 crashed, $10,907.04 simulated loss), the Seatbelt reference agent grades A (21 of 21 survived). The product is never described as "safe" or "certified". Source: https://github.com/0xmdrakib/AgentAirbag
+
+## Start here
+
+- [README](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/README.md): what it is, how to verify it in a few commands, how NEAR fits, limitations
+- [AGENTS.md](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/AGENTS.md): setup, commands, repository map and invariants for coding agents
+- [Claims ledger](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/CLAIMS.md): every public claim with the command that proves it
+- [Full text](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/llms-full.txt): README, AGENTS.md, architecture, scenarios, claims, facts and deploy notes in one file
+
+## Product and design
+
+- [Architecture](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/ARCHITECTURE.md): run lifecycle, determinism, money model, judge invariants, sandbox routes
+- [Scenarios](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/SCENARIOS.md): all 21 crashes with story, fault, judge rule and fix
+- [Generated facts](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/FACTS.md): grades, losses and counts produced by code
+- [Verified facts](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/VERIFIED_FACTS.md): what was checked against live NEAR Intents responses and when
+- [Deploy and wallet setup](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/DEPLOY.md): static hosting, the Node API, Neon, environment variables
+
+## Data
+
+- [Dummy report (JSON)](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/fixtures/report.naive.json): the F report with the full event log
+- [Seatbelt report (JSON)](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/fixtures/report.hardened.json): the A report with the full event log
+- [Scenario files](https://github.com/0xmdrakib/AgentAirbag/tree/main/scenarios): 21 YAML scenarios, grouped by law
+- [Example agent](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/examples/http-agent.mjs): a minimal bring-your-own agent over HTTP
+
+## Optional
+
+- [Decisions](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/DECISIONS.md): non-obvious choices with alternatives and reasons
+- [Build log](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/BUILD_LOG.md): timeline of the build
+- [Demo script](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/DEMO_SCRIPT.md): a two-minute walkthrough
+- [Build prompt](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/MASTER_PROMPT.md): the original brief, saved verbatim
+- [Hackathon rules](https://raw.githubusercontent.com/0xmdrakib/AgentAirbag/main/docs/HACKATHON.md): the organizers' instructions this project followed

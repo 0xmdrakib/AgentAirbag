@@ -1,37 +1,39 @@
+/**
+ * Captures the README images into docs/images at a fixed desktop size and one phone size.
+ * Needs the demo running (pnpm demo). Run: pnpm screenshots
+ */
+import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright-core';
 import { PREVIEW_URL, chromePath } from './preview';
 import { settle } from './settle';
-import { mkdirSync } from 'node:fs';
 
-const executablePath = chromePath();
-const out = 'artifacts/screens';
+const out = 'docs/images';
 mkdirSync(out, { recursive: true });
 
-const browser = await chromium.launch({ executablePath, headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 980 }, deviceScaleFactor: 1 });
-const base = PREVIEW_URL;
+const browser = await chromium.launch({ executablePath: chromePath(), headless: true });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 
-const routes: { name: string; hash: string; fullPage?: boolean }[] = [
+const desktop: { name: string; hash: string }[] = [
   { name: 'lab', hash: '#/' },
-  { name: 'report', hash: '#/report' },
-  { name: 'runner', hash: '#/run' },
+  { name: 'report-card', hash: '#/report' },
   { name: 'replay', hash: '#/replay/timeout-after-transfer' },
   { name: 'scenarios', hash: '#/scenarios' },
   { name: 'connect', hash: '#/connect' },
 ];
 
-for (const route of routes) {
-  await page.goto(`${base}${route.hash}`, { waitUntil: 'networkidle' });
+for (const shot of desktop) {
+  await page.goto(`${PREVIEW_URL}${shot.hash}`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(400);
   await settle(page);
-  await page.screenshot({ path: `${out}/${route.name}.png`, fullPage: route.fullPage ?? true });
-  console.log(`captured ${route.name}`);
+  await page.screenshot({ path: `${out}/${shot.name}.png`, fullPage: false });
+  console.log(`captured ${shot.name}`);
 }
 
 await page.setViewportSize({ width: 390, height: 844 });
-await page.goto(`${base}#/report`, { waitUntil: 'networkidle' });
+await page.goto(`${PREVIEW_URL}#/report`, { waitUntil: 'networkidle' });
 await page.waitForTimeout(600);
-await page.screenshot({ path: `${out}/report-mobile.png`, fullPage: false });
-console.log('captured report-mobile');
+await settle(page);
+await page.screenshot({ path: `${out}/report-card-mobile.png`, fullPage: false });
+console.log('captured report-card-mobile');
 
 await browser.close();

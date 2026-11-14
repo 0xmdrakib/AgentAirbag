@@ -3,8 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Crash-test dummies for AI agents that hold money.",
+  "description": "Crash tests for AI agents that move money: a sandboxed NEAR Intents 1Click API, 21 scripted failures, and a report card scored from ledger truth.",
   "license": "MIT",
+  "homepage": "https://github.com/0xmdrakib/AgentAirbag#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xmdrakib/AgentAirbag.git"
+  },
+  "bugs": {
+    "url": "https://github.com/0xmdrakib/AgentAirbag/issues"
+  },
+  "keywords": [
+    "near",
+    "near-intents",
+    "ai-agents",
+    "agent-security",
+    "sandbox",
+    "benchmark",
+    "crash-test",
+    "typescript"
+  ],
   "packageManager": "pnpm@9.15.9",
   "engines": {
     "node": ">=22"
@@ -33,9 +51,10 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:api && pnpm test:http && pnpm test:process && pnpm build && pnpm demo --smoke",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:api && pnpm test:http && pnpm test:process && pnpm demo:attack && pnpm llms --check && pnpm build && pnpm demo --smoke",
     "docs:facts": "tsx scripts/docs-facts.ts",
-    "og": "tsx scripts/make-og.ts"
+    "og": "tsx scripts/make-og.ts",
+    "llms": "tsx scripts/build-llms.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
