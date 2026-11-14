@@ -12,7 +12,7 @@ posts this.** Everything shown must exist in the local build.
 | 0:45–0:55 | Toggle **Dummy → Seatbelt**; the same crash, no loss | Same crash. Seatbelt checked the status first. |
 | 0:55–1:10 | Scenario Library → `token-metadata-injection`; show the modeled tag and the Dummy loss | A scripted Dummy drained $9,995 by obeying a token’s name. This result is modeled by the agent’s `followsInlineInstructions` flag; there is no LLM recording in this build. |
 | 1:10–1:20 | Two terminals: `pnpm demo` in one, `pnpm airbag run --cmd "node examples/http-agent.mjs"` in the other | One command. Or point your own agent at it. |
-| 1:20–1:30 | End card with the demo URL (when hosted) and repo URL | Which crash should be next? |
+| 1:20–1:30 | End card with agentairbag.xyz and the repo URL | Which crash should be next? |
 
 `pnpm demo` blocks on the static server, so the `pnpm airbag run` command needs a second terminal.
 
@@ -20,7 +20,7 @@ posts this.** Everything shown must exist in the local build.
 
 - Say **scripted** or **modeled** for Dummy’s injection result. Do not say “a real LLM obeyed”.
 - Say **simulated loss**, not “lost funds”.
-- Do not show a hosted URL until it exists.
+- Show only URLs that load logged out: agentairbag.xyz and the repository.
 - Do not claim a cassette or LLM score; none is bundled.
 - The report card is a real run of the local build; do not hand-animate numbers.
 

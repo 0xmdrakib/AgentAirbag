@@ -137,3 +137,6 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 **2026-11-14 (wallet providers).** Replaced the hand written Buffer shim with the real buffer package, which fixed Meteor, Here, Coin98 and Ledger. The picker shows four primary wallets and a More wallets list with the rest. Removed the upstream modal and its fallback, so closing the picker no longer reopens an old dialog. Wallet errors are portal toasts at the bottom; cancel is silent.
 
 **2026-11-15 (name and preview).** Renamed the product to Agent Airbag and added the 1200x630 `og.png` generator (`pnpm og`), replacing the SVG preview. Report hashes are unchanged.
+
+**2026-11-15 (hosting).** Switched to clean URLs (History API) and deployed the static build to Vercel from the GitHub repository; the project domain agentairbag.xyz serves it. Wallet connect is disabled on that host because no API runs there. The UI audit skips the wallet picker check on hosts without the API.
+

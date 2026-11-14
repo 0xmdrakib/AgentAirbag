@@ -144,20 +144,20 @@ An old `/#/report` address is rewritten to `/report` on load, so early bookmarks
 
 ## Project domain
 
-The maintainer registered `agentairbag.xyz`. It does not point at anything yet, and the page
-metadata (`canonical`, `og:url`, `og:image` in `apps/web/index.html`) already assumes it. Once a host
-exists:
+The live site is `https://agentairbag.xyz`. It is a Vercel project named `agentairbag`, connected to
+this repository, and every push to `main` deploys it (root directory `./`, build `pnpm build`, output
+`apps/web/dist`, from `vercel.json`). The page metadata (`canonical`, `og:url`, `og:image` in
+`apps/web/index.html`) already points at that domain.
 
-1. Add `agentairbag.xyz` as a custom domain in the host (Vercel, Cloudflare Pages or GitHub Pages)
-   and create the DNS records the host asks for at the registrar.
-2. Wait for HTTPS to be issued, then open the site in a logged-out window.
-3. If the API runs on the same host, set `AIRBAG_ALLOWED_ORIGIN=https://agentairbag.xyz`.
-4. If the site is served from a different hostname, update the three metadata URLs first.
+To move to another host: add the domain there, create the DNS records it asks for, wait for HTTPS,
+then open the site logged out. If an API runs on the same origin, set
+`AIRBAG_ALLOWED_ORIGIN=https://agentairbag.xyz`. If the hostname changes, update the three metadata
+URLs first.
 
 ## What is not built
 
-- **No hosted URL exists.** This repository does not ship a live demo or a deployed API. The
-  `agentairbag.xyz` domain is registered but not connected to a host.
+- **No hosted API.** The live site is static, so `GET /api/me` returns the app shell and the app
+  disables **Connect wallet**. Wallet sign-in and saved runs work only with the Node API.
 - **No Vercel function for the API.** The Vercel configuration is static only.
 - **No production host configuration.** There is no Dockerfile, Terraform, or managed host setup for
   the Node path.

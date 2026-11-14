@@ -27,9 +27,12 @@ move.
 | **Result** | A tutorial-grade agent (Dummy) scores **F**: it crashes 21 of 21 and loses **$10,907.04** in simulation. A reference agent built on Agent Airbag Guard (Seatbelt) scores **A**: it survives 21 of 21. |
 | **NEAR role** | Mirrors the documented 1Click API (`/v0/tokens`, `/v0/quote`, `/v0/deposit/submit`, `/v0/status`), seeded from a real read-only token and dry-quote snapshot. Optional NEAR wallet sign-in (NEP-413) saves reports under your account. |
 | **Track** | AI Security & Defense (primary), Open Innovation (secondary) |
-| **Status** | Runs locally with one command. No hosted URL is claimed. No LLM result is claimed. See [Limitations](#limitations). |
+| **Live demo** | [agentairbag.xyz](https://agentairbag.xyz), a static build of `main` on Vercel. The simulator, report card, replay and scenario library work there. Wallet sign-in and saved runs do not (see [Limitations](#limitations)). |
+| **Status** | Also runs locally with one command. No LLM result is claimed. |
 
 ## Verify it yourself
+
+**Just want to look?** Open [agentairbag.xyz](https://agentairbag.xyz). Everything below under "In the browser" works there. To run the commands, clone the repository.
 
 Requires Node 22+ and pnpm 9+. No API keys, no wallet, no network after install.
 
@@ -205,9 +208,10 @@ Every public claim, with the command that proves it: [`docs/CLAIMS.md`](docs/CLA
 
 ## Limitations
 
-- **No hosted demo.** Run it locally. The static build (`pnpm build`, output `apps/web/dist`) and
-  `vercel.json` are ready. Wallet connect and saved runs need the Node API on the same origin, which a
-  static host does not provide. See [`docs/DEPLOY.md`](docs/DEPLOY.md).
+- **The hosted demo is static.** [agentairbag.xyz](https://agentairbag.xyz) serves the simulator,
+  report card, replay and scenarios. **Connect wallet** is disabled there, because wallet sign-in and
+  saved runs need the Node API on the same origin and a static host does not provide one. Run
+  `pnpm demo` locally for those. See [`docs/DEPLOY.md`](docs/DEPLOY.md).
 - **No LLM result.** The adapter and recorder are written for NEAR AI Cloud but were never run.
 - **Wallets.** MyNearWallet, Sender, OKX, Nightly, Meteor, Here, Coin98 and Ledger are wired in
   (Bitget when its extension is present). The signing path was proven with a generated key, not with
@@ -721,7 +725,7 @@ is not here, it is not a shipped claim.
 | The hosted static app needs no backend | `pnpm build` | `apps/web/dist` contains only static assets |
 | The LLM adapter ships | `grep -R "class ToolRunner" packages/agents/src` | `tools.ts` defines the tool surface; `llm.ts` defines the adapter |
 | No LLM result is claimed | UI Report → Compare | “LLM on NEAR AI Cloud: not recorded” |
-| No hosted demo is claimed | README | “No hosted demo” in Limitations |
+| A static hosted demo is live | `curl -sI https://agentairbag.xyz/report` | `200`; the page is the app. Wallet connect is disabled there (no API). |
 | `llms.txt` links resolve and `llms-full.txt` is current | `pnpm llms --check` | `llms.txt links resolve and llms-full.txt is current.` |
 | No report signature is claimed | README + report metadata | `signature` is absent; README says so |
 
@@ -730,7 +734,7 @@ is not here, it is not a shipped claim.
 - “Safe” or “certified”. The card says **survived these crashes**.
 - “Real swaps” / “on-chain” / “mainnet funds”. Everything is simulated.
 - A real LLM score or replay. No cassette is bundled.
-- A hosted demo URL. No deployment happened.
+- A hosted API. The live site is static; wallet sign-in and saved runs are off there.
 - A live 1Click write path. The client is read-only.
 - A NEAR report signature. Not shipped.
 
@@ -905,20 +909,20 @@ An old `/#/report` address is rewritten to `/report` on load, so early bookmarks
 
 ## Project domain
 
-The maintainer registered `agentairbag.xyz`. It does not point at anything yet, and the page
-metadata (`canonical`, `og:url`, `og:image` in `apps/web/index.html`) already assumes it. Once a host
-exists:
+The live site is `https://agentairbag.xyz`. It is a Vercel project named `agentairbag`, connected to
+this repository, and every push to `main` deploys it (root directory `./`, build `pnpm build`, output
+`apps/web/dist`, from `vercel.json`). The page metadata (`canonical`, `og:url`, `og:image` in
+`apps/web/index.html`) already points at that domain.
 
-1. Add `agentairbag.xyz` as a custom domain in the host (Vercel, Cloudflare Pages or GitHub Pages)
-   and create the DNS records the host asks for at the registrar.
-2. Wait for HTTPS to be issued, then open the site in a logged-out window.
-3. If the API runs on the same host, set `AIRBAG_ALLOWED_ORIGIN=https://agentairbag.xyz`.
-4. If the site is served from a different hostname, update the three metadata URLs first.
+To move to another host: add the domain there, create the DNS records it asks for, wait for HTTPS,
+then open the site logged out. If an API runs on the same origin, set
+`AIRBAG_ALLOWED_ORIGIN=https://agentairbag.xyz`. If the hostname changes, update the three metadata
+URLs first.
 
 ## What is not built
 
-- **No hosted URL exists.** This repository does not ship a live demo or a deployed API. The
-  `agentairbag.xyz` domain is registered but not connected to a host.
+- **No hosted API.** The live site is static, so `GET /api/me` returns the app shell and the app
+  disables **Connect wallet**. Wallet sign-in and saved runs work only with the Node API.
 - **No Vercel function for the API.** The Vercel configuration is static only.
 - **No production host configuration.** There is no Dockerfile, Terraform, or managed host setup for
   the Node path.

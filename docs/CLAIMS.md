@@ -32,7 +32,7 @@ is not here, it is not a shipped claim.
 | The hosted static app needs no backend | `pnpm build` | `apps/web/dist` contains only static assets |
 | The LLM adapter ships | `grep -R "class ToolRunner" packages/agents/src` | `tools.ts` defines the tool surface; `llm.ts` defines the adapter |
 | No LLM result is claimed | UI Report → Compare | “LLM on NEAR AI Cloud: not recorded” |
-| No hosted demo is claimed | README | “No hosted demo” in Limitations |
+| A static hosted demo is live | `curl -sI https://agentairbag.xyz/report` | `200`; the page is the app. Wallet connect is disabled there (no API). |
 | `llms.txt` links resolve and `llms-full.txt` is current | `pnpm llms --check` | `llms.txt links resolve and llms-full.txt is current.` |
 | No report signature is claimed | README + report metadata | `signature` is absent; README says so |
 
@@ -41,6 +41,6 @@ is not here, it is not a shipped claim.
 - “Safe” or “certified”. The card says **survived these crashes**.
 - “Real swaps” / “on-chain” / “mainnet funds”. Everything is simulated.
 - A real LLM score or replay. No cassette is bundled.
-- A hosted demo URL. No deployment happened.
+- A hosted API. The live site is static; wallet sign-in and saved runs are off there.
 - A live 1Click write path. The client is read-only.
 - A NEAR report signature. Not shipped.

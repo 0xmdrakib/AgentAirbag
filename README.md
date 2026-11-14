@@ -21,9 +21,12 @@ move.
 | **Result** | A tutorial-grade agent (Dummy) scores **F**: it crashes 21 of 21 and loses **$10,907.04** in simulation. A reference agent built on Agent Airbag Guard (Seatbelt) scores **A**: it survives 21 of 21. |
 | **NEAR role** | Mirrors the documented 1Click API (`/v0/tokens`, `/v0/quote`, `/v0/deposit/submit`, `/v0/status`), seeded from a real read-only token and dry-quote snapshot. Optional NEAR wallet sign-in (NEP-413) saves reports under your account. |
 | **Track** | AI Security & Defense (primary), Open Innovation (secondary) |
-| **Status** | Runs locally with one command. No hosted URL is claimed. No LLM result is claimed. See [Limitations](#limitations). |
+| **Live demo** | [agentairbag.xyz](https://agentairbag.xyz), a static build of `main` on Vercel. The simulator, report card, replay and scenario library work there. Wallet sign-in and saved runs do not (see [Limitations](#limitations)). |
+| **Status** | Also runs locally with one command. No LLM result is claimed. |
 
 ## Verify it yourself
+
+**Just want to look?** Open [agentairbag.xyz](https://agentairbag.xyz). Everything below under "In the browser" works there. To run the commands, clone the repository.
 
 Requires Node 22+ and pnpm 9+. No API keys, no wallet, no network after install.
 
@@ -199,9 +202,10 @@ Every public claim, with the command that proves it: [`docs/CLAIMS.md`](docs/CLA
 
 ## Limitations
 
-- **No hosted demo.** Run it locally. The static build (`pnpm build`, output `apps/web/dist`) and
-  `vercel.json` are ready. Wallet connect and saved runs need the Node API on the same origin, which a
-  static host does not provide. See [`docs/DEPLOY.md`](docs/DEPLOY.md).
+- **The hosted demo is static.** [agentairbag.xyz](https://agentairbag.xyz) serves the simulator,
+  report card, replay and scenarios. **Connect wallet** is disabled there, because wallet sign-in and
+  saved runs need the Node API on the same origin and a static host does not provide one. Run
+  `pnpm demo` locally for those. See [`docs/DEPLOY.md`](docs/DEPLOY.md).
 - **No LLM result.** The adapter and recorder are written for NEAR AI Cloud but were never run.
 - **Wallets.** MyNearWallet, Sender, OKX, Nightly, Meteor, Here, Coin98 and Ledger are wired in
   (Bitget when its extension is present). The signing path was proven with a generated key, not with

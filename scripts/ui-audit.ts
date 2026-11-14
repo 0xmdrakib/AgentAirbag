@@ -118,10 +118,16 @@ for (const theme of themes) {
 }
 
 // Wallet picker: opens from the header, lists the primary wallets, expands, and closes.
-{
+// A static host has no wallet API, so the button is disabled there and this check is skipped.
+walletCheck: {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto(`${PREVIEW_URL}`, { waitUntil: 'networkidle' });
+  if (await page.getByRole('button', { name: /Connect a NEAR wallet/ }).isDisabled()) {
+    console.log('Wallet picker check skipped: this host has no wallet API.');
+    await context.close();
+    break walletCheck;
+  }
   await page.getByRole('button', { name: /Connect a NEAR wallet/ }).click();
   await page.waitForSelector('.wallet-picker-row', { timeout: 10_000 }).catch(() => undefined);
   const rows = await page.locator('.wallet-picker-row').count();

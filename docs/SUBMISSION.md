@@ -33,7 +33,7 @@ leave a retry buffer.
    - Every number comes from `docs/FACTS.md` or a report file.
    - Every modeled scenario is tagged.
    - No LLM replay is claimed; there is no cassette.
-   - No hosted URL is claimed until it exists. `agentairbag.xyz` is registered but counts as the demo URL only once it serves the app over HTTPS; check it logged out before pasting it.
+   - No hosted URL is claimed until it exists. `https://agentairbag.xyz` serves the static app over HTTPS and was checked logged out; the demo URL in the form is the X post, not this.
    - The pre-hackathon baseline, every library and every template are disclosed.
 5. Tag the final commit `hackathon-submission`. Confirm `pre-hackathon` exists. Add the public diff
    link to the README disclosure when the repo URL exists.

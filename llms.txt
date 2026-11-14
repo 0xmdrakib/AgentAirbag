@@ -2,7 +2,7 @@
 
 > Crash tests for AI agents that move money. A sandboxed copy of the NEAR Intents 1Click swap API that fails on purpose, 21 scripted crashes (three for each of seven laws), and a report card scored from ledger truth. No real funds move. Built at NEAR HACKATHON, November 2026. MIT licensed.
 
-Status: runs locally with `pnpm demo`; no hosted URL and no LLM result are claimed. Results are simulated and labelled as such (seed `airbag-demo-2026`): the Dummy agent grades F (21 of 21 crashed, $10,907.04 simulated loss), the Seatbelt reference agent grades A (21 of 21 survived). The product is never described as "safe" or "certified". Source: https://github.com/0xmdrakib/AgentAirbag
+Status: a static demo is live at https://agentairbag.xyz (wallet sign-in and saved runs are disabled there because no API runs on that host); the full version runs locally with `pnpm demo`; no LLM result is claimed. Results are simulated and labelled as such (seed `airbag-demo-2026`): the Dummy agent grades F (21 of 21 crashed, $10,907.04 simulated loss), the Seatbelt reference agent grades A (21 of 21 survived). The product is never described as "safe" or "certified". Source: https://github.com/0xmdrakib/AgentAirbag
 
 ## Start here
 
