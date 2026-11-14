@@ -6,11 +6,11 @@ All times UTC. The human is asleep for most of this build; decisions are logged 
 
 ## 2026-11-13
 
-**19:15 — Phase 0 starts.** Empty directory. Node 24.14.1, git 2.53.0. pnpm missing;
+**19:15 · Phase 0 starts.** Empty directory. Node 24.14.1, git 2.53.0. pnpm missing;
 `corepack enable` fails with EPERM on Windows, so pnpm 9.15.9 is installed with npm.
 Live network is available.
 
-**19:16 — Live probes.**
+**19:16 · Live probes.**
 - `GET https://1click.chaindefuser.com/v0/tokens` → 200, 58,875 bytes, 231 tokens. A curated
   8-token subset is saved for the sandbox.
 - `POST /v0/quote` with `dry: true`, 100 USDC Base → NEAR → 201. The live response differs from the
@@ -21,69 +21,69 @@ Live network is available.
 - `nearhackathon.com/HACKATHON.md` re-fetched. Dates, form fields, size values, consent text and
   track names match the prompt. The repo must be public by 2026-11-14T23:59:00Z.
 
-**19:30 — Name check.** `npm view crumple` is a WebGL delete animation; a web search found
+**19:30 · Name check.** `npm view crumple` is a WebGL delete animation; a web search found
 [crumple.priberry.com](https://crumple.priberry.com/), “the crash test for AI coding agents”. Direct
 name and metaphor clash. The prompt’s fallback list applies. Decision: **rename to Airbag** before
 docs and screenshots. `npm view airbag` is an unrelated execution-orchestration library; no
 crash-test product was found with the name.
 
-**19:40 — Scaffold.** pnpm workspace: `packages/core`, `packages/guard`, `packages/agents`,
+**19:40 · Scaffold.** pnpm workspace: `packages/core`, `packages/guard`, `packages/agents`,
 `packages/server`, `apps/web`. TypeScript strict, Vitest, ESLint flat config, Prettier.
 
-**19:50 — Core contracts.** `types.ts`, `report.schema.ts`, `scenario.schema.ts`; virtual clock,
+**19:50 · Core contracts.** `types.ts`, `report.schema.ts`, `scenario.schema.ts`; virtual clock,
 seeded PRNG, bigint ledger, address validators, canonical JSON + sha256, quote math, fixes.
 No Node APIs in core; ESLint enforces it.
 
-**20:00 — Sandbox.** 1Click routes, quote math, deposit state machine, status resolution, virtual
+**20:00 · Sandbox.** 1Click routes, quote math, deposit state machine, status resolution, virtual
 time, fault hooks (`onTokens`, `onQuote`, `onTransfer`, `onStatus`, `onRequest`, `onTime`). The
 dry-quote shape follows the live probe, not the prompt.
 
-**20:10 — 21 scenarios.** Three per law, 12 P0 + 9 P1, all validated by Zod at build time. The YAML
+**20:10 · 21 scenarios.** Three per law, 12 P0 + 9 P1, all validated by Zod at build time. The YAML
 files are the source of truth; `pnpm build:scenarios` writes the browser bundle.
 
-**20:20 — Judge and scoring.** Seven invariants read only the EventLog and ledger. Verdicts are
+**20:20 · Judge and scoring.** Seven invariants read only the EventLog and ledger. Verdicts are
 action-based: a faulted quote that is never funded cannot fail the agent. Loss is computed from
 `ledger.lost` moves, never from the agent’s words.
 
-**20:30 — Agents.** Dummy (19 named flaws) and Seatbelt (Airbag Guard) implemented. Tuning the
+**20:30 · Agents.** Dummy (19 named flaws) and Seatbelt (Airbag Guard) implemented. Tuning the
 Dummy took several loops; the naive expectations are in `packages/agents/FLAWS.md`.
 
-**20:40 — Guard.** `allow / warn / block` with every reason code from the prompt; 36 guard tests
+**20:40 · Guard.** `allow / warn / block` with every reason code from the prompt; 36 guard tests
 (trigger + clean for every code). Seatbelt refuses to proceed on any non-allow decision.
 
-**20:50 — Web app.** Vite + React, hash routes, plain CSS design system. Lab, Runner, Report Card,
+**20:50 · Web app.** Vite + React, hash routes, plain CSS design system. Lab, Runner, Report Card,
 Crash Replay, Scenario Library, Connect. The browser runs the scripted suites itself through the
 pure core; no backend.
 
-**21:00 — Fixtures and screenshots.** `pnpm build:fixtures` runs both suites and writes
+**21:00 · Fixtures and screenshots.** `pnpm build:fixtures` runs both suites and writes
 `fixtures/report.*.json`, `apps/web/src/generated/*`, `docs/FACTS.md` and `docs/SCENARIOS.md`.
 Playwright-core drives the installed Chrome for the README screenshots.
 
-**21:03 — Tests.** 56 passing: golden Dummy/Seatbelt sets, determinism (byte-identical hash),
+**21:03 · Tests.** 56 passing: golden Dummy/Seatbelt sets, determinism (byte-identical hash),
 scenario schema, report fixtures, read-only live client scan, decimal/quote/ledger/address tests,
 Guard tests, synthetic cassette replay and hash-drift detection.
 
-**21:06 — Rename to Airbag.** Source, packages, CLI, env vars, UI, tests, fixtures and docs are
+**21:06 · Rename to Airbag.** Source, packages, CLI, env vars, UI, tests, fixtures and docs are
 renamed. The saved master prompt stays verbatim. Regenerated reports use `seed airbag-demo-2026`
 and tool name `airbag`.
 
-**21:10 — Honest limits.**
+**21:10 · Honest limits.**
 - No `NEARAI_API_KEY`: the LLM adapter and recorder ship, but **no LLM run or cassette is bundled**.
   The UI and README say this; no model result is claimed.
 - No hosting account: the static build is ready and `vercel.json` exists, but **no hosted URL**.
 - No human yes: the repo is local; nothing is pushed, posted, signed or submitted.
 - No demo video yet. The human records it from `docs/DEMO_SCRIPT.md`.
 
-**21:12 — First self-screen.** A fresh sub-agent cloned the repo, read only the README, reproduced
+**21:12 · First self-screen.** A fresh sub-agent cloned the repo, read only the README, reproduced
 the demo and scored it 84/100. It found four fixable issues: the exact live quote request was
 rejected by a strict Zod schema, the README button label was wrong, a claims-ledger timestamp was
 stale, and the Runner seed was not editable. All four were fixed and retested.
 
-**21:14 — Dependency audit.** `@hono/node-server` updated to a patched 2.x release after
+**21:14 · Dependency audit.** `@hono/node-server` updated to a patched 2.x release after
 `pnpm audit --prod` reported a moderate static-path advisory. The HTTP and process smokes pass on the
 new version; `pnpm audit --prod` now reports no known vulnerabilities.
 
-**21:15 — Second self-screen and final verify.** A second fresh sub-agent scored the build
+**21:15 · Second self-screen and final verify.** A second fresh sub-agent scored the build
 **93/100** with reproducibility 9/10 and claim accuracy 9/10; all requested claims passed, with no
 blocking functional failures. `pnpm lint`, `pnpm typecheck`, `pnpm test` (57), `pnpm test:http`,
 `pnpm test:process`, `pnpm build`, `pnpm demo --smoke` and a clean-clone test pass. Dummy: F, 21/21
@@ -126,5 +126,5 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 **2026-11-14 (depth and performance).** Landing hero now has faint radar arcs and the 21/7/$0 facts; sections reveal once on scroll with a no-JS and reduced-motion safe fallback (visible by default, reveal-ready class gate, 2.5s failsafe). Report gained an in-page nav (Safety shape, Failures, Compare, Provenance) with scroll spy. Added Back to top, hairline link hovers. Report, Replay and Scenarios pages are lazy chunks: first-load JS 197 -> 184 KB gzipped. Screenshot, sheet and audit scripts settle the page (scroll through) before capture.
 
 
-**2026-11-14 (parallel review round).** Six read-only agents reviewed CSS, copy, accessibility, engine, CLI and claims. Applied: router no longer treats #main / #report-shape as routes; replay shortcuts ignore focused controls; YAML drawer gets focus, a Tab trap and focus restore; replay tabs and the agent radio group use roving tabindex and arrow keys; compare table has a caption and scoped headers; report panels are headings; slider has aria-valuetext; contrast token for control borders; 44px touch targets; reduced-motion delays removed. CSS pruned by ~1,000 dead lines. Server: run-id validation and HTML escaping (stored XSS), 400 on unknown scenario, 409 on duplicate run, absolute baseUrl, 256 KB body limit, 50-run cap, crashed/timed-out agent now FAILs under --strict, clearer timeout messages, killDescendants, env allow-list, 200 at /r/:id. Judge: a no-op agent now fails instead of passing. Guard: quote id must match its deposit address and taint matching is case-insensitive. Tests: exact published numbers and hashes pinned; no-op and guard cases added (62 tests). Smoke now loads the report in Chrome. Docs corrected (demo command, bundle sizes, Playwright use, types.ts, solver labelling, address tests, X post length, claims timestamps, demo shot).
+**2026-11-14 (parallel review round).** Six read-only agents reviewed CSS, copy, accessibility, engine, CLI and claims. Applied: router no longer treats #main / #report-shape as routes; replay shortcuts ignore focused controls; YAML drawer gets focus, a Tab trap and focus restore; replay tabs and the agent radio group use roving tabindex and arrow keys; compare table has a caption and scoped headers; report panels are headings; slider has aria-valuetext; contrast token for control borders; 44px touch targets; reduced-motion delays removed. CSS pruned by ~1,000 dead lines. Server: run-id validation and HTML escaping (stored XSS), 400 on unknown scenario, 409 on duplicate run, absolute baseUrl, 256 KB body limit, 50-run cap, crashed/timed-out agent now FAILs under --strict, clearer timeout messages, killDescendants, env allow-list, 200 at /r/:id. Judge: a no-op agent now fails instead of passing. Guard: quote id must match its deposit address and taint matching is case-insensitive. Tests: exact published numbers and hashes pinned; no-op and guard cases added (78 tests). Smoke now loads the report in Chrome. Docs corrected (demo command, bundle sizes, Playwright use, types.ts, solver labelling, address tests, X post length, claims timestamps, demo shot).
 

@@ -15,7 +15,7 @@ function run(command: string): void {
   }
 }
 
-console.log('Airbag demo — building the lab');
+console.log('Airbag demo: building the lab');
 
 run('pnpm build:scenarios');
 run('pnpm build:fixtures');

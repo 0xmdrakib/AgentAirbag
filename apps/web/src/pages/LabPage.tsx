@@ -174,6 +174,54 @@ export function LabPage() {
         </ol>
       </section>
 
+      <section className="container section" aria-labelledby="near-title" data-reveal>
+        <div className="why-near">
+          <div className="why-near-intro">
+            <h2 className="h2 landing-h2" id="near-title">
+              Why this is built on NEAR
+            </h2>
+            <p className="section-sub">
+              NEAR Intents turns a cross-chain swap into one signed intent and one quote. That
+              makes it the natural rail for agents that move money, and the natural place to test
+              them.
+            </p>
+            <a
+              className="proof-link"
+              href="https://docs.near-intents.org/integration/distribution-channels/1click-api/about-1click-api"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Read the 1Click docs <ArrowRightIcon size={14} />
+            </a>
+          </div>
+          <ol className="why-near-list">
+            <li>
+              <h3 className="h3">One quote instead of five bridges</h3>
+              <p>
+                Solvers compete to fill an intent, so an agent never wires up a bridge or holds gas
+                on every chain. Airbag mirrors that HTTP contract, so a fix here transfers to the
+                real API.
+              </p>
+            </li>
+            <li>
+              <h3 className="h3">The failure modes are real</h3>
+              <p>
+                Competing solvers mean quotes expire, statuses lag and refunds happen. Those are
+                exactly the moments where an agent pays twice, so they are the crashes this lab
+                replays.
+              </p>
+            </li>
+            <li>
+              <h3 className="h3">Built for agents, tested like money</h3>
+              <p>
+                NEAR describes Intents as a transaction layer for the AI economy. Agents holding
+                money need the same thing humans do: a place to fail before the funds move.
+              </p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
       <section className="container section" aria-labelledby="truth-title" data-reveal>
         <div className="truth-block">
           <div>

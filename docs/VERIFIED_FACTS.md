@@ -63,8 +63,8 @@ Fact, source, date, how verified. Live behavior wins over the prompt when they d
 | pnpm 9.15.9 | Local shell | 2026-11-13 | Installed with npm after `corepack enable` hit EPERM |
 | git 2.53.0 | Local shell | 2026-11-13 | `git --version` |
 | Chrome and Edge are installed; Playwright-core uses Chrome for screenshots | Local shell | 2026-11-14 | Paths checked; screenshots generated |
-| Docker availability | — | 2026-11-13 | **Unverified**; the clean-clone test uses a temp directory, not Docker |
-| Hosting account | — | 2026-11-14 | **None available**; static build ready, no hosted URL |
+| Docker availability | n/a | 2026-11-13 | **Unverified**; the clean-clone test uses a temp directory, not Docker |
+| Hosting account | n/a | 2026-11-14 | **None available**; static build ready, no hosted URL |
 | Time left at Phase 0 | 2026-11-13 19:15 UTC | 2026-11-13 | Deadline 2026-11-14 23:59 UTC → ~28.7 hours |
 
 ## Discrepancies

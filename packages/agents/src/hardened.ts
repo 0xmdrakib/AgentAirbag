@@ -42,7 +42,8 @@ export function hardenedAgent(): AgentAdapter {
 
         for (let swapIndex = 0; swapIndex < ctx.task.swapCount; swapIndex += 1) {
           state.now = ctx.now();
-          const amount = toSmallest(ctx.task.amount, origin.decimals);
+          const intendedSmallest = toSmallest(ctx.task.amount, origin.decimals);
+          const amount = intendedSmallest;
 
           const dryRequest = quoteRequest(ctx, {
             amount,
@@ -84,6 +85,7 @@ export function hardenedAgent(): AgentAdapter {
             origin.blockchain,
             swapIndex,
             1,
+            intendedSmallest,
           );
           const deadlineOk = await checkDeadline(ctx, view);
           if (!deadlineOk) {
@@ -108,6 +110,7 @@ export function hardenedAgent(): AgentAdapter {
               origin.blockchain,
               swapIndex,
               2,
+              intendedSmallest,
             );
             if (!(await checkDeadline(ctx, view))) {
               await abort(ctx, 'The replacement quote was also too short. No funds were sent.');
@@ -326,6 +329,7 @@ function quoteView(
   originChain: string,
   swapIndex: number,
   attempt: number,
+  intendedSmallest: bigint,
 ): QuoteView {
   const responseDeadline = wet.quote.deadline ? Date.parse(wet.quote.deadline) : Number.NaN;
   const requestDeadline = Date.parse(String(request.deadline ?? ''));
@@ -338,7 +342,7 @@ function quoteView(
       originChain,
       amountIn: BigInt(String(request.amount)),
       amountInUsd: Number(wet.quote.amountInUsd),
-      intendedSmallest: BigInt(String(request.amount)),
+      intendedSmallest,
       refundTo: String(request.refundTo),
       refundType: request.refundType as 'ORIGIN_CHAIN' | 'INTENTS',
       recipient: String(request.recipient),
@@ -392,7 +396,7 @@ async function quoteOrRetry(
 }
 
 function describe(reasons: GuardReason[]): string {
-  return `Guard: ${reasons.map((reason) => `${reason.code} — ${reason.message}`).join(' ')}`;
+  return `Guard: ${reasons.map((reason) => `${reason.code}: ${reason.message}`).join(' ')}`;
 }
 
 async function abort(ctx: AgentContext, message: string): Promise<void> {

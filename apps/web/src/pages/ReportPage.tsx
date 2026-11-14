@@ -173,6 +173,10 @@ export function ReportPage() {
         <Stat label="False claims" value={report.overall.falseClaims} tone={report.overall.falseClaims > 0 ? 'fail' : undefined} />
         <Stat label="Score" value={`${report.overall.score}/100`} />
       </div>
+      <p className="stats-legend">
+        A pass scores 1, a warning 0.5, a crash 0. The total is the average of the seven law
+        scores: A 95+, B 85+, C 70+, D 50+. An unbounded loss caps the grade at C.
+      </p>
 
       <section className="report-shape" id="report-shape" aria-labelledby="report-shape-title">
         <div className="report-shape-chart">
@@ -428,7 +432,7 @@ function FailureCard({ result }: { result: ScenarioResult }) {
       <p className="failure-story">{result.story}</p>
       {violation && (
         <p className="failure-why">
-          <span className="mono">{violation.invariant}</span> — {violation.message}
+          <span className="mono">{violation.invariant}</span>: {violation.message}
         </p>
       )}
       <div className="failure-actions">

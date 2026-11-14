@@ -5712,3 +5712,283 @@ h2.eyebrow {
   font-size: 14px;
   font-weight: 600;
 }
+
+/* ---------- v7: mobile board and print ---------- */
+
+/* On phones the 3-column crash grid becomes one readable row per scenario: a status mark,
+   the name, and the modeled tag. 21 rows scan faster than 7 groups of tiny boxes. */
+@media (max-width: 640px) {
+  .scenario-board {
+    gap: 18px;
+  }
+  .scenario-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .scenario-row-label {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .scenario-law-num {
+    min-width: 0;
+  }
+  .scenario-cells {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .scenario-cell {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    min-height: 44px;
+    padding: 10px 2px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+  }
+  .scenario-cell:last-child {
+    border-bottom: 0;
+  }
+  .cell-idle {
+    background: transparent;
+  }
+  .cell-id {
+    flex: 1;
+    min-width: 0;
+    font-size: 14.5px;
+  }
+  .cell-modeled {
+    flex: 0 0 auto;
+  }
+  .cell-icon {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+  }
+  .cell-idle .cell-icon {
+    width: 12px;
+    height: 12px;
+    margin-inline: 4px;
+  }
+}
+
+/* Printing the report card: drop the chrome, keep the facts. */
+@media print {
+  .app-header,
+  .app-footer,
+  .section-nav,
+  .report-actions,
+  .shared-banner,
+  .skip-link,
+  .toast,
+  .failure-actions .failure-watch,
+  .compare-link,
+  .copy-button,
+  .meta-hash .copy-button {
+    display: none !important;
+  }
+  body {
+    background: #ffffff;
+    color: #000000;
+    font-size: 11pt;
+  }
+  .app-main {
+    padding: 0;
+  }
+  .container {
+    width: 100%;
+    max-width: none;
+  }
+  .page {
+    padding-top: 0;
+  }
+  .section {
+    margin-top: 18pt;
+  }
+  .report-hero,
+  .report-shape-chart,
+  .report-law-bars,
+  .failure-card,
+  .compare-table-wrap,
+  .meta-card,
+  .report-stats .stat {
+    border: 1px solid #bbbbbb;
+    box-shadow: none;
+    background: #ffffff;
+    break-inside: avoid;
+  }
+  .failure-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .report-shape {
+    grid-template-columns: 1fr 1fr;
+  }
+  a[href^='#'] {
+    text-decoration: none;
+    color: #000000;
+  }
+  .grade-badge {
+    box-shadow: none;
+  }
+}
+
+.stats-legend {
+  margin-top: 10px;
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Print: the report should read like a document, not a web page. */
+@media print {
+  .section-head .btn,
+  .section-head .proof-link,
+  .section-head a.btn,
+  .law-acc-chevron,
+  .report-hero .chip {
+    display: none !important;
+  }
+  .stats-legend {
+    color: #333333;
+  }
+  #report-shape,
+  #report-failures,
+  #report-compare,
+  #report-meta {
+    break-inside: auto;
+  }
+  .report-law-bars .law-acc {
+    break-inside: avoid;
+  }
+}
+
+/* Lazy-page skeleton: keeps the first paint calm instead of showing a bare word. */
+.page-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: clamp(48px, 8vh, 96px) 0;
+}
+
+.page-loading-bar {
+  height: 18px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-2) 37%, var(--surface-3) 63%);
+  background-size: 400% 100%;
+  animation: skeleton 1.4s ease-in-out infinite;
+}
+
+.page-loading-bar:nth-child(1) {
+  width: 38%;
+  height: 34px;
+}
+
+.page-loading-bar:nth-child(2) {
+  width: 62%;
+}
+
+.page-loading-bar:nth-child(3) {
+  width: 48%;
+}
+
+@keyframes skeleton {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-loading-bar {
+    animation: none;
+  }
+}
+
+/* Phones: show every in-page section instead of hiding the last one off-screen. */
+@media (max-width: 640px) {
+  .section-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-inline: 0;
+    padding: 6px;
+    border-inline: 1px solid var(--line);
+    border-radius: var(--r-md);
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .section-nav a {
+    text-align: center;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+/* "Why NEAR" reads like a product note, not an ad: one intro column, three plain reasons. */
+.why-near {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: start;
+  padding-top: clamp(24px, 4vh, 40px);
+  border-top: 1px solid var(--line-strong);
+}
+
+.why-near-intro .section-sub {
+  margin-top: 10px;
+}
+
+.why-near-intro .proof-link {
+  margin-top: 16px;
+}
+
+.why-near-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin: 0;
+  counter-reset: near;
+}
+
+.why-near-list li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: 14px;
+  counter-increment: near;
+}
+
+.why-near-list li::before {
+  content: counter(near);
+  grid-row: 1 / span 2;
+  color: var(--text-3);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding-top: 2px;
+}
+
+.why-near-list h3 {
+  font-size: 16.5px;
+}
+
+.why-near-list p {
+  margin-top: 4px;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media (max-width: 860px) {
+  .why-near {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+}

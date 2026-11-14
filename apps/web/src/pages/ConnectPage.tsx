@@ -4,8 +4,8 @@ import { ShieldIcon, TerminalIcon } from '../components/Icons';
 const SERVE = 'pnpm airbag serve';
 const ENV = `export ONECLICK_BASE_URL=http://localhost:4321/r/demo
 export AIRBAG_BASE_URL=http://localhost:4321/r/demo`;
-const RUN = 'pnpm airbag run --cmd "node my-agent.js"';
-const SAMPLE = `// my-agent.js — the three rules
+const RUN = 'pnpm airbag run --cmd "node examples/http-agent.mjs"';
+const SAMPLE = `// my-agent.js: the three rules
 const base = process.env.AIRBAG_BASE_URL;
 
 const tokens = await (await fetch(base + '/v0/tokens')).json();
@@ -73,7 +73,8 @@ export function ConnectPage() {
               <h2 className="h3">Point your agent at one run</h2>
               <p>
                 Every run has its own URL prefix, ledger and virtual clock. Create more runs with{' '}
-                <span className="mono">POST /sandbox/v0/runs</span>.
+                <span className="mono">POST /sandbox/v0/runs</span>. Use the port the server printed
+                if 4321 was taken.
               </p>
               <CodeBlock code={ENV} />
             </div>
@@ -84,7 +85,7 @@ export function ConnectPage() {
               <h2 className="h3">Run every crash</h2>
               <p>
                 The harness starts your process once per scenario, exports a fresh base URL, and
-                waits for your final report.
+                judges the ledger when the process exits.
               </p>
               <CodeLine code={RUN} />
             </div>
@@ -115,8 +116,8 @@ export function ConnectPage() {
             <li>
               <span className="limits-num mono">03</span>
               <p>
-                Post a final claim to <code className="mono">POST /sandbox/v0/report</code>. The
-                judge ignores it and reads the ledger; the report is only a claim to compare.
+                Post a final claim to <code className="mono">POST /sandbox/v0/report</code>. Money
+                movement is judged from the ledger; your claim is only used to catch a false one.
               </p>
             </li>
           </ol>
@@ -146,14 +147,14 @@ export function ConnectPage() {
       <section className="section">
         <SectionHead
           title="What a run looks like"
-          body="Example terminal session. The Dummy and Seatbelt lines are the bundled reference agents; your agent gets its own row."
+          body="Two bundled agents first, then the same harness pointed at your own process."
         />
         <div className="terminal-card">
           <div className="terminal-head">
             <TerminalIcon size={16} /> <span className="mono">terminal</span>
           </div>
           <pre className="mono">
-            <code>{`$ pnpm install\n$ pnpm airbag serve\nAirbag sandbox listening on http://localhost:4321\nDefault run: http://localhost:4321/r/demo\n$ pnpm airbag run --cmd "node my-agent.js"\n\nDummy (no guards)      0 survived · 21 crashed · $10,907.04 simulated loss\nSeatbelt (Guard)      21 survived · 0 crashed · $1.00 modeled refund fee`}</code>
+            <code>{`$ pnpm install\n$ pnpm airbag serve\nSandbox listening on http://localhost:4321  (next free port if taken)\n\n$ pnpm airbag run --agent naive --summary\nDummy (no guards)      0 survived · 21 crashed · $10,907.04 simulated loss\n\n$ pnpm airbag run --agent hardened --summary\nSeatbelt (Guard)      21 survived · 0 crashed · $1.00 modeled refund fee\n\n$ pnpm airbag run --cmd "node examples/http-agent.mjs" --summary\nBring your own: http-agent    … your agent's own row`}</code>
           </pre>
         </div>
       </section>

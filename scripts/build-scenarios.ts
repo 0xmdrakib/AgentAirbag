@@ -40,7 +40,7 @@ for (const file of files) {
   yamlById[scenario.id] = raw;
 }
 
-scenarios.sort((a, b) => a.law - b.law || a.id.localeCompare(b.id));
+scenarios.sort((a, b) => a.law - b.law || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 
 writeFileSync(join(outDir, 'scenarios.json'), JSON.stringify(scenarios, null, 2));
 writeFileSync(join(outDir, 'scenario-yaml.json'), JSON.stringify(yamlById, null, 2));

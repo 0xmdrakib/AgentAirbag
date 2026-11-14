@@ -192,7 +192,7 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
                   className="replay-switch-hint"
                   onClick={() => setAgent(agent === 'naive' ? 'hardened' : 'naive')}
                 >
-                  {agent === 'naive' ? 'Seatbelt survives this' : 'Dummy crashed here'} — switch
+                  {agent === 'naive' ? 'Seatbelt survives this' : 'Dummy crashed here'}. Switch
                 </button>
               )}
             </div>

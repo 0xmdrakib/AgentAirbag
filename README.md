@@ -2,7 +2,7 @@
 
 **Crash-test dummies for AI agents that hold money.**
 
-![tests](https://img.shields.io/badge/tests-57%20passing-3EE6A0)
+![tests](https://img.shields.io/badge/tests-78%20passing-3EE6A0)
 ![scenarios](https://img.shields.io/badge/crashes-21-FFD21F)
 ![simulation](https://img.shields.io/badge/funds-0%20real-FF4D5E)
 ![license](https://img.shields.io/badge/license-MIT-9AA2B1)
@@ -15,6 +15,31 @@
 AI agents now swap and send crypto on their own. NEAR Intents has no testnet, so the only way to test
 one today is with real money. Airbag replaces the NEAR Intents 1Click API with a drop-in sandbox,
 then crashes the agent 21 ways before it touches a wallet. **No real funds move.**
+
+## Why NEAR
+
+NEAR Intents turns a cross-chain swap into one signed intent and one quote. A network of solvers
+competes to fill it, and the [1Click Swap API](https://docs.near-intents.org/integration/distribution-channels/1click-api/about-1click-api)
+exposes that flow as a small REST surface: ask for a quote, send the deposit to the quoted address,
+poll the status. NEAR describes Intents as a [transaction layer for the AI economy](https://www.near.org/intents),
+which makes agent safety a first-order problem rather than an afterthought.
+
+That shape is why Airbag is built here:
+
+- **The contract is small enough to mirror honestly.** Four endpoints, one deposit address, one
+  status object. Our sandbox can match the documented wire format, so a fix that works here is a fix
+  for the real API, not a lesson about a toy.
+- **The failure modes are inherent to solver competition.** Quotes expire, statuses lag, solvers go
+  quiet and refunds happen. Each one is a place where an agent can pay twice, trust an echo or lose
+  its exit path. Those are the 21 crashes in this suite.
+- **Money can arrive from any chain.** A single intent can move BTC, ETH, SOL or a stablecoin, so an
+  agent has to reason about address formats, decimals and refund types it did not choose. Airbag
+  tests exactly those edges.
+- **Agents are the intended user.** When an autonomous agent is the one holding the wallet, a
+  sandbox with ledger truth and a reproducible seed is the only responsible way to ship it.
+
+The [scenario library](docs/SCENARIOS.md) is the concrete version of that argument: every crash has
+a real 1Click field behind it, and every fix is a line an agent can adopt.
 
 ![Report card](docs/report-card.png)
 
@@ -41,7 +66,7 @@ The browser runs the whole scripted suite itself.
 | Open `#/scenarios` and press **View YAML** | All 21 crashes as data, with the story, fault, judge rule and fix key |
 | Run `pnpm airbag run --agent hardened --summary` | `score 100 · grade A · 21 survived · 0 crashed` |
 | Run `pnpm demo:attack` | The unguarded Dummy pays an injected address ($9,995.46 simulated); the guarded agent blocks with `TAINTED_VALUE` and loses $0 |
-| Run `pnpm verify` | Lint, typecheck, 57 tests, the HTTP and process sandbox smokes, production build and the demo smoke test |
+| Run `pnpm verify` | Lint, typecheck, 78 tests, the HTTP and process sandbox smokes, production build and the demo smoke test |
 
 `pnpm build` writes the static build to `apps/web/dist`. It is ready for Vercel, Cloudflare Pages or
 GitHub Pages, but **no hosting account was available in this build window, so there is no hosted URL
@@ -55,7 +80,7 @@ Airbag is four parts and one fix:
    `/v0/deposit/submit`, `/v0/status`) plus a simulated ledger and a virtual clock. Change one base
    URL and the agent runs in a fake world.
 2. **Crash scenarios.** **21** scripted failures, three for each of seven laws.
-3. **Judge.** Scores from ledger truth — what actually moved — not from what the agent says.
+3. **Judge.** Scores from ledger truth, meaning what actually moved, not what the agent says.
 4. **Report Card and Crash Replay.** A grade, a safety shape, the money lost in simulation, and a
    scrubbable EventLog.
 5. **Airbag Guard.** A pure policy engine (spend limits, refund allow-lists, deadline and slippage
@@ -68,9 +93,9 @@ loses **$0.00**. The log is printed, not hand-waved.
 
 Two reference agents run the same suite:
 
-- **Dummy** — the tutorial-grade agent. Every flaw is a named line in
+- **Dummy**: the tutorial-grade agent. Every flaw is a named line in
   [`packages/agents/FLAWS.md`](packages/agents/FLAWS.md). It crashes on all 21 scenarios.
-- **Seatbelt** — the reference implementation of the seven laws, built on Airbag Guard. It survives
+- **Seatbelt**: the reference implementation of the seven laws, built on Airbag Guard. It survives
   all 21.
 
 The LLM adapter and cassette recorder target NEAR AI Cloud and ship in `packages/agents/src/llm.ts`
@@ -104,7 +129,7 @@ No mainnet transaction, key, signature or real swap is part of this repository.
 | Quote signatures | A deterministic simulated placeholder; **not** a real ed25519 signature |
 | Token list and prices | A real read-only snapshot (`fixtures/tokens.snapshot.json`, 58,875 bytes); the sandbox exposes a curated 8-token subset |
 | Swaps, deposits, refunds and the ledger | **Simulated. No funds move.** |
-| Solver latency, refund penalties, late-deposit handling | **Modeled**; solver latency is simulated inside the sandbox, and `solver-stall` currently declares `modeled: false` — a known labelling gap. Refund penalties and late-deposit handling are labelled `modeled: true` in the YAML and `docs/SCENARIOS.md` |
+| Solver latency, refund penalties, late-deposit handling | **Modeled**; solver latency is simulated inside the sandbox, and `solver-stall` currently declares `modeled: false`, a known labelling gap. Refund penalties and late-deposit handling are labelled `modeled: true` in the YAML and `docs/SCENARIOS.md` |
 | Dummy and Seatbelt | Scripted agents; Law 5 results for Dummy are modeled via `followsInlineInstructions` |
 | LLM runs | Real adapter + recorder, but **no live run or cassette is bundled**; no LLM result is claimed |
 | Report hash | sha256 of canonical JSON; **no signature** |

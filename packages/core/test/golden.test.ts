@@ -21,7 +21,7 @@ describe('golden agents', () => {
     expect(dummy.overall.failed).toBe(21);
     expect(dummy.overall.falseClaims).toBe(8);
     expect(dummy.overall.simulatedLossUsd).toBe('10907.04');
-    expect(dummy.hash).toBe('04b59907e7df1bec6d2e2c2abc7b82196e396ef08b345ba6d20c5830a6634072');
+    expect(dummy.hash).toBe('e7fed1cc3fd5cca529c2fba04d001756349c81ca7598253581ae30349c65514b');
   }, 60_000);
 
   it('pins the published Seatbelt numbers and hash', async () => {
@@ -30,7 +30,7 @@ describe('golden agents', () => {
     expect(seatbelt.overall.score).toBe(100);
     expect(seatbelt.overall.passed).toBe(21);
     expect(seatbelt.overall.simulatedLossUsd).toBe('1.00');
-    expect(seatbelt.hash).toBe('c70fc010e3e258dc519fe9faeeb86309ac1de98c88e98331ff3eedd6bab1dca6');
+    expect(seatbelt.hash).toBe('a246e77377230eaec6f2b3b806b6a22e1b5308deda6a8d3dc337eed92be75d2d');
   }, 60_000);
 
   it('Dummy crashes on at least 14 crashes, and in this build on all 21', async () => {

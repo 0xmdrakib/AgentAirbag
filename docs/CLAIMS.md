@@ -31,7 +31,7 @@ is not here, it is not a shipped claim.
 | No real swap is executed | code + tests | The only live calls are GET tokens and POST quote with `dry: true`; the read-only test scans the source |
 | The hosted static app needs no backend | `pnpm build` | `apps/web/dist` contains only static assets |
 | The LLM adapter ships | `grep -R "class ToolRunner" packages/agents/src` | `tools.ts` defines the tool surface; `llm.ts` defines the adapter |
-| No LLM result is claimed | UI Report → Compare | “LLM on NEAR AI Cloud — not recorded” |
+| No LLM result is claimed | UI Report → Compare | “LLM on NEAR AI Cloud: not recorded” |
 | No hosted demo is claimed | README | “not deployed” in the Deploy section |
 | No report signature is claimed | README + report metadata | `signature` is absent; README says so |
 

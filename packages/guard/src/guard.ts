@@ -171,10 +171,17 @@ export class Guard {
         message: `A NEAR refund address cannot be used with refundType ORIGIN_CHAIN on ${quote.originChain}.`,
       });
     }
-    if (state.untrustedSpans.some((span) => span.toLowerCase().includes(quote.refundTo.toLowerCase()))) {
+    const untrustedText = state.untrustedSpans.map((span) => span.toLowerCase());
+    if (untrustedText.some((span) => span.includes(quote.refundTo.toLowerCase()))) {
       reasons.push({
         code: 'TAINTED_VALUE',
         message: 'The refund address appeared inside untrusted tool text.',
+      });
+    }
+    if (untrustedText.some((span) => span.includes(quote.recipient.toLowerCase()))) {
+      reasons.push({
+        code: 'TAINTED_VALUE',
+        message: 'The recipient appeared inside untrusted tool text.',
       });
     }
     return reasons;

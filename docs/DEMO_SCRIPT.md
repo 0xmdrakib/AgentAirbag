@@ -26,9 +26,9 @@ posts this.** Everything shown must exist in the local build.
 
 ## Screenshots to capture
 
-1. `docs/report-card.png` — the Dummy report at the top (F, simulated loss, radar).
-2. `docs/replay.png` — Replay at the second payment, with the violation card visible.
-3. `docs/scenario-library.png` — the 21-card library with the modeled tag visible.
+1. `docs/report-card.png`: the Dummy report at the top (F, simulated loss, radar).
+2. `docs/replay.png`: Replay at the second payment, with the violation card visible.
+3. `docs/scenario-library.png`: the 21-card library with the modeled tag visible.
 
 The screenshots in `docs/` were captured from this build. `docs/report-card.png` is referenced by
 the README; `docs/replay.png` shows the second payment; `docs/scenario-library.png` shows the modeled

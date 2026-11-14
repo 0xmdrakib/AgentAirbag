@@ -14,10 +14,12 @@ import {
 import {
   errorText,
   fetchTokens,
+  findToken,
   getStatus,
   postQuote,
   quoteOf,
   quoteRequest,
+  smallestForTask,
   submitDeposit,
 } from './common';
 
@@ -98,10 +100,19 @@ export class ToolRunner {
     }));
   }
 
+  private async originToken() {
+    if (!this.tokens) await this.listTokens();
+    const origin = findToken(this.tokens ?? [], this.ctx.task.originAssetId);
+    if (!origin) throw new Error('Origin token missing from the token list');
+    return origin;
+  }
+
   private async getQuote(args: Record<string, unknown>): Promise<unknown> {
     const dry = args.dry === true;
     const amount = String(args.amount ?? '');
     if (!/^\d+$/.test(amount)) throw new Error('amount must be an integer string in smallest units');
+    const origin = await this.originToken();
+    const intendedSmallest = smallestForTask(this.ctx, origin.decimals);
     const request = quoteRequest(this.ctx, {
       amount: BigInt(amount),
       dry,
@@ -130,7 +141,7 @@ export class ToolRunner {
           originChain: 'base',
           amountIn: BigInt(quote.quote.amountIn),
           amountInUsd: Number(quote.quote.amountInUsd),
-          intendedSmallest: BigInt(quote.quote.amountIn),
+          intendedSmallest,
           refundTo: quote.quoteRequest.refundTo,
           refundType: quote.quoteRequest.refundType,
           recipient: quote.quoteRequest.recipient,
@@ -164,7 +175,7 @@ export class ToolRunner {
         originChain: 'base',
         amountIn: BigInt(quote.quote.amountIn),
         amountInUsd: Number(quote.quote.amountInUsd),
-        intendedSmallest: BigInt(quote.quote.amountIn),
+        intendedSmallest,
         refundTo: quote.quoteRequest.refundTo,
         refundType: quote.quoteRequest.refundType,
         recipient: quote.quoteRequest.recipient,

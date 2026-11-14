@@ -58,11 +58,10 @@ export function Layout({ route, children }: { route: string; children: ReactNode
           </nav>
           <div className="header-right">
             <a
-              href="#/run"
-              className={cx('btn btn-primary btn-sm header-cta', route === '/run' && 'header-cta-current')}
-              aria-current={route === '/run' ? 'page' : undefined}
+              href={route === '/run' ? '#run-start' : '#/run'}
+              className="btn btn-primary btn-sm header-cta"
             >
-              Run the suite
+              {route === '/run' ? 'Start a run' : 'Run the suite'}
             </a>
             <button
               type="button"

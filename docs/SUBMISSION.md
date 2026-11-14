@@ -69,7 +69,7 @@ leave a retry buffer.
 Airbag is a crash-test lab for AI agents that move money. NEAR Intents has no testnet, so agent
 builders test swap agents with real funds. Airbag replaces the 1Click Swap API with a drop-in sandbox:
 change one base URL and the agent runs in a simulated world with a ledger, a virtual clock and no real
-funds. We crash it 21 ways across seven laws — pay only what you quoted, never pay twice, respect the
+funds. We crash it 21 ways across seven laws: pay only what you quoted, never pay twice, respect the
 clock, verify never assume, data is not a command, stay inside the limits, always keep an exit. A judge
 scores every run from ledger truth, not from what the agent says, and produces a report card with a
 safety radar, the simulated loss and a fix for each failure. The repo includes a scripted Dummy and a

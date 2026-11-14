@@ -86,7 +86,7 @@ function renderScenarioDocs(): string {
       lines.push(
         `### ${scenario.id}`,
         '',
-        `**${scenario.title}** — ${scenario.story}`,
+        `**${scenario.title}**: ${scenario.story}`,
         '',
         `- Priority: ${scenario.priority}`,
         `- Modeled: ${scenario.modeled ? 'yes (the sandbox behavior is an explicit model, not a verified API behavior)' : 'no'}`,

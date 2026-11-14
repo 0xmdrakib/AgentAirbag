@@ -198,7 +198,7 @@ export function eventPlainText(event: LogEvent): string {
     case 'agent.message':
       return event.text;
     case 'agent.report':
-      return `Agent reported ${event.report.outcome} — ${event.report.message}`;
+      return `Agent reported ${event.report.outcome}: ${event.report.message}`;
   }
 }
 

@@ -1,6 +1,6 @@
 import { fixByKey } from '../fixes';
 import { buildRunReport } from '../scoring';
-import { BUDGETS, DEFAULT_BALANCES, DEFAULT_POLICY, DEFAULT_TASK, USER_WALLET } from '../constants';
+import { BUDGETS, DEFAULT_BALANCES, DEFAULT_POLICY, DEFAULT_TASK, USER_WALLET, VIRTUAL_EPOCH_ISO } from '../constants';
 import { createFetch, createSandbox, type Sandbox } from '../sandbox';
 import { judge } from '../judge';
 import { tokensFor } from '../tokens';
@@ -171,12 +171,15 @@ export async function runScenario(options: RunScenarioOptions): Promise<Scenario
 
   sandbox.finalize();
   const lossUsd = sandbox.totalLossUsd();
+  // Freeze the evidence before judging. An in-process agent can still reach the
+  // sandbox and push events after finalize; the result must not change after this point.
+  const events = structuredClone(sandbox.events);
   const judged = judge({
     scenario,
     task: world.task,
     policy: world.policy,
     tokens: world.tokens,
-    events: sandbox.events,
+    events,
     report: sandbox.getReport(),
     lossUsd,
   });
@@ -191,7 +194,7 @@ export async function runScenario(options: RunScenarioOptions): Promise<Scenario
     modeled: scenario.modeled,
     lossUsd: judged.lossUsd.toFixed(2),
     violations: judged.violations,
-    events: sandbox.events,
+    events,
     fix: fixByKey(scenario.fix.key),
   };
   return { result, sandbox };
@@ -225,8 +228,8 @@ export async function runSuite(options: RunSuiteOptions): Promise<RunReport> {
     }
 
     const trialVerdicts: Verdict[] = [];
-    let first: ScenarioResult | undefined;
-    let totalLoss = 0;
+    const trialResults: ScenarioResult[] = [];
+    let totalLossCents = 0;
     for (let trial = 0; trial < trials; trial += 1) {
       const { result } = await runScenario({
         scenario,
@@ -235,25 +238,59 @@ export async function runSuite(options: RunSuiteOptions): Promise<RunReport> {
         wallTimeoutMs: options.wallTimeoutMs,
       });
       trialVerdicts.push(result.verdict);
-      totalLoss += Number(result.lossUsd);
-      if (!first) first = result;
+      trialResults.push(result);
+      totalLossCents += Math.round(Number(result.lossUsd) * 100);
     }
     const aggregate: Verdict = trialVerdicts.includes('FAIL')
       ? 'FAIL'
       : trialVerdicts.includes('WARN')
         ? 'WARN'
         : 'PASS';
+    // A failing scenario must show the evidence that caused the failure, not a
+    // clean earlier trial. Pick the worst trial: highest-severity violation,
+    // then the largest loss.
+    const evidence = aggregate === 'PASS' ? trialResults[0]! : worstTrial(trialResults);
     const result: ScenarioResult = {
-      ...first!,
+      ...evidence,
       verdict: aggregate,
       trials: trialVerdicts,
-      lossUsd: totalLoss.toFixed(2),
+      lossUsd: (totalLossCents / 100).toFixed(2),
     };
     results.push(result);
     onResult?.(result);
   }
 
-  return buildRunReport({ agent, scenarios, results, seed });
+  return buildRunReport({
+    agent: {
+      ...agent,
+      // The cassette or model timestamp is wall-clock metadata. Derive it from
+      // the fixed virtual epoch so the same seed and cassette always hash the same.
+      ...(agent.recordedAt ? { recordedAt: VIRTUAL_EPOCH_ISO } : {}),
+    },
+    scenarios,
+    results,
+    seed,
+  });
+}
+
+function worstTrial(results: ScenarioResult[]): ScenarioResult {
+  return results.reduce((worst, candidate) => {
+    const worstSeverity = trialSeverity(worst);
+    const candidateSeverity = trialSeverity(candidate);
+    if (candidateSeverity !== worstSeverity) {
+      return candidateSeverity > worstSeverity ? candidate : worst;
+    }
+    return Number(candidate.lossUsd) > Number(worst.lossUsd) ? candidate : worst;
+  });
+}
+
+function trialSeverity(result: ScenarioResult): number {
+  let severity = 0;
+  for (const violation of result.violations) {
+    if (violation.severity === 'fail') return 2;
+    severity = 1;
+  }
+  return severity;
 }
 
 /** A compact event log for terminal output. */
@@ -276,7 +313,7 @@ export function formatEvent(event: LogEvent): string {
     case 'agent.message':
       return `agent: ${event.text}`;
     case 'agent.report':
-      return `agent report: ${event.report.outcome} — ${event.report.message}`;
+      return `agent report: ${event.report.outcome}: ${event.report.message}`;
   }
   return 'event';
 }

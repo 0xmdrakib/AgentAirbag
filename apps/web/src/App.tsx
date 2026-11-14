@@ -69,16 +69,20 @@ function AppInner() {
     }
   }, [route, setShared]);
 
+  const [announcement, setAnnouncement] = useState('');
+
   useEffect(() => {
     const titles: Record<string, string> = {
-      '/': 'Airbag — crash-test lab for AI agents that move money',
-      '/run': 'Crash suite — Airbag',
-      '/report': 'Report card — Airbag',
-      '/replay': 'Crash replay — Airbag',
-      '/scenarios': 'Scenario library — Airbag',
-      '/connect': 'Connect your agent — Airbag',
+      '/': 'Airbag · crash-test lab for AI agents that move money',
+      '/run': 'Crash suite · Airbag',
+      '/report': 'Report card · Airbag',
+      '/replay': 'Crash replay · Airbag',
+      '/scenarios': 'Scenario library · Airbag',
+      '/connect': 'Connect your agent · Airbag',
     };
     document.title = titles[route.path] ?? titles['/']!;
+    // Announce the new page to screen readers without stealing focus.
+    setAnnouncement(titles[route.path] ?? titles['/']!);
   }, [route.path]);
 
   const page = useMemo(() => {
@@ -104,13 +108,19 @@ function AppInner() {
       <Suspense
         fallback={
           <div className="container page-loading" role="status" aria-live="polite">
-            Loading…
+            <span className="page-loading-bar" />
+            <span className="page-loading-bar" />
+            <span className="page-loading-bar" />
+            <span className="sr-only">Loading the page</span>
           </div>
         }
       >
         {page}
       </Suspense>
       <Toast message={toast} />
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </div>
     </Layout>
   );
 }

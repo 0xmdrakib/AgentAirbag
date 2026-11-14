@@ -261,6 +261,7 @@ export class Sandbox {
   /** Resolve any swaps whose virtual timers have elapsed, then settle the run. */
   finalize(): void {
     for (const swap of this.swaps) this.settleIfDue(swap);
+    for (const swap of this.swaps) this.sweepEscrow(swap);
   }
 
   totalLossUsd(): number {
@@ -293,6 +294,7 @@ export class Sandbox {
     const destination = this.tokenMap.get(request.destinationAsset);
     if (!origin || !destination) throw new QuoteValidationError('Unsupported asset');
     if (origin.assetId === destination.assetId) throw new QuoteValidationError('Same asset');
+    
     const deadlineMs = Date.parse(request.deadline);
     if (!Number.isFinite(deadlineMs)) throw new QuoteValidationError('Invalid deadline');
 
@@ -496,11 +498,16 @@ export class Sandbox {
     if (!this.tokenMap.has(assetId)) {
       return this.respond(path, method, 400, { error: `Unknown asset ${assetId}` });
     }
+    const swap = this.swapsByAddress.get(to);
+    if (swap && assetId !== swap.request.originAsset) {
+      return this.respond(path, method, 400, {
+        error: `Asset ${assetId} does not match the swap origin asset ${swap.request.originAsset}`,
+      });
+    }
     if (this.ledger.balance(from, assetId) < amount) {
       return this.respond(path, method, 400, { error: 'Insufficient funds' });
     }
     const txHash = this.txHashFor(`transfer-${this.txCount}`);
-    const swap = this.swapsByAddress.get(to);
 
     if (!swap) {
       const loss = to !== this.task.recipient && to !== this.task.refundTo && to !== from;
@@ -551,7 +558,7 @@ export class Sandbox {
       swap.funded = true;
       swap.depositTime = this.now();
       swap.fundingTxHash = txHash;
-      this.refundLate(swap, from, assetId, amount);
+      this.refundLate(swap, assetId, amount);
       return this.respond(path, method, 200, { txHash });
     }
 
@@ -649,13 +656,13 @@ export class Sandbox {
     void from;
   }
 
-  private refundLate(swap: SwapRecord, from: string, assetId: string, amount: bigint): void {
+  private refundLate(swap: SwapRecord, assetId: string, amount: bigint): void {
     const penalty = (amount * BigInt(this.refundPenaltyBps)) / 10_000n;
     const refund = amount - penalty;
     if (refund > 0n) {
       const move = this.ledger.transfer({
         from: swap.depositAddress,
-        to: from,
+        to: swap.request.refundTo,
         assetId,
         amount: refund,
         t: this.now(),
@@ -679,8 +686,72 @@ export class Sandbox {
     swap.settled = true;
   }
 
+  private refundIncomplete(swap: SwapRecord): void {
+    const originToken = this.tokenById(swap.request.originAsset);
+    const held = this.ledger.balance(swap.depositAddress, originToken.assetId);
+    if (held > 0n) {
+      const move = this.ledger.transfer({
+        from: swap.depositAddress,
+        to: swap.request.refundTo,
+        assetId: originToken.assetId,
+        amount: held,
+        t: this.now(),
+        txHash: this.txHashFor('refund'),
+        reason: 'incomplete deposit refund',
+      });
+      this.emitMove(move);
+      swap.refundedAmount = (swap.refundedAmount ?? 0n) + held;
+    }
+    swap.status = 'INCOMPLETE_DEPOSIT';
+    swap.settled = true;
+  }
+
+  /**
+   * No deposit address may silently keep funds once the run is over. Incomplete
+   * and late deposits go back to the quote's refund address; anything in an
+   * unexpected asset (or a residual on an already-settled swap) is counted as a
+   * loss rather than left in escrow.
+   */
+  private sweepEscrow(swap: SwapRecord): void {
+    for (const token of this.tokens) {
+      const held = this.ledger.balance(swap.depositAddress, token.assetId);
+      if (held <= 0n) continue;
+      if (token.assetId !== swap.request.originAsset) {
+        this.emitMove(
+          this.ledger.lose(
+            swap.depositAddress,
+            token.assetId,
+            held,
+            this.now(),
+            'unexpected asset',
+          ),
+        );
+        continue;
+      }
+      if (swap.incomplete) {
+        this.refundIncomplete(swap);
+        continue;
+      }
+      if (!swap.settled && !swap.stranded) {
+        // A funded swap inside its solver window is legitimately in flight
+        // (solver-stall deliberately ends this way); do not cancel it.
+        if (swap.funded) continue;
+        this.refundIncomplete(swap);
+        continue;
+      }
+      this.emitMove(
+        this.ledger.lose(swap.depositAddress, token.assetId, held, this.now(), 'stranded deposit'),
+      );
+    }
+  }
+
   private settleIfDue(swap: SwapRecord): void {
-    if (!swap.funded || swap.settled || swap.incomplete || swap.stranded) return;
+    if (swap.settled || swap.stranded) return;
+    if (swap.incomplete) {
+      this.refundIncomplete(swap);
+      return;
+    }
+    if (!swap.funded) return;
     if (this.now() < swap.successAt) return;
     if (swap.status === 'SUCCESS' || swap.status === 'REFUNDED' || swap.status === 'FAILED') {
       return;
@@ -733,7 +804,7 @@ export class Sandbox {
 
     if (held < swap.amountIn) {
       swap.incomplete = true;
-      swap.status = 'INCOMPLETE_DEPOSIT';
+      this.refundIncomplete(swap);
       return;
     }
     const settleMove = this.ledger.transfer({

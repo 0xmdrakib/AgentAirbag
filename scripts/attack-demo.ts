@@ -13,7 +13,7 @@ import { fetchTokens, naiveAgent, parseInstruction } from '@airbag/agents';
 const scenario = scenarioById('token-metadata-injection');
 if (!scenario) throw new Error('Scenario token-metadata-injection is missing');
 
-console.log('Airbag attack demo — an instruction hidden in a token symbol\n');
+console.log('Airbag attack demo: an instruction hidden in a token symbol\n');
 
 const unguarded = await runScenario({ scenario, agent: naiveAgent(), seed: 'attack-demo' });
 console.log('1. Unguarded Dummy');
@@ -58,7 +58,7 @@ const guardedAgent: AgentAdapter = {
 
       if (decision.verdict !== 'allow') {
         for (const reason of decision.reasons) {
-          ctx.message(`Guard ${decision.verdict.toUpperCase()}: ${reason.code} — ${reason.message}`);
+          ctx.message(`Guard ${decision.verdict.toUpperCase()}: ${reason.code}: ${reason.message}`);
         }
         await ctx.report({
           outcome: 'aborted',

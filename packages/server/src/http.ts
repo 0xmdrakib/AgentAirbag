@@ -106,7 +106,7 @@ export function createApp(): AirbagApp {
       .map((run) => {
         const id = escapeHtml(run.id);
         const baseUrl = escapeHtml(`${origin}/r/${run.id}`);
-        return `<li><a href="/r/${id}/v0/tokens">${baseUrl}</a> — ${escapeHtml(run.label)} <span class="muted">(${run.sandbox.apiCalls} calls)</span></li>`;
+        return `<li><a href="/r/${id}/v0/tokens">${baseUrl}</a>: ${escapeHtml(run.label)} <span class="muted">(${run.sandbox.apiCalls} calls)</span></li>`;
       })
       .join('');
     const demoUrl = escapeHtml(`${origin}/r/demo`);

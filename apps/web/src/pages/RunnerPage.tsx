@@ -69,7 +69,7 @@ export function RunnerPage() {
       </div>
 
       <div className="run-layout">
-        <aside className="run-sidebar">
+        <aside className="run-sidebar" id="run-start">
           <p className="label">Agent under test</p>
           <div
             className="agent-picker"
