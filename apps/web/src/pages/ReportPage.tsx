@@ -144,7 +144,14 @@ export function ReportPage() {
             <Button variant="secondary" size="sm" onClick={download}>
               <DownloadIcon size={14} /> JSON
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => void navigator.clipboard.writeText(badge)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                void navigator.clipboard.writeText(badge);
+                showToast('README badge copied.');
+              }}
+            >
               Copy badge
             </Button>
           </div>
