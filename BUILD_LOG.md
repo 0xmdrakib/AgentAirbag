@@ -113,3 +113,6 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 
 **2026-11-14 (design system v3).** Owner said the UI read as cheap and AI-generated. Removed the template tells (grid and glow background, mono caps labels, gradient cards, hover lifts, headline highlighter, boxed numerals, slogan headlines, duplicate stat rows and chips). New warm neutral palette, ink buttons, hairlines, smaller radii, Inter only, tabular money figures, plain-language headlines, laws as an editorial list. Dropped Bricolage Grotesque. ui:audit, interact, share and seed checks clean.
 
+
+**2026-11-14 (hero, law accordion, header).** Rebuilt the Report law list as an accordion (name, law number and survived count, score, SVG chevron, thin score line) replacing the text glyph chevron and crowded pip/bar row. Rebuilt the Lab hero copy: brand kicker, shorter subhead, and a three-fact row. Removed the header Simulation chip at the owner's request; simulated labels stay on every figure and in the footer.
+

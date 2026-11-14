@@ -137,6 +137,12 @@ Crash-test yellow is a marker only: the logo, the simulation dot, the final call
 highlights in the replay. Headlines are plain descriptions. Duplicated numbers were removed (Lab stats
 row, Report hero chips). Bricolage Grotesque was dropped.
 
+**No header "Simulation" chip.** The master prompt asked for a persistent SIMULATION chip on every
+screen; the owner asked to remove it from the header. The honesty requirement is still met where the
+numbers are: every money figure is labelled "simulated", the Lab hero says the API is sandboxed and
+shows "$0 real funds at risk", modeled scenarios carry a "modeled" tag, and the footer on every page
+says "Everything here is simulated · No real funds move".
+
 **Light theme only.** v2 first shipped dark-first with a light toggle. The owner then asked for light
 mode only, so the dark tokens, the toggle, the pre-paint theme script and the `localStorage` key were
 removed. Alternatives: keep both themes. Reason: one theme means one palette to keep accessible and

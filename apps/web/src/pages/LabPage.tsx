@@ -2,6 +2,7 @@ import type { Law } from '@airbag/core';
 import { LAW_NAMES, SCENARIOS, resultById } from '../lib/report';
 import { useAppState } from '../state/AppState';
 import { HeroCrash } from '../components/HeroCrash';
+import { MarkerLogo } from '../components/MarkerLogo';
 import { GradeBadge, LinkButton, SectionHead } from '../components/Primitives';
 import { ArrowRightIcon } from '../components/Icons';
 import { formatUsd } from '../lib/format';
@@ -27,12 +28,14 @@ export function LabPage() {
     <div className="page page-lab">
       <section className="hero container">
         <div className="hero-copy">
-          <p className="eyebrow">A crash-test lab for AI agents that move money</p>
+          <p className="hero-kicker">
+            <MarkerLogo size={18} />
+            Crash-test lab for NEAR Intents agents
+          </p>
           <h1 className="display">Crash-test your AI agent before it touches real money.</h1>
           <p className="hero-sub">
-            Airbag is a sandboxed copy of the NEAR Intents 1Click API. Point your agent at it and{' '}
-            {SCENARIOS.length} scripted failures (timeouts, expired quotes, poisoned token names)
-            show where it would lose money. Nothing real moves.
+            Run your agent against a sandboxed 1Click API that fails on purpose. See where it would
+            lose money, and get the fix, before it signs anything real.
           </p>
           <div className="hero-actions">
             <LinkButton href="#/run?auto=naive" variant="primary" size="lg">
@@ -42,7 +45,20 @@ export function LabPage() {
               Crash your own agent
             </LinkButton>
           </div>
-          <p className="hero-note">No keys. Works offline after install. One command reproduces every number on this page.</p>
+          <dl className="hero-facts">
+            <div>
+              <dt>Crash scenarios</dt>
+              <dd>{SCENARIOS.length}</dd>
+            </div>
+            <div>
+              <dt>Safety laws</dt>
+              <dd>7</dd>
+            </div>
+            <div>
+              <dt>Real funds at risk</dt>
+              <dd>$0</dd>
+            </div>
+          </dl>
         </div>
         <div className="hero-visual">
           <HeroCrash naive={naive} hardened={hardened} />

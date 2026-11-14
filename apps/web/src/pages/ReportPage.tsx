@@ -25,6 +25,7 @@ import { SafetyRadar } from '../components/SafetyRadar';
 import { FixSnippet } from '../components/FixSnippet';
 import {
   ArrowRightIcon,
+  ChevronIcon,
   DownloadIcon,
   ShareIcon,
   ShieldIcon,
@@ -162,7 +163,9 @@ export function ReportPage() {
         <div className="report-shape-chart">
           <div className="panel-head">
             <p className="eyebrow">Safety shape</p>
-            <span className="mono muted">seven laws · 0 to 100</span>
+            {!sharedReport && (report.agent.id === 'naive' || report.agent.id === 'hardened') && (
+              <span className="muted panel-hint">Dashed: the other reference agent</span>
+            )}
           </div>
           <SafetyRadar
             laws={report.laws}
@@ -182,40 +185,33 @@ export function ReportPage() {
         <div className="report-law-bars">
           <div className="panel-head">
             <p className="eyebrow">Law by law</p>
-            <span className="mono muted">click to expand</span>
+            <span className="muted panel-hint">Score out of 100</span>
           </div>
           {report.laws.map((law) => {
             const open = openLaw === law.law;
+            const survived = law.scenarios.filter((scenario) => scenario.verdict === 'PASS').length;
+            const tone = law.score >= 90 ? 'pass' : law.score >= 50 ? 'warn' : 'fail';
             return (
-              <div className={cx('law-bar-wrap', open && 'law-bar-open')} key={law.law}>
+              <div className={cx('law-acc', open && 'law-acc-open')} key={law.law}>
                 <button
                   type="button"
-                  className="law-bar"
+                  className="law-acc-head"
                   aria-expanded={open}
                   onClick={() => setOpenLaw(open ? null : (law.law as Law))}
                 >
-                  <span className="law-bar-num mono">0{law.law}</span>
-                  <span className="law-bar-name">{LAW_NAMES[law.law as Law]}</span>
-                  <span className="law-pips" aria-label={`${law.scenarios.length} crashes`}>
-                    {law.scenarios.map((scenario) => (
-                      <i
-                        key={scenario.id}
-                        className={cx('law-pip', `pip-${scenario.verdict.toLowerCase()}`)}
-                        title={`${scenario.title}: ${scenario.verdict}`}
-                      />
-                    ))}
+                  <span className="law-acc-text">
+                    <span className="law-acc-name">{LAW_NAMES[law.law as Law]}</span>
+                    <span className="law-acc-meta">
+                      Law {law.law} · {survived} of {law.scenarios.length} survived
+                    </span>
                   </span>
-                  <span className="law-bar-track" aria-hidden="true">
-                    <span
-                      className={cx(
-                        'law-bar-fill',
-                        law.score >= 90 ? 'fill-pass' : law.score >= 50 ? 'fill-warn' : 'fill-fail',
-                      )}
-                      style={{ width: `${law.score}%` }}
-                    />
+                  <span className={cx('law-acc-score', `text-${tone}`)}>{law.score}</span>
+                  <span className="law-acc-chevron" aria-hidden="true">
+                    <ChevronIcon size={16} />
                   </span>
-                  <span className="law-bar-score mono">{law.score}</span>
-                  <span className={cx('law-bar-chevron', open && 'chevron-open')}>⌄</span>
+                  <span className="law-acc-track" aria-hidden="true">
+                    <span className={cx('law-acc-fill', `fill-${tone}`)} style={{ width: `${Math.max(law.score, 0)}%` }} />
+                  </span>
                 </button>
                 {open && (
                   <div className="law-scenario-pills">
