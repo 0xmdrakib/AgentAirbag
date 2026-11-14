@@ -58,13 +58,13 @@ export function Layout({ route, children }: { route: string; children: ReactNode
             ))}
           </nav>
           <div className="header-right">
-            <WalletButton className="header-wallet" />
             <a
               href={route === '/run' ? '#run-start' : '#/run'}
               className="btn btn-primary btn-sm header-cta"
             >
               {route === '/run' ? 'Start a run' : 'Run the suite'}
             </a>
+            <WalletButton className="header-wallet" />
             <button
               type="button"
               ref={menuButton}

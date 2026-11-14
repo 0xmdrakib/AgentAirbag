@@ -7034,3 +7034,33 @@ h2.eyebrow {
     bottom: 16px;
   }
 }
+
+/* Wide header: brand left, three links centred in the bar, actions at the right edge with the
+   wallet control last. The grid keeps the nav truly centred regardless of side widths. */
+@media (min-width: 861px) {
+  .header-inner {
+    display: grid;
+    grid-template-columns: minmax(140px, 1fr) auto minmax(140px, 1fr);
+    align-items: center;
+  }
+
+  .brand {
+    justify-self: start;
+  }
+
+  .nav {
+    margin-left: 0;
+    justify-self: center;
+  }
+
+  .header-right {
+    margin-left: 0;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 860px) {
+  .header-right {
+    margin-left: auto;
+  }
+}

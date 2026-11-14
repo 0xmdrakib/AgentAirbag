@@ -83,7 +83,8 @@ run `pnpm db:migrate` once. Setup, the exact environment variables and the deplo
 
 `pnpm build` writes the static build to `apps/web/dist`. It is ready for Vercel, Cloudflare Pages or
 GitHub Pages, but **no hosting account was available in this build window, so there is no hosted URL
-yet**. The one-command local demo is the reproducible path; see [Deploy](#deploy).
+yet**. The project domain, `agentairbag.xyz`, is registered by the maintainer but does not point at a
+deployment yet. The one-command local demo is the reproducible path; see [Deploy](#deploy).
 
 ## What it is
 

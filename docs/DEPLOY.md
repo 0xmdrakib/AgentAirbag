@@ -128,9 +128,22 @@ To run wallet connect and saved runs in production, serve the static app and the
 process supervision or hardening for public traffic. Use it as the reference for the two-port split,
 not as the deployment itself.
 
+## Project domain
+
+The maintainer registered `agentairbag.xyz`. It does not point at anything yet, and the page
+metadata (`canonical`, `og:url`, `og:image` in `apps/web/index.html`) already assumes it. Once a host
+exists:
+
+1. Add `agentairbag.xyz` as a custom domain in the host (Vercel, Cloudflare Pages or GitHub Pages)
+   and create the DNS records the host asks for at the registrar.
+2. Wait for HTTPS to be issued, then open the site in a logged-out window.
+3. If the API runs on the same host, set `AIRBAG_ALLOWED_ORIGIN=https://agentairbag.xyz`.
+4. If the site is served from a different hostname, update the three metadata URLs first.
+
 ## What is not built
 
-- **No hosted URL exists.** This repository does not ship a live demo or a deployed API.
+- **No hosted URL exists.** This repository does not ship a live demo or a deployed API. The
+  `agentairbag.xyz` domain is registered but not connected to a host.
 - **No Vercel function for the API.** The Vercel configuration is static only.
 - **No production host configuration.** There is no Dockerfile, Terraform, or managed host setup for
   the Node path.
