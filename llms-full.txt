@@ -10,6 +10,7 @@
 that fails on purpose, 21 scripted crashes, and a report card scored from ledger truth. No real funds
 move.
 
+[![verify](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml/badge.svg)](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml)
 ![tests](https://img.shields.io/badge/tests-107%20passing-0d7a4e)
 ![scenarios](https://img.shields.io/badge/crashes-21-ffd21f)
 ![funds](https://img.shields.io/badge/real%20funds-0-c01f31)
