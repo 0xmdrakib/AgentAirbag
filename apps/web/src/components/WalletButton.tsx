@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { cx } from '../lib/format';
 import { useWallet } from '../wallet/WalletProvider';
 import {
@@ -197,24 +198,26 @@ export function WalletButton({ compactLabel = 'Connect', className }: WalletButt
         )}
       </button>
 
-      {error && (
-        <div className="wallet-toast" role="alert">
-          <span className="wallet-toast-text">{error}</span>
-          {unavailable && (
-            <button type="button" className="wallet-toast-action" onClick={() => void refresh()}>
-              Retry
+      {error &&
+        createPortal(
+          <div className="wallet-toast" role="alert">
+            <span className="wallet-toast-text">{error}</span>
+            {unavailable && (
+              <button type="button" className="wallet-toast-action" onClick={() => void refresh()}>
+                Retry
+              </button>
+            )}
+            <button
+              type="button"
+              className="wallet-toast-close"
+              onClick={clearError}
+              aria-label="Dismiss wallet message"
+            >
+              <XIcon size={14} />
             </button>
-          )}
-          <button
-            type="button"
-            className="wallet-toast-close"
-            onClick={clearError}
-            aria-label="Dismiss wallet message"
-          >
-            <XIcon size={14} />
-          </button>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
       {connected && open && (
         <div

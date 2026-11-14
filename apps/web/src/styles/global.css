@@ -7005,3 +7005,32 @@ h2.eyebrow {
     animation: none;
   }
 }
+
+/* Wallet errors use the app toast pattern, fixed to the bottom, never over the page. */
+.wallet-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 160;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: min(460px, calc(100vw - 32px));
+  padding: 10px 10px 10px 16px;
+  transform: translateX(-50%);
+  border: 1px solid var(--fail-line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.45;
+  animation: toast-in 200ms var(--ease);
+}
+
+@media (max-width: 640px) {
+  .wallet-toast {
+    bottom: 16px;
+  }
+}

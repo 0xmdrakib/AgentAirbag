@@ -201,3 +201,17 @@ MyNearWallet, Sender, OKX Wallet and Nightly, plus Bitget when its extension is 
 HERE and Coin98 were tested and removed because one of them crashed the selector at open time; the
 picker hides modules that the selector does not expose. WalletConnect needs a project id and Ledger
 needs hardware, so both are out of scope for this build.
+
+## Wallet picker and provider list
+
+**The hand written Buffer shim was the reason most wallet modules failed.** It lacked
+`Buffer.alloc`, `concat` and `slice`, so Meteor, Here, Coin98 and Ledger crashed the selector at
+load time and were removed. Installing the real `buffer` package and exposing it as the global fixed
+all of them. The picker now lists four primary wallets (MyNearWallet, Sender, OKX Wallet, Nightly)
+and puts Meteor, Here, Coin98, Ledger and Bitget under More wallets, ordered by popularity.
+
+**The upstream modal is gone.** It had no way to show a second tier and its fallback reopened the
+old dialog after the picker closed, which produced a confusing second modal and a "connection
+closed" message. The custom picker is the only chooser now. Wallet errors render through a portal
+to `document.body` as a bottom toast, because the header's backdrop-filter traps fixed children.
+Cancelling a wallet prompt is silent; only real failures show a message.

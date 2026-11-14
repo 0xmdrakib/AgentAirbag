@@ -13,7 +13,7 @@ import { ArrowRightIcon, ChevronIcon, WalletIcon, XIcon } from '../components/Ic
 import { loadWallet } from './selector';
 
 /** The wallets most NEAR users reach for, kept in a stable order ahead of the rest. */
-const PRIMARY_WALLET_IDS = ['my-near-wallet', 'sender', 'okx-wallet'];
+const PRIMARY_WALLET_IDS = ['my-near-wallet', 'sender', 'okx-wallet', 'nightly'];
 
 type LoadState = 'loading' | 'ready' | 'error';
 

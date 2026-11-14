@@ -8,8 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { AccountState, Subscription, WalletSelector } from '@near-wallet-selector/core';
-import type { WalletSelectorModal } from '@near-wallet-selector/modal-ui';
+import type { AccountState, WalletSelector } from '@near-wallet-selector/core';
 import {
   ApiError,
   describeError,
@@ -49,52 +48,10 @@ interface LegacyConnectWallet {
   connect?: (params: { contractId?: string; methodNames?: string[] }) => Promise<unknown>;
 }
 
-function waitForModalSignIn(selector: WalletSelector, modal: WalletSelectorModal): Promise<void> {
-  if (selector.isSignedIn()) return Promise.resolve();
-
-  return new Promise<void>((resolve, reject) => {
-    let settled = false;
-    let timer = 0;
-    let signedIn: Subscription | null = null;
-    let hidden: Subscription | null = null;
-
-    const cleanup = () => {
-      window.clearTimeout(timer);
-      signedIn?.remove();
-      hidden?.remove();
-    };
-    const finish = (failure?: Error) => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      if (failure) reject(failure);
-      else resolve();
-    };
-
-    signedIn = selector.on('signedIn', () => finish());
-    hidden = modal.on('onHide', ({ hideReason }) => {
-      if (hideReason === 'user-triggered') {
-        finish(new Error('Wallet connection was closed before it finished.'));
-      }
-    });
-    timer = window.setTimeout(() => {
-      finish(
-        new Error('The wallet did not answer in time. Close the wallet window and try again.'),
-      );
-    }, CONNECT_TIMEOUT_MS);
-
-    try {
-      modal.show();
-    } catch (caught) {
-      finish(caught instanceof Error ? caught : new Error('The wallet modal could not open.'));
-    }
-  });
-}
-
 /**
  * Try the selected module without the upstream modal. v10 wallets expose signIn(); a
  * couple of older builds still expose connect(), so both are accepted. Any failure or
- * an empty account list falls back to the modal so the wallet's own UI can finish.
+ * an empty account list is reported as an unavailable wallet.
  */
 async function tryDirectSignIn(
   selector: WalletSelector,
@@ -240,14 +197,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setStatus('connecting');
 
       try {
-        const { selector, modal } = await loadWallet();
+        const { selector } = await loadWallet();
         let accounts = (await tryDirectSignIn(selector, walletId)).filter((account) =>
           Boolean(account.accountId),
         );
 
         if (accounts.length === 0) {
-          await waitForModalSignIn(selector, modal);
-          accounts = selector.store.getState().accounts;
+          throw new Error(
+            'This wallet is not available in this browser. Install its extension or pick another wallet.',
+          );
         }
 
         const state = selector.store.getState();
@@ -291,7 +249,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       } catch (caught) {
         setAccountId(null);
         setStatus(isApiUnavailable(caught) ? 'unavailable' : 'disconnected');
-        setError(describeError(caught, 'The wallet could not connect. Try again.'));
+        const message = describeError(caught, 'The wallet could not connect. Try again.');
+        setError(/cancel|closed|reject|denied/i.test(message) ? null : message);
       } finally {
         connectingRef.current = false;
       }

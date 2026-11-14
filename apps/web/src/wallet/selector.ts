@@ -1,7 +1,5 @@
 import './buffer-shim';
-import '@near-wallet-selector/modal-ui/styles.css';
 import type { NetworkId, WalletSelector } from '@near-wallet-selector/core';
-import type { WalletSelectorModal } from '@near-wallet-selector/modal-ui';
 
 interface ImportMetaEnv {
   VITE_NEAR_NETWORK?: string;
@@ -14,31 +12,30 @@ export const nearNetwork: NetworkId = env?.VITE_NEAR_NETWORK === 'mainnet' ? 'ma
 
 export interface WalletSetup {
   selector: WalletSelector;
-  modal: WalletSelectorModal;
   network: NetworkId;
 }
 
 let setup: Promise<WalletSetup> | null = null;
 
 /**
- * One wallet selector per tab. setupWalletSelector refuses a second instance by default,
- * and a module-level promise also keeps React StrictMode's double effect from racing.
- *
- * The selector, modal and wallet module are imported on first use so the landing page does
- * not pay for the wallet SDK until someone actually connects.
+ * One wallet selector per tab. The SDK and every wallet module are imported on first use,
+ * so the landing page does not pay for them until someone connects.
  */
 export function loadWallet(): Promise<WalletSetup> {
   if (!setup) {
     setup = Promise.all([
       import('@near-wallet-selector/core'),
-      import('@near-wallet-selector/modal-ui'),
       import('@near-wallet-selector/my-near-wallet'),
       import('@near-wallet-selector/sender'),
       import('@near-wallet-selector/okx-wallet'),
-      import('@near-wallet-selector/bitget-wallet'),
       import('@near-wallet-selector/nightly'),
+      import('@near-wallet-selector/meteor-wallet'),
+      import('@near-wallet-selector/here-wallet'),
+      import('@near-wallet-selector/coin98-wallet'),
+      import('@near-wallet-selector/ledger'),
+      import('@near-wallet-selector/bitget-wallet'),
     ])
-      .then(([core, modalUi, myNearWallet, sender, okx, bitget, nightly]) =>
+      .then(([core, myNearWallet, sender, okx, nightly, meteor, here, coin98, ledger, bitget]) =>
         core
           .setupWalletSelector({
             network: nearNetwork,
@@ -46,17 +43,15 @@ export function loadWallet(): Promise<WalletSetup> {
               myNearWallet.setupMyNearWallet(),
               sender.setupSender(),
               okx.setupOKXWallet(),
-              bitget.setupBitgetWallet(),
               nightly.setupNightly(),
+              meteor.setupMeteorWallet(),
+              here.setupHereWallet(),
+              coin98.setupCoin98Wallet(),
+              ledger.setupLedger(),
+              bitget.setupBitgetWallet(),
             ],
           })
-          .then((selector) => {
-            const modal = modalUi.setupModal(selector, {
-              theme: 'light',
-              description: 'Connect a NEAR wallet to save crash reports to your account.',
-            });
-            return { selector, modal, network: nearNetwork };
-          }),
+          .then((selector) => ({ selector, network: nearNetwork })),
       )
       .catch((error: unknown) => {
         setup = null;
