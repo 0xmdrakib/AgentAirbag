@@ -3,5 +3,5 @@
   "buildCommand": "pnpm build",
   "outputDirectory": "apps/web/dist",
   "framework": null,
-  "cleanUrls": true
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

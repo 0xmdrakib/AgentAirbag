@@ -140,7 +140,7 @@ export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
             <h2 className="h3">{scenario.title}</h2>
             <p className="library-story">{scenario.story}</p>
             <div className="library-actions">
-              <a href={`#/replay/${scenario.id}`} className="library-watch">
+              <a href={`/replay/${scenario.id}`} className="library-watch">
                 Watch Dummy crash <ArrowRightIcon size={14} />
               </a>
               <button

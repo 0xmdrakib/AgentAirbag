@@ -16,7 +16,7 @@ page.on('console', (message) => {
 const base = PREVIEW_URL;
 
 // Runner: press Crash, wait for the grid to fill, then open the report.
-await page.goto(`${base}#/run`, { waitUntil: 'networkidle' });
+await page.goto(`${base}run`, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: 'Run the suite', exact: true }).click();
 await page.waitForSelector('.cell-fail, .cell-pass', { timeout: 15_000 });
 await page.waitForTimeout(1500);
@@ -34,7 +34,7 @@ if (hasReportLink) {
 }
 
 // Replay: skip to the crash.
-await page.goto(`${base}#/replay/timeout-after-transfer`, { waitUntil: 'networkidle' });
+await page.goto(`${base}replay/timeout-after-transfer`, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: /Skip to the key moment/ }).click();
 await page.waitForTimeout(400);
 await page.evaluate(() => {
@@ -45,7 +45,7 @@ await page.waitForTimeout(400);
 await page.screenshot({ path: `${out}/replay-crash.png`, fullPage: true });
 
 // Scenario drawer.
-await page.goto(`${base}#/scenarios`, { waitUntil: 'networkidle' });
+await page.goto(`${base}scenarios`, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: 'View YAML' }).first().click();
 await page.waitForTimeout(300);
 const drawerVisible = await page.locator('.drawer').isVisible();
@@ -53,7 +53,7 @@ await page.screenshot({ path: `${out}/scenarios-drawer.png`, fullPage: false });
 
 // Mobile runner.
 await page.setViewportSize({ width: 390, height: 844 });
-await page.goto(`${base}#/run`, { waitUntil: 'networkidle' });
+await page.goto(`${base}run`, { waitUntil: 'networkidle' });
 await page.screenshot({ path: `${out}/runner-mobile.png`, fullPage: false });
 
 await browser.close();

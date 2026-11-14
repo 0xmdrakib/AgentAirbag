@@ -44,7 +44,7 @@ packages/core      sandbox, ledger, virtual clock, seeded PRNG, scenario runtime
 packages/guard     allow / warn / block policy engine (no I/O)
 packages/agents    Dummy, Seatbelt, LLM adapter, cassette replay, process adapter
 packages/server    Hono HTTP sandbox, CLI, wallet auth API, Postgres or JSON store
-apps/web           React + Vite app, hash routing
+apps/web           React + Vite app, History API routing (a static host must serve index.html for unknown paths)
 scenarios/         21 YAML scenarios, three per law
 fixtures/          live token and quote snapshots, generated golden reports
 docs/              architecture, scenarios, claims, facts, deploy, process records

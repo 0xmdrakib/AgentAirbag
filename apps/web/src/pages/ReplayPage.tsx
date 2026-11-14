@@ -27,6 +27,7 @@ import {
   XIcon,
 } from '../components/Icons';
 import { tokenDecimals, tokenSymbol } from '../lib/report';
+import { navigate } from '../lib/router';
 
 type Pane = 'trace' | 'ledger' | 'violations';
 
@@ -113,11 +114,11 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
         const all = SCENARIOS;
         const cursor = all.findIndex((candidate) => candidate.id === scenarioId);
         const nextIndex = event.key === ']' ? (cursor + 1) % all.length : (cursor - 1 + all.length) % all.length;
-        window.location.hash = `#/replay/${all[nextIndex]!.id}`;
+        navigate(`/replay/${all[nextIndex]!.id}`);
       } else if (/^[1-7]$/.test(event.key)) {
         const law = Number(event.key) as 1 | 2 | 3 | 4 | 5 | 6 | 7;
         const first = scenariosForLaw(law)[0];
-        if (first) window.location.hash = `#/replay/${first.id}`;
+        if (first) navigate(`/replay/${first.id}`);
       }
     };
     window.addEventListener('keydown', onKey);
@@ -131,7 +132,7 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
           <span className="state-glyph">?</span>
           <h1>That crash does not exist.</h1>
           <p>Pick one from the library. There are {SCENARIOS.length} to choose from.</p>
-          <a href="#/scenarios" className="btn btn-primary btn-md">
+          <a href="/scenarios" className="btn btn-primary btn-md">
             Open the scenario library
           </a>
         </div>
@@ -150,7 +151,7 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
       <div className="container">
         <header className="replay-head">
           <div className="replay-head-top">
-            <a href="#/report" className="back-link">
+            <a href="/report" className="back-link">
               ← Report card
             </a>
             <div className="replay-toggles">

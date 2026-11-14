@@ -25,7 +25,7 @@ page.on('console', (message) => {
 });
 
 const base = PREVIEW_URL;
-await page.goto(`${base}#/report`, { waitUntil: 'networkidle' });
+await page.goto(`${base}report`, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: 'Share', exact: true }).click();
 await page.waitForTimeout(300);
 const copied = await page.evaluate(() => (window as unknown as { __copied?: string }).__copied);
@@ -42,13 +42,13 @@ if (copied) {
   sharedText = (await page.locator('main').innerText()).slice(0, 200);
 }
 
-await page.goto(`${base}#/replay/timeout-after-transfer`, { waitUntil: 'networkidle' });
+await page.goto(`${base}replay/timeout-after-transfer`, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: 'Seatbelt', exact: true }).click();
 await page.waitForTimeout(300);
 const survived = await page.getByText('Survived', { exact: true }).first().isVisible().catch(() => false);
 const seatbeltText = await page.locator('.replay-verdict-box').innerText();
 
-await page.goto(`${base}#/run?auto=naive`, { waitUntil: 'networkidle' });
+await page.goto(`${base}run?auto=naive`, { waitUntil: 'networkidle' });
 await page.waitForSelector('.cell-fail', { timeout: 20_000 });
 await page.waitForTimeout(1000);
 const cells = await page.locator('.cell-fail').count();

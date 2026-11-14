@@ -47,12 +47,12 @@ In the browser at `http://localhost:4321`:
 
 | Open | See |
 | --- | --- |
-| `#/` | The lab: both agents, side by side, with the two grades |
-| `#/run`, then **Run the crash suite** | The 7 by 3 grid fills in; every cell is clickable |
-| `#/report` | Grade, seven law scores, the top failures, a paste-ready fix and the report hash |
-| `#/replay/timeout-after-transfer`, then switch **Dummy** to **Seatbelt** | Same crash, same seed. Dummy pays twice (9,900 to 9,800). Seatbelt checks status first and holds at 9,900. |
-| `#/scenarios` | All 21 crashes as data: story, fault, judge rule, fix |
-| `#/connect` | Copy-paste setup for your own agent |
+| `/` | The lab: both agents, side by side, with the two grades |
+| `/run`, then **Run the crash suite** | The 7 by 3 grid fills in; every cell is clickable |
+| `/report` | Grade, seven law scores, the top failures, a paste-ready fix and the report hash |
+| `/replay/timeout-after-transfer`, then switch **Dummy** to **Seatbelt** | Same crash, same seed. Dummy pays twice (9,900 to 9,800). Seatbelt checks status first and holds at 9,900. |
+| `/scenarios` | All 21 crashes as data: story, fault, judge rule, fix |
+| `/connect` | Copy-paste setup for your own agent |
 
 Golden results are pinned in [`packages/core/test/golden.test.ts`](packages/core/test/golden.test.ts):
 seed `airbag-demo-2026`, Dummy report hash `e7fed1cc3fd5…`, Seatbelt `a246e7737723…`.
@@ -172,7 +172,7 @@ packages/core      sandbox, ledger, clock, PRNG, scenario runtime, judge, scorin
 packages/guard     allow / warn / block policy engine
 packages/agents    Dummy, Seatbelt, LLM adapter, cassette replay, process adapter
 packages/server    HTTP sandbox, CLI, NEAR wallet auth API, Postgres or JSON store
-apps/web           React app (hash routing; static build)
+apps/web           React app (History API routing; static build)
 scenarios/         21 YAML scenarios, three per law
 fixtures/          live token and quote snapshots, generated reports
 docs/              architecture, scenarios, claims, facts, deploy, process records

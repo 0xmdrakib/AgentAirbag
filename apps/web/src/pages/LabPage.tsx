@@ -60,10 +60,10 @@ export function LabPage() {
           have lost, and how to fix it.
         </p>
         <div className="landing-actions">
-          <LinkButton href="#/run?auto=naive" variant="primary" size="lg">
+          <LinkButton href="/run?auto=naive" variant="primary" size="lg">
             Run the crash suite <ArrowRightIcon size={18} />
           </LinkButton>
-          <LinkButton href="#/connect" variant="secondary" size="lg">
+          <LinkButton href="/connect" variant="secondary" size="lg">
             Test your own agent
           </LinkButton>
         </div>
@@ -90,7 +90,7 @@ export function LabPage() {
             <h2 className="proof-title" id="proof-title">
               Same {SCENARIOS.length} crash scenarios, two agents
             </h2>
-            <a href="#/report" className="proof-link">
+            <a href="/report" className="proof-link">
               Open the report <ArrowRightIcon size={14} />
             </a>
           </div>
@@ -156,14 +156,14 @@ export function LabPage() {
               Seven laws for agents that move money. Each crash breaks one of them.
             </p>
           </div>
-          <a href="#/scenarios" className="proof-link">
+          <a href="/scenarios" className="proof-link">
             All {SCENARIOS.length} scenarios <ArrowRightIcon size={14} />
           </a>
         </div>
         <ol className="law-list">
           {([1, 2, 3, 4, 5, 6, 7] as Law[]).map((law) => (
             <li key={law}>
-              <a href={`#/scenarios?law=${law}`} className="law-row">
+              <a href={`/scenarios?law=${law}`} className="law-row">
                 <span className="law-row-num">{law}</span>
                 <span className="law-row-name">{LAW_NAMES[law]}</span>
                 <span className="law-row-text">{LAW_SENTENCES[law]}</span>
@@ -254,7 +254,7 @@ export function LabPage() {
             </p>
           </div>
           <div className="cta-actions">
-            <LinkButton href="#/replay/token-metadata-injection" variant="primary" size="lg">
+            <LinkButton href="/replay/token-metadata-injection" variant="primary" size="lg">
               Watch that crash <ArrowRightIcon size={16} />
             </LinkButton>
           </div>

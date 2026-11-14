@@ -5,7 +5,8 @@ without a wallet, an account, a database or any API keys.
 
 ## What runs where
 
-- **Static app:** `apps/web/dist`. Hash routing means no rewrite rules.
+- **Static app:** `apps/web/dist`. Routes are real paths (`/report`, `/replay/<id>`), so the host must
+  serve `index.html` for unknown paths. `vercel.json` already does; see "Single page app fallback" below.
 - **API:** `packages/server/src/api.ts` exports `createApiApp()`, a Hono app mounted at `/api`. It
   handles wallet sessions and saved runs.
 - **Local demo:** `scripts/demo.ts` serves the static app and proxies `/api` to a second port on
@@ -127,6 +128,19 @@ To run wallet connect and saved runs in production, serve the static app and the
 `scripts/demo.ts` is a local demo, not a production server. It binds to `127.0.0.1` and has no TLS,
 process supervision or hardening for public traffic. Use it as the reference for the two-port split,
 not as the deployment itself.
+
+## Single page app fallback
+
+The app uses clean paths, so opening `/report` directly must return `index.html` and let the app route.
+
+| Host | What to do |
+| --- | --- |
+| Vercel | Nothing. `vercel.json` has a rewrite of every path to `/index.html`; real files still win. |
+| Cloudflare Pages | Nothing. A project without a top-level `404.html` is treated as a single page app. |
+| GitHub Pages | Copy `index.html` to `404.html` in the published folder. Pages serves it for unknown paths. |
+| `pnpm demo` | Nothing. The demo server falls back to `index.html`. |
+
+An old `/#/report` address is rewritten to `/report` on load, so early bookmarks still work.
 
 ## Project domain
 

@@ -6,7 +6,7 @@ import { PREVIEW_URL, chromePath } from './preview';
  * Above-the-fold check on real device viewports (CSS pixels, browser chrome excluded).
  * Writes artifacts/devices/<route>-<device>.png, one viewport-sized shot each, and reports
  * whether the primary call to action is visible without scrolling.
- *   tsx scripts/ui-devices.ts [route-hash]
+ *   tsx scripts/ui-devices.ts [route]
  */
 const DEVICES = [
   { name: 'phone-small', width: 360, height: 640 },
@@ -21,8 +21,8 @@ const DEVICES = [
   { name: 'desktop-qhd', width: 2560, height: 1300 },
 ];
 
-const hash = process.argv[2] ?? '#/';
-const name = hash.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'lab';
+const route = (process.argv[2] ?? '').replace(/^#?\/*/, '');
+const name = route.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'lab';
 mkdirSync('artifacts/devices', { recursive: true });
 
 const browser = await chromium.launch({ executablePath: chromePath(), headless: true });
@@ -33,7 +33,7 @@ for (const device of DEVICES) {
     reducedMotion: 'reduce',
   });
   const page = await context.newPage();
-  await page.goto(`${PREVIEW_URL}${hash}`, { waitUntil: 'networkidle' });
+  await page.goto(`${PREVIEW_URL}${route}`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(250);
   const fold = await page.evaluate(() => {
     const cta = document.querySelector<HTMLElement>('.landing-actions .btn, .page-head ~ * .crash-button');

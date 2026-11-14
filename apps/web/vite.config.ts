@@ -5,7 +5,7 @@ import { fileURLToPath, URL } from 'node:url';
 const r = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [react()],
   resolve: {
     alias: {

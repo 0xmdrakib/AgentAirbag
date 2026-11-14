@@ -12,12 +12,12 @@ import { settle } from './settle';
  */
 const WIDTHS = [360, 390, 768, 1024, 1280, 1440, 1920];
 const ROUTES = [
-  { name: 'lab', hash: '#/' },
-  { name: 'run', hash: '#/run' },
-  { name: 'report', hash: '#/report' },
-  { name: 'replay', hash: '#/replay/timeout-after-transfer' },
-  { name: 'scenarios', hash: '#/scenarios' },
-  { name: 'connect', hash: '#/connect' },
+  { name: 'lab', path: '' },
+  { name: 'run', path: 'run' },
+  { name: 'report', path: 'report' },
+  { name: 'replay', path: 'replay/timeout-after-transfer' },
+  { name: 'scenarios', path: 'scenarios' },
+  { name: 'connect', path: 'connect' },
 ];
 const themes = ['light']; // the UI ships a single light theme
 const shots = process.env.AUDIT_SHOTS !== '0';
@@ -38,7 +38,7 @@ for (const theme of themes) {
   for (const width of WIDTHS) {
     await page.setViewportSize({ width, height: width < 700 ? 844 : 900 });
     for (const route of ROUTES) {
-      await page.goto(`${PREVIEW_URL}${route.hash}`, { waitUntil: 'networkidle' });
+      await page.goto(`${PREVIEW_URL}${route.path}`, { waitUntil: 'networkidle' });
       await page.waitForTimeout(250);
       const result = await page.evaluate(() => {
         const doc = document.documentElement;
@@ -100,14 +100,14 @@ for (const theme of themes) {
 {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
-  await page.goto(`${PREVIEW_URL}#/`, { waitUntil: 'networkidle' });
+  await page.goto(`${PREVIEW_URL}`, { waitUntil: 'networkidle' });
   const navHidden = !(await page.locator('#primary-nav').isVisible());
   if (!navHidden) problems.push('menu: nav should be collapsed on mobile');
   await page.getByRole('button', { name: 'Open menu' }).click();
   if (!(await page.locator('#primary-nav').isVisible())) problems.push('menu: did not open');
   await page.locator('#primary-nav').getByRole('link', { name: 'Report', exact: true }).click();
   await page.waitForTimeout(200);
-  if (!page.url().endsWith('#/report')) problems.push(`menu: Report link went to ${page.url()}`);
+  if (!page.url().endsWith('/report')) problems.push(`menu: Report link went to ${page.url()}`);
   if (await page.locator('#primary-nav').isVisible()) problems.push('menu: did not close after navigation');
 
   // Light only: there must be no theme toggle left in the header.
@@ -121,7 +121,7 @@ for (const theme of themes) {
 {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
-  await page.goto(`${PREVIEW_URL}#/`, { waitUntil: 'networkidle' });
+  await page.goto(`${PREVIEW_URL}`, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: /Connect a NEAR wallet/ }).click();
   await page.waitForSelector('.wallet-picker-row', { timeout: 10_000 }).catch(() => undefined);
   const rows = await page.locator('.wallet-picker-row').count();

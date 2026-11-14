@@ -251,7 +251,7 @@ server.listen(port, '127.0.0.1', async () => {
   }
 
   const base = `http://localhost:${port}`;
-  const reportUrl = `${base}/#/report`;
+  const reportUrl = `${base}/report`;
   console.log(`\nAirbag is ready at ${base}`);
   console.log(`Report card: ${reportUrl}`);
   console.log(

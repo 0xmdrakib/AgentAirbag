@@ -6,6 +6,7 @@ import { ScenarioCells } from '../components/ScenarioBoard';
 import { Button, Chip, CopyButton, LinkButton, VerdictPill } from '../components/Primitives';
 import { ArrowRightIcon, PlayIcon, ShieldIcon } from '../components/Icons';
 import { cx } from '../lib/format';
+import { navigate } from '../lib/router';
 
 type Pick = AgentId | 'llm' | 'byo';
 
@@ -47,7 +48,7 @@ export function RunnerPage() {
   };
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.split('?')[1] ?? '');
+    const params = new URLSearchParams(window.location.search);
     const auto = params.get('auto');
     if ((auto === 'naive' || auto === 'hardened') && !started.current) {
       started.current = true;
@@ -140,7 +141,7 @@ export function RunnerPage() {
               ) : (
                 <>
                   <strong>Bring your own agent.</strong> Your own agent runs use the local CLI or sandbox.
-                  <LinkButton href="#/connect" size="sm" variant="ghost">
+                  <LinkButton href="/connect" size="sm" variant="ghost">
                     See the three steps <ArrowRightIcon size={14} />
                   </LinkButton>
                 </>
@@ -195,7 +196,7 @@ export function RunnerPage() {
             results={results}
             animate={Boolean(running)}
             onSelect={(id) => {
-              window.location.hash = `#/replay/${id}`;
+              navigate(`/replay/${id}`);
             }}
           />
           <div className="run-foot">
@@ -207,7 +208,7 @@ export function RunnerPage() {
             </div>
             {finished && currentReport && (
               <a
-                href="#/report"
+                href="/report"
                 className="btn btn-primary btn-md"
                 ref={reportRef}
               >

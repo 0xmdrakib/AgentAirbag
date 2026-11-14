@@ -11,7 +11,7 @@ page.on('pageerror', (error) => errors.push(error.message));
 page.on('console', (message) => {
   if (message.type() === 'error') errors.push(message.text());
 });
-await page.goto(`${PREVIEW_URL}#/run`, { waitUntil: 'networkidle' });
+await page.goto(`${PREVIEW_URL}run`, { waitUntil: 'networkidle' });
 await page.getByLabel('Suite seed').fill('seed-check-42');
 await page.getByRole('button', { name: 'Run the suite', exact: true }).click();
 await page.waitForSelector('.cell-fail', { timeout: 20_000 });

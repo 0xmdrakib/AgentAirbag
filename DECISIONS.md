@@ -202,6 +202,16 @@ HERE and Coin98 were tested and removed because one of them crashed the selector
 picker hides modules that the selector does not expose. WalletConnect needs a project id and Ledger
 needs hardware, so both are out of scope for this build.
 
+## Clean URLs instead of hash routing
+
+**The app now uses the History API.** This replaces the earlier hash routing decision. Links read
+`/report` and `/replay/<id>` instead of `/#/report`. Alternatives: keep hash routing. Reason: the hash
+made every shared link look unfinished, and the only cost of clean paths is one host rule, serve
+`index.html` for unknown paths, which Vercel, Cloudflare Pages and the demo server already provide
+(GitHub Pages needs a `404.html` copy). A click handler turns plain `<a href="/path">` into client
+navigation, anchors such as `#main` still scroll natively, and an old `/#/report` address is rewritten
+on load. Vite's `base` is now `/`.
+
 ## Wallet picker and provider list
 
 **The hand written Buffer shim was the reason most wallet modules failed.** It lacked

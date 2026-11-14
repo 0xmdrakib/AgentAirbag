@@ -5,9 +5,9 @@ import { ArrowUpIcon, MenuIcon, XIcon } from './Icons';
 import { WalletButton } from './WalletButton';
 
 const NAV = [
-  { href: '#/report', label: 'Report', path: '/report' },
-  { href: '#/scenarios', label: 'Scenarios', path: '/scenarios' },
-  { href: '#/connect', label: 'Test your agent', path: '/connect' },
+  { href: '/report', label: 'Report', path: '/report' },
+  { href: '/scenarios', label: 'Scenarios', path: '/scenarios' },
+  { href: '/connect', label: 'Test your agent', path: '/connect' },
 ];
 
 export function Layout({ route, children }: { route: string; children: ReactNode }) {
@@ -37,7 +37,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
       </a>
       <header className="app-header">
         <div className="container header-inner">
-          <a href="#/" className="brand" aria-label="Agent Airbag home">
+          <a href="/" className="brand" aria-label="Agent Airbag home">
             <MarkerLogo size={28} />
             <span className="wordmark">Agent Airbag</span>
           </a>
@@ -59,7 +59,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
           </nav>
           <div className="header-right">
             <a
-              href={route === '/run' ? '#run-start' : '#/run'}
+              href={route === '/run' ? '#run-start' : '/run'}
               className="btn btn-primary btn-sm header-cta"
             >
               {route === '/run' ? 'Start a run' : 'Run the suite'}
@@ -85,7 +85,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
       <footer className="app-footer">
         <div className="container footer-main">
           <div className="footer-brand-col">
-            <a href="#/" className="footer-brand" aria-label="Agent Airbag home">
+            <a href="/" className="footer-brand" aria-label="Agent Airbag home">
               <MarkerLogo size={22} />
               <span className="wordmark">Agent Airbag</span>
             </a>
@@ -95,10 +95,10 @@ export function Layout({ route, children }: { route: string; children: ReactNode
             </p>
           </div>
           <nav className="footer-links" aria-label="Footer">
-            <a href="#/run">Run the suite</a>
-            <a href="#/report">Report</a>
-            <a href="#/scenarios">Scenarios</a>
-            <a href="#/connect">Test your agent</a>
+            <a href="/run">Run the suite</a>
+            <a href="/report">Report</a>
+            <a href="/scenarios">Scenarios</a>
+            <a href="/connect">Test your agent</a>
           </nav>
         </div>
         <div className="container footer-bottom">

@@ -34,6 +34,7 @@ import {
   SparkIcon,
 } from '../components/Icons';
 import { cx } from '../lib/format';
+import { navigate } from '../lib/router';
 
 export function ReportPage() {
   const { activeReport, reports, shareError, sharedReport, showToast, setActiveAgent, setShared } =
@@ -49,7 +50,7 @@ export function ReportPage() {
           body="The compressed report did not survive the trip. Run the suite again and copy a fresh link."
         />
         <div className="center-actions">
-          <LinkButton href="#/run" variant="primary">
+          <LinkButton href="/run" variant="primary">
             Run the suite again
           </LinkButton>
         </div>
@@ -64,7 +65,7 @@ export function ReportPage() {
           title="No runs yet"
           body="Pick an agent and press Crash. The report card is generated from ledger truth."
           action={
-            <LinkButton href="#/run" variant="primary">
+            <LinkButton href="/run" variant="primary">
               Open the runner
             </LinkButton>
           }
@@ -77,7 +78,7 @@ export function ReportPage() {
   const total = report.overall.passed + report.overall.warned + report.overall.failed;
 
   const share = async () => {
-    const url = `${window.location.origin}${window.location.pathname}#/report?d=${encodeReport(report)}`;
+    const url = `${window.location.origin}/report?d=${encodeReport(report)}`;
     try {
       await navigator.clipboard.writeText(url);
       showToast('Share link copied. It contains the report, not the event log.');
@@ -114,7 +115,7 @@ export function ReportPage() {
             className="shared-banner-button"
             onClick={() => {
               setShared(null);
-              window.location.hash = '#/report';
+              navigate('/report');
             }}
           >
             Use my latest report
@@ -255,7 +256,7 @@ export function ReportPage() {
                       <a
                         key={scenario.id}
                         className={cx('law-scenario-pill', `pill-${scenario.verdict.toLowerCase()}`)}
-                        href={`#/replay/${scenario.id}`}
+                        href={`/replay/${scenario.id}`}
                       >
                         <span className={cx('pill-dot', `dot-${scenario.verdict.toLowerCase()}`)} />
                         {scenario.title}
@@ -280,7 +281,7 @@ export function ReportPage() {
           }
           right={
             failures.length ? (
-              <LinkButton href="#/scenarios" variant="ghost" size="sm">
+              <LinkButton href="/scenarios" variant="ghost" size="sm">
                 See all {SCENARIOS.length} crashes <ArrowRightIcon size={14} />
               </LinkButton>
             ) : undefined
@@ -350,7 +351,7 @@ export function ReportPage() {
                       onClick={() => {
                         setActiveAgent(row.agent.id === 'hardened' ? 'hardened' : 'naive');
                         setShared(null);
-                        window.location.hash = '#/report';
+                        navigate('/report');
                       }}
                     >
                       view
@@ -446,7 +447,7 @@ function FailureCard({ result }: { result: ScenarioResult }) {
         </p>
       )}
       <div className="failure-actions">
-        <a href={`#/replay/${result.id}`} className="failure-watch">
+        <a href={`/replay/${result.id}`} className="failure-watch">
           Watch the crash <ArrowRightIcon size={14} />
         </a>
       </div>

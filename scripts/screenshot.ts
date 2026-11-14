@@ -13,16 +13,16 @@ mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: chromePath(), headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 
-const desktop: { name: string; hash: string }[] = [
-  { name: 'lab', hash: '#/' },
-  { name: 'report-card', hash: '#/report' },
-  { name: 'replay', hash: '#/replay/timeout-after-transfer' },
-  { name: 'scenarios', hash: '#/scenarios' },
-  { name: 'connect', hash: '#/connect' },
+const desktop: { name: string; path: string }[] = [
+  { name: 'lab', path: '' },
+  { name: 'report-card', path: 'report' },
+  { name: 'replay', path: 'replay/timeout-after-transfer' },
+  { name: 'scenarios', path: 'scenarios' },
+  { name: 'connect', path: 'connect' },
 ];
 
 for (const shot of desktop) {
-  await page.goto(`${PREVIEW_URL}${shot.hash}`, { waitUntil: 'networkidle' });
+  await page.goto(`${PREVIEW_URL}${shot.path}`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(400);
   await settle(page);
   await page.screenshot({ path: `${out}/${shot.name}.png`, fullPage: false });
@@ -30,7 +30,7 @@ for (const shot of desktop) {
 }
 
 await page.setViewportSize({ width: 390, height: 844 });
-await page.goto(`${PREVIEW_URL}#/report`, { waitUntil: 'networkidle' });
+await page.goto(`${PREVIEW_URL}report`, { waitUntil: 'networkidle' });
 await page.waitForTimeout(600);
 await settle(page);
 await page.screenshot({ path: `${out}/report-card-mobile.png`, fullPage: false });

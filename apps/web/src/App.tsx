@@ -3,6 +3,7 @@ import { Layout } from './components/Layout';
 import { AppStateProvider, useAppState } from './state/AppState';
 import { WalletProvider } from './wallet/WalletProvider';
 import { decodeReport } from './lib/share';
+import { interceptLinks, onNavigate, routeKey, upgradeLegacyHash } from './lib/router';
 import { LabPage } from './pages/LabPage';
 import { RunnerPage } from './pages/RunnerPage';
 import { ConnectPage } from './pages/ConnectPage';
@@ -22,14 +23,15 @@ export interface RouteInfo {
   replayId?: string;
 }
 
+upgradeLegacyHash();
+
 function readRoute(): RouteInfo {
-  const raw = window.location.hash.replace(/^#/, '') || '/';
-  const [pathPart, queryPart] = raw.split('?') as [string, string?];
-  const path = pathPart || '/';
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  const query = new URLSearchParams(window.location.search);
   if (path.startsWith('/replay/')) {
-    return { path: '/replay', replayId: decodeURIComponent(path.slice('/replay/'.length)), query: new URLSearchParams(queryPart ?? '') };
+    return { path: '/replay', replayId: decodeURIComponent(path.slice('/replay/'.length)), query };
   }
-  return { path, query: new URLSearchParams(queryPart ?? '') };
+  return { path, query };
 }
 
 function AppInner() {
@@ -39,24 +41,29 @@ function AppInner() {
   useSectionSpy(route.path);
 
   useEffect(() => {
-    const onHash = () => {
-      const rawHash = window.location.hash.replace(/^#/, '');
-      // In-page anchors (#main, #report-shape) are not routes. Scroll to them and keep the page.
-      if (rawHash && !rawHash.startsWith('/')) {
-        const target = document.getElementById(rawHash);
+    let lastKey = routeKey();
+    const removeLinks = interceptLinks();
+    const removeNavigate = onNavigate(() => {
+      const key = routeKey();
+      if (key === lastKey) {
+        // Same path and query: an in-page anchor (#main, #report-shape), not a route change.
+        const id = window.location.hash.replace(/^#/, '');
+        const target = id ? document.getElementById(id) : null;
         if (target) {
           target.scrollIntoView({ block: 'start' });
           target.setAttribute('tabindex', '-1');
-          (target as HTMLElement).focus({ preventScroll: true });
-          return;
+          target.focus({ preventScroll: true });
         }
+        return;
       }
-      const next = readRoute();
-      setRoute(next);
+      lastKey = key;
+      setRoute(readRoute());
       window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    });
+    return () => {
+      removeLinks();
+      removeNavigate();
     };
-    window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
   useEffect(() => {
