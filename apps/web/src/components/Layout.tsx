@@ -103,7 +103,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
           </div>
         </div>
         <div className="container footer-bottom">
-          <span>Built at NEAR HACKATHON</span>
+          <span>Built on NEAR</span>
           <span className="mono">MIT licensed</span>
         </div>
       </footer>

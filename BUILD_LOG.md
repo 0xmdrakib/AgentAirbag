@@ -116,3 +116,6 @@ refund fee. Tags: `pre-hackathon` (first commit) and `hackathon-submission` (cur
 
 **2026-11-14 (hero, law accordion, header).** Rebuilt the Report law list as an accordion (name, law number and survived count, score, SVG chevron, thin score line) replacing the text glyph chevron and crowded pip/bar row. Rebuilt the Lab hero copy: brand kicker, shorter subhead, and a three-fact row. Removed the header Simulation chip at the owner's request; simulated labels stay on every figure and in the footer.
 
+
+**2026-11-14 (fluid sizing).** Owner reported the UI did not adapt across PCs, laptops, mini PCs and phones. Added fluid type, gutters and section rhythm that scale with viewport width and height; a compact hero card on short desktop screens; a compact Runner sidebar so Crash stays on the first screen; grade beside the headline on phone report cards; a one-row sticky replay player on phones; a sideways-scrolling law filter row. New pnpm ui:devices checks the first screen on 10 real viewports (360x640 to 2560x1300): primary action above the fold and no overflow on all of them. Footer now reads Built on NEAR.
+

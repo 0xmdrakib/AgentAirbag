@@ -5629,3 +5629,271 @@ pre,
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Fluid sizing ----------
+   Type, gutters and vertical rhythm scale with the viewport's width and height, so a phone,
+   a 1366x768 laptop, a 1536x864 laptop at 125%, a 1024x600 mini PC and a 2560 monitor each
+   get a composed first screen instead of fixed pixel sizes. Last in the file on purpose. */
+
+:root {
+  --gutter: clamp(16px, 3.2vw + 4px, 56px);
+  --section-gap: clamp(72px, 6vw + 40px, 136px);
+}
+
+.container {
+  width: min(100% - 2 * var(--gutter), var(--max));
+}
+
+.page {
+  padding-top: clamp(28px, 3vh + 16px, 72px);
+}
+
+.section {
+  margin-top: var(--section-gap);
+}
+
+.app-footer {
+  margin-top: var(--section-gap);
+}
+
+.display {
+  font-size: clamp(34px, min(4.4vw + 10px, 6.6vh + 14px), 76px);
+}
+
+.h1 {
+  font-size: clamp(28px, 1.8vw + 16px, 46px);
+}
+
+.h2 {
+  font-size: clamp(22px, 1vw + 15px, 32px);
+}
+
+.page-sub,
+.section-sub {
+  font-size: clamp(16px, 0.25vw + 14px, 18px);
+}
+
+.hero {
+  gap: clamp(28px, 5vw, 88px);
+  padding-top: clamp(4px, 2.5vh, 36px);
+}
+
+.hero-kicker {
+  margin-bottom: clamp(12px, 2.2vh, 24px);
+}
+
+.hero-sub {
+  margin-top: clamp(14px, 2.4vh, 26px);
+  font-size: clamp(16px, 0.35vw + 13.5px, 19px);
+}
+
+.hero-actions {
+  margin-top: clamp(20px, 3.4vh, 36px);
+}
+
+.hero-facts {
+  margin-top: clamp(24px, 4.4vh, 48px);
+  padding-top: clamp(16px, 2.4vh, 24px);
+}
+
+.results-strip {
+  margin-top: clamp(56px, 7vh + 16px, 104px);
+}
+
+/* Short desktop screens: laptops with display scaling and mini PCs. Compress the hero card so the
+   headline, the actions and the demo all fit in the first screen. */
+@media (min-width: 981px) and (max-height: 860px) {
+  .hero {
+    align-items: start;
+  }
+  .hero-crash {
+    padding: 16px 18px;
+  }
+  .hero-crash-bar {
+    padding-bottom: 12px;
+  }
+  .hero-steps {
+    margin: 14px 0 4px;
+  }
+  .hero-caption {
+    min-height: 0;
+    margin: 10px 0 12px;
+    font-size: 20px;
+  }
+  .hero-ledger {
+    padding: 12px 14px;
+  }
+  .hero-ledger-value {
+    font-size: 30px;
+  }
+  .hero-flow {
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .hero-flow-row {
+    padding: 8px 12px;
+  }
+  .hero-loss-row {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  .hero-caption-foot {
+    display: none;
+  }
+}
+
+@media (min-width: 981px) and (max-height: 680px) {
+  .hero-flow {
+    display: none;
+  }
+}
+
+/* Large monitors: a wider canvas and a touch more type, not a narrow strip in the middle. */
+@media (min-width: 1700px) {
+  :root {
+    --max: 1400px;
+  }
+}
+
+@media (min-width: 2200px) {
+  :root {
+    --max: 1560px;
+  }
+  body {
+    font-size: 18px;
+  }
+}
+
+/* Short screens: keep the Runner's Crash button on the first screen. */
+@media (max-height: 860px) {
+  .page-run .page-head {
+    margin-bottom: 28px;
+  }
+  .page-run .page-sub {
+    margin-top: 10px;
+  }
+  .agent-picker {
+    gap: 2px;
+    margin-top: 8px;
+  }
+  .agent-option {
+    min-height: 50px;
+    padding: 6px 10px;
+  }
+  .agent-option-mark {
+    width: 32px;
+    height: 32px;
+  }
+  .crash-button {
+    margin-top: 12px;
+  }
+}
+
+/* Phones: the report hero leads with the grade beside the headline, not on its own row. */
+@media (max-width: 640px) {
+  .report-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 16px;
+    row-gap: 18px;
+    align-items: start;
+  }
+  .report-hero-copy {
+    display: contents;
+  }
+  .report-hero-copy .eyebrow {
+    grid-column: 2;
+    align-self: center;
+    margin: 0;
+  }
+  .report-hero-copy .h1 {
+    grid-column: 1 / -1;
+  }
+  .report-hero-copy .report-hero-meta {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+  .grade-lg {
+    width: 72px;
+    height: 72px;
+  }
+  .grade-lg .grade-letter {
+    margin-top: 0;
+    font-size: 38px;
+  }
+  .grade-lg .grade-caption {
+    display: none;
+  }
+  .report-stats {
+    gap: 8px;
+  }
+  .report-stats .stat {
+    padding: 14px 16px;
+  }
+  .report-stats .stat-value {
+    font-size: 22px;
+  }
+}
+
+/* Phones: the sticky replay player stays one compact row plus the timeline. */
+@media (max-width: 640px) {
+  .scrubber {
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  }
+  .scrubber-controls {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .scrub-play {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+  }
+  .scrubber-controls .btn-sm {
+    padding: 0 8px;
+  }
+  .speed-btn {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 0 6px;
+  }
+  .scrub-time {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .timeline-wrap {
+    margin: 8px 4px 2px;
+  }
+}
+
+@media (max-width: 440px) {
+  .speed-group {
+    display: none;
+  }
+}
+
+/* Law filters: one row that scrolls sideways instead of orphaning a chip on a second line. */
+.filter-chips {
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: -4px;
+  padding: 4px;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+}
+
+.filter-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chip {
+  flex: 0 0 auto;
+}
+
+@media (min-width: 1180px) {
+  .filter-chips {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}

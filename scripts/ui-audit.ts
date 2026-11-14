@@ -61,7 +61,7 @@ for (const theme of themes) {
             if (visible && parseFloat(style.fontSize) < 12) {
               small.push(`${style.fontSize} "${text.slice(0, 32)}"`);
             }
-            if (visible && box.right > doc.clientWidth + 1 && !el.closest('pre, .timeline-wrap, .drawer, .code-line, .trace-list, .compare-table-wrap')) {
+            if (visible && box.right > doc.clientWidth + 1 && !el.closest('pre, .timeline-wrap, .drawer, .code-line, .trace-list, .compare-table-wrap, .filter-chips')) {
               clipped.push(`"${text.slice(0, 32)}" right=${Math.round(box.right)}`);
             }
           }

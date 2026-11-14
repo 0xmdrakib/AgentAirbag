@@ -45,6 +45,7 @@ pnpm ui:share         # share link round-trip, Dummy -> Seatbelt toggle, auto-ru
 pnpm ui:seed          # custom seed -> report card shows it
 pnpm ui:audit         # 6 routes x 7 widths (360..1920): overflow, text <12px, tap targets, mobile menu
 pnpm ui:sheet '#/report' 390 4          # slice a long page side by side to read it at full size
+pnpm ui:devices '#/run'                 # first screen on 10 real viewports (phones, 1024x600, 1366x660 ... 2560)
 ```
 
 The scripts use `CHROME_PATH` if set, otherwise a local Chrome/Edge path; `AIRBAG_PREVIEW_URL`
