@@ -73,11 +73,13 @@ database. See [Wallet and database](#wallet-and-database).
 
 ### Wallet and database
 
-Wallet connect and saving runs are optional. `pnpm demo` serves the API under `/api` on the same
-origin when the API module is present; if it is not bundled, the demo prints one line and keeps the
-static simulator running. Without `DATABASE_URL` the API uses a local JSON store. To use Neon, set
-`DATABASE_URL` and run `pnpm db:migrate` once. Setup, the exact environment variables and the deploy
-limits are in [docs/DEPLOY.md](docs/DEPLOY.md). The simulator works without either path.
+Wallet connect and saving runs are optional. The connect dialog lists MyNearWallet, Sender, OKX
+Wallet and Nightly; Bitget appears when its browser extension is installed. `pnpm demo` serves the
+API under `/api` on the same origin when the API module is present; if it is not bundled, the demo
+prints one line and keeps the static simulator running. Without `DATABASE_URL` the API uses a local
+JSON store. To use Neon, set `DATABASE_URL` and run `pnpm db:migrate` once. Setup, the exact
+environment variables and the deploy limits are in [docs/DEPLOY.md](docs/DEPLOY.md). The simulator
+works without either path.
 
 `pnpm build` writes the static build to `apps/web/dist`. It is ready for Vercel, Cloudflare Pages or
 GitHub Pages, but **no hosting account was available in this build window, so there is no hosted URL

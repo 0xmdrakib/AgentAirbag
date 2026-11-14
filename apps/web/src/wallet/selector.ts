@@ -33,12 +33,22 @@ export function loadWallet(): Promise<WalletSetup> {
       import('@near-wallet-selector/core'),
       import('@near-wallet-selector/modal-ui'),
       import('@near-wallet-selector/my-near-wallet'),
+      import('@near-wallet-selector/sender'),
+      import('@near-wallet-selector/okx-wallet'),
+      import('@near-wallet-selector/bitget-wallet'),
+      import('@near-wallet-selector/nightly'),
     ])
-      .then(([core, modalUi, myNearWallet]) =>
+      .then(([core, modalUi, myNearWallet, sender, okx, bitget, nightly]) =>
         core
           .setupWalletSelector({
             network: nearNetwork,
-            modules: [myNearWallet.setupMyNearWallet()],
+            modules: [
+              myNearWallet.setupMyNearWallet(),
+              sender.setupSender(),
+              okx.setupOKXWallet(),
+              bitget.setupBitgetWallet(),
+              nightly.setupNightly(),
+            ],
           })
           .then((selector) => {
             const modal = modalUi.setupModal(selector, {

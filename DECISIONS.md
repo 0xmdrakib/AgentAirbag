@@ -188,3 +188,16 @@ The report body is capped at 512 KB.
 **Known limit:** signature verification proves key possession, not that the key is currently a
 full-access key of the claimed account, because the API does not call NEAR RPC. A production deploy
 should add that RPC check; it is listed in docs/DEPLOY.md.
+
+## Icons and wallet providers
+
+**One icon family: Lucide.** The hand-drawn SVGs read as inconsistent weights and odd shapes, and the
+wallet glyph in particular looked like a card. Every icon now comes from `lucide-react` (MIT, 24px
+grid, 1.75 stroke) through thin wrappers in `components/Icons.tsx`, so export names and call sites did
+not change. The brand mark stays custom.
+
+**Wallet providers.** Only modules that work without an API key or project id are registered:
+MyNearWallet, Sender, OKX Wallet and Nightly, plus Bitget when its extension is present. Meteor,
+HERE and Coin98 were tested and removed because one of them crashed the selector at open time; the
+picker hides modules that the selector does not expose. WalletConnect needs a project id and Ledger
+needs hardware, so both are out of scope for this build.

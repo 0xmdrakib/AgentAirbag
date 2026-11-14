@@ -178,11 +178,6 @@ export function SaveRun({ report }: { report: RunReport }) {
           )}
           {status === 'connecting' ? 'Connecting' : 'Connect to save'}
         </button>
-        {walletError && (
-          <p className="wallet-save-error" role="alert">
-            {walletError}
-          </p>
-        )}
       </div>
     );
   }

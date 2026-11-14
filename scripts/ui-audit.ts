@@ -117,6 +117,29 @@ for (const theme of themes) {
   await context.close();
 }
 
+// Wallet picker: opens from the header, lists the primary wallets, expands, and closes.
+{
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  await page.goto(`${PREVIEW_URL}#/`, { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: /Connect a NEAR wallet/ }).click();
+  await page.waitForSelector('.wallet-picker-row', { timeout: 10_000 }).catch(() => undefined);
+  const rows = await page.locator('.wallet-picker-row').count();
+  if (rows < 3) problems.push(`wallet picker: expected at least 3 primary wallets, saw ${rows}`);
+  if (!(await page.locator('.wallet-picker-more').isVisible().catch(() => false))) {
+    problems.push('wallet picker: More wallets is missing');
+  } else {
+    await page.locator('.wallet-picker-more').click();
+    await page.waitForTimeout(200);
+    const expanded = await page.locator('.wallet-picker-row').count();
+    if (expanded <= rows) problems.push('wallet picker: More wallets did not reveal another wallet');
+  }
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+  if ((await page.locator('.wallet-picker').count()) > 0) problems.push('wallet picker: Escape did not close it');
+  await context.close();
+}
+
 await browser.close();
 if (problems.length) {
   console.log(`${problems.length} problem(s):`);

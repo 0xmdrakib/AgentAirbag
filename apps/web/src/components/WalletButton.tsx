@@ -50,16 +50,8 @@ async function copyText(value: string): Promise<boolean> {
 }
 
 export function WalletButton({ compactLabel = 'Connect', className }: WalletButtonProps) {
-  const {
-    status,
-    accountId,
-    error,
-    connect,
-    disconnect,
-    refresh,
-    clearError,
-    openRuns,
-  } = useWallet();
+  const { status, accountId, error, disconnect, refresh, clearError, openRuns, openPicker } =
+    useWallet();
 
   const [open, setOpen] = useState(false);
   const [copyState, setCopyState] = useState<CopyState>('idle');
@@ -101,9 +93,7 @@ export function WalletButton({ compactLabel = 'Connect', className }: WalletButt
 
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('pointerdown', onPointerDown);
-    popoverRef.current
-      ?.querySelector<HTMLElement>('button:not([disabled]), a[href]')
-      ?.focus();
+    popoverRef.current?.querySelector<HTMLElement>('button:not([disabled]), a[href]')?.focus();
 
     return () => {
       document.removeEventListener('keydown', onKeyDown);
@@ -117,6 +107,12 @@ export function WalletButton({ compactLabel = 'Connect', className }: WalletButt
     },
     [],
   );
+
+  useEffect(() => {
+    if (!error) return undefined;
+    const timer = window.setTimeout(() => clearError(), 7000);
+    return () => window.clearTimeout(timer);
+  }, [error, clearError]);
 
   const handleCopy = async () => {
     if (!accountId) return;
@@ -167,16 +163,12 @@ export function WalletButton({ compactLabel = 'Connect', className }: WalletButt
         aria-busy={busy || undefined}
         aria-label={ariaLabel}
         aria-expanded={connected ? open : undefined}
-        aria-haspopup={connected ? 'dialog' : undefined}
+        aria-haspopup={busy || unavailable ? undefined : 'dialog'}
         aria-controls={connected && open ? popoverId : undefined}
-        title={
-          unavailable
-            ? 'Saving needs the Airbag API. The simulator still works.'
-            : undefined
-        }
+        title={unavailable ? 'Saving needs the Airbag API. The simulator still works.' : undefined}
         onClick={() => {
           if (connected) setOpen((value) => !value);
-          else void connect();
+          else openPicker(triggerRef.current);
         }}
       >
         {connected && accountId ? (
@@ -206,27 +198,21 @@ export function WalletButton({ compactLabel = 'Connect', className }: WalletButt
       </button>
 
       {error && (
-        <div className="wallet-error" role="alert">
-          <span className="wallet-error-text">{error}</span>
-          <div className="wallet-error-actions">
-            {unavailable && (
-              <button
-                type="button"
-                className="wallet-error-action"
-                onClick={() => void refresh()}
-              >
-                Retry
-              </button>
-            )}
-            <button
-              type="button"
-              className="wallet-error-dismiss"
-              onClick={clearError}
-              aria-label="Dismiss wallet message"
-            >
-              <XIcon size={14} />
+        <div className="wallet-toast" role="alert">
+          <span className="wallet-toast-text">{error}</span>
+          {unavailable && (
+            <button type="button" className="wallet-toast-action" onClick={() => void refresh()}>
+              Retry
             </button>
-          </div>
+          )}
+          <button
+            type="button"
+            className="wallet-toast-close"
+            onClick={clearError}
+            aria-label="Dismiss wallet message"
+          >
+            <XIcon size={14} />
+          </button>
         </div>
       )}
 
