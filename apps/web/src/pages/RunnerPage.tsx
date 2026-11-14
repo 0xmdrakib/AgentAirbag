@@ -221,8 +221,9 @@ export function RunnerPage() {
       <div className="run-terminal">
         <span>Same suite from a terminal</span>
         <div className="code-line">
-          <span className="mono code-prompt">$</span>
-          <code className="mono">pnpm airbag run --agent naive</code>
+          <code className="mono">
+            <span className="code-prompt">$</span> pnpm airbag run --agent naive
+          </code>
           <CopyButton value="pnpm airbag run --agent naive" />
         </div>
       </div>

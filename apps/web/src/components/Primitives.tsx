@@ -128,9 +128,14 @@ export function CopyButton({
     window.setTimeout(() => setCopied(false), 1600);
   };
   return (
-    <button type="button" className={cx('copy-button', className)} onClick={copy}>
+    <button
+      type="button"
+      className={cx('copy-button', className)}
+      onClick={copy}
+      aria-label={copied ? 'Copied' : label}
+    >
       {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
-      {copied ? 'Copied' : label}
+      <span className="copy-label-text">{copied ? 'Copied' : label}</span>
     </button>
   );
 }

@@ -47,7 +47,8 @@ export function LabPage() {
 
   return (
     <div className="page page-lab">
-      <section className="landing-hero container">
+      <div className="landing-top container">
+        <section className="landing-hero">
         <p className="landing-kicker">
           <MarkerLogo size={16} />
           Crash-test lab for NEAR Intents agents
@@ -83,7 +84,7 @@ export function LabPage() {
         </dl>
       </section>
 
-      <section className="container landing-proof" data-reveal aria-labelledby="proof-title">
+      <section className="landing-proof" data-reveal aria-labelledby="proof-title">
         <div className="proof-panel">
           <div className="proof-head">
             <h2 className="proof-title" id="proof-title">
@@ -128,6 +129,7 @@ export function LabPage() {
           </p>
         </div>
       </section>
+      </div>
 
       <section className="container section" aria-labelledby="how-title" data-reveal>
         <h2 className="h2 landing-h2" id="how-title">

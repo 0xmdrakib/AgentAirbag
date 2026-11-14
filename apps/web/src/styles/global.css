@@ -2263,50 +2263,54 @@ pre,
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 14px;
+  padding: 8px 8px 8px 14px;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--code-bg);
-  overflow-x: auto;
-}
-
-.code-line {
-  align-items: flex-start;
-}
-
-.code-line .copy-button {
-  flex: 0 0 auto;
 }
 
 .code-line code {
   min-width: 0;
   flex: 1 1 0;
-  padding-top: 5px;
   color: var(--text);
   font-size: 14px;
+  line-height: 1.5;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
 .code-prompt {
+  margin-right: 6px;
   color: var(--signal-text);
-  font-size: 14px;
+  user-select: none;
 }
 
 .code-line .copy-button {
+  flex: 0 0 auto;
   margin-left: auto;
 }
 
 .code-block {
-  display: flex;
-  flex-direction: column;
+  display: block;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--code-bg);
+  overflow: hidden;
+}
+
+.code-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-3);
+  font-size: 12.5px;
 }
 
 .code-block pre {
-  padding: 4px 14px 14px;
+  padding: 12px 14px;
   overflow-x: auto;
   color: var(--text);
   font-size: 13.5px;
@@ -2314,9 +2318,8 @@ pre,
 }
 
 .code-block .copy-button {
-  order: -1;
-  align-self: flex-end;
-  margin: 10px 10px 0;
+  position: static;
+  flex: 0 0 auto;
 }
 
 .limits-card {
@@ -5990,5 +5993,169 @@ h2.eyebrow {
   .why-near {
     grid-template-columns: minmax(0, 1fr);
     gap: 28px;
+  }
+}
+
+/* ---------- v8: large screens use the width ---------- */
+
+/* On wide monitors the landing page is a two-column first screen: the pitch on the left,
+   the Dummy vs Seatbelt proof on the right. Narrow screens keep the centred stack. */
+@media (min-width: 1280px) and (min-height: 760px) {
+  .landing-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+    column-gap: clamp(40px, 4.5vw, 80px);
+    align-items: center;
+    padding-top: clamp(32px, 6vh, 88px);
+  }
+
+  .page-lab .landing-hero {
+    align-items: flex-start;
+    padding-top: 0;
+    text-align: left;
+  }
+
+  .page-lab .landing-title {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 14ch;
+    font-size: clamp(44px, min(4.4vw, 7.4vh), 76px);
+  }
+
+  .page-lab .landing-sub {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 34rem;
+  }
+
+  .page-lab .landing-actions {
+    justify-content: flex-start;
+  }
+
+  .page-lab .landing-facts {
+    align-self: flex-start;
+  }
+
+  .landing-top .landing-proof {
+    margin-top: 0;
+  }
+
+  .landing-top .proof-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .landing-top .proof-agent {
+    padding: clamp(18px, 2vw, 26px);
+  }
+
+  .landing-top .proof-agent + .proof-agent {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .landing-top .proof-money {
+    margin-top: 14px;
+    font-size: clamp(32px, 2.4vw, 46px);
+  }
+
+  .landing-top .proof-bar {
+    margin-top: 14px;
+  }
+
+  .landing-top .proof-head,
+  .landing-top .proof-foot {
+    padding-inline: clamp(18px, 2vw, 26px);
+  }
+}
+
+/* Wide Report: let the radar and the law list breathe without a narrow centre strip. */
+@media (min-width: 1700px) {
+  .report-shape {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    gap: 20px;
+  }
+  .report-hero {
+    gap: 48px;
+  }
+}
+
+/* Report hero: a tidy right column on every width. The amount sets the column width, the
+   three actions sit under it as equal buttons instead of one floating text link. */
+.report-hero {
+  grid-template-columns: auto minmax(0, 1fr) minmax(260px, max-content);
+  column-gap: clamp(28px, 3vw, 56px);
+}
+
+.report-hero-money {
+  min-width: 260px;
+  gap: 14px;
+}
+
+.report-actions {
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.report-actions .btn {
+  min-height: 38px;
+}
+
+@media (max-width: 980px) {
+  .report-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .report-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 16px;
+  }
+  .report-hero-money {
+    min-width: 0;
+  }
+  .report-actions {
+    justify-content: flex-start;
+  }
+}
+
+/* Phones: the copy control becomes an icon so a long command keeps its width. */
+@media (max-width: 640px) {
+  .code-line .copy-button,
+  .code-block-head .copy-button {
+    justify-content: center;
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+    gap: 0;
+  }
+  .code-line .copy-button .copy-label-text,
+  .code-block-head .copy-button .copy-label-text {
+    display: none;
+  }
+  .code-line .copy-button svg,
+  .code-block-head .copy-button svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Phones: commands keep two lines, and a long env line wraps instead of hiding. */
+@media (max-width: 640px) {
+  .code-line code {
+    font-size: 13px;
+  }
+  .code-block pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* A long command or URL scrolls sideways rather than breaking in the middle of a token. */
+@media (max-width: 640px) {
+  .code-block pre {
+    white-space: pre;
+    overflow-wrap: normal;
   }
 }

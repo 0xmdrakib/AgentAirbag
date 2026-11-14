@@ -2,8 +2,11 @@ import { CopyButton, SectionHead } from '../components/Primitives';
 import { ShieldIcon, TerminalIcon } from '../components/Icons';
 
 const SERVE = 'pnpm airbag serve';
-const ENV = `export ONECLICK_BASE_URL=http://localhost:4321/r/demo
-export AIRBAG_BASE_URL=http://localhost:4321/r/demo`;
+const ENV = [
+  'base=http://localhost:4321/r/demo',
+  'export ONECLICK_BASE_URL=$base',
+  'export AIRBAG_BASE_URL=$base',
+].join('\n');
 const RUN = 'pnpm airbag run --cmd "node examples/http-agent.mjs"';
 const SAMPLE = `// my-agent.js: the three rules
 const base = process.env.AIRBAG_BASE_URL;
@@ -76,7 +79,7 @@ export function ConnectPage() {
                 <span className="mono">POST /sandbox/v0/runs</span>. Use the port the server printed
                 if 4321 was taken.
               </p>
-              <CodeBlock code={ENV} />
+              <CodeBlock code={ENV} label="env" />
             </div>
           </article>
           <article className="connect-step">
@@ -166,20 +169,24 @@ export function ConnectPage() {
 function CodeLine({ code }: { code: string }) {
   return (
     <div className="code-line">
-      <span className="mono code-prompt">$</span>
-      <code className="mono">{code}</code>
+      <code className="mono">
+        <span className="code-prompt">$</span> {code}
+      </code>
       <CopyButton value={code} />
     </div>
   );
 }
 
-function CodeBlock({ code }: { code: string }) {
+function CodeBlock({ code, label = 'shell' }: { code: string; label?: string }) {
   return (
     <div className="code-block">
+      <div className="code-block-head">
+        <span className="mono">{label}</span>
+        <CopyButton value={code} />
+      </div>
       <pre className="mono">
         <code>{code}</code>
       </pre>
-      <CopyButton value={code} />
     </div>
   );
 }

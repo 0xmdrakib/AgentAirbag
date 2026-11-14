@@ -26,6 +26,7 @@ import { FixSnippet } from '../components/FixSnippet';
 import {
   ArrowRightIcon,
   ChevronIcon,
+  CopyIcon,
   DownloadIcon,
   ShareIcon,
   ShieldIcon,
@@ -145,14 +146,14 @@ export function ReportPage() {
               <DownloadIcon size={14} /> JSON
             </Button>
             <Button
-              variant="ghost"
+              variant="secondary"
               size="sm"
               onClick={() => {
                 void navigator.clipboard.writeText(badge);
                 showToast('README badge copied.');
               }}
             >
-              Copy badge
+              <CopyIcon size={14} /> Badge
             </Button>
           </div>
         </div>
