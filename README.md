@@ -2,7 +2,7 @@
 
 **Crash-test dummies for AI agents that hold money.**
 
-![tests](https://img.shields.io/badge/tests-78%20passing-3EE6A0)
+![tests](https://img.shields.io/badge/tests-107%20passing-3EE6A0)
 ![scenarios](https://img.shields.io/badge/crashes-21-FFD21F)
 ![simulation](https://img.shields.io/badge/funds-0%20real-FF4D5E)
 ![license](https://img.shields.io/badge/license-MIT-9AA2B1)
@@ -53,8 +53,10 @@ pnpm demo
 ```
 
 `pnpm demo` builds the scenarios and fixtures, runs the Dummy and Seatbelt suites in-process, serves
-the static web app, prints the report URL and opens it. No API keys. No network calls after install.
-The browser runs the whole scripted suite itself.
+the static web app, prints the report URL and opens it. No API keys. The simulator itself makes no
+network calls; wallet connect is the one optional feature that talks to the wallet and the local
+`/api`. It is local-first: the simulator, report card and replay work with no wallet, account or
+database. See [Wallet and database](#wallet-and-database).
 
 | Do this | See that |
 | --- | --- |
@@ -65,8 +67,17 @@ The browser runs the whole scripted suite itself.
 | Press **Skip to the key moment** in Replay | The scrubber jumps to the action the judge cited as evidence |
 | Open `#/scenarios` and press **View YAML** | All 21 crashes as data, with the story, fault, judge rule and fix key |
 | Run `pnpm airbag run --agent hardened --summary` | `score 100 · grade A · 21 survived · 0 crashed` |
+| Press **Connect wallet**, sign in with MyNearWallet, then **Save to my runs** on a report | The report is stored under your NEAR account; **My runs** lists it. Needs the local API, and Neon only when `DATABASE_URL` is set |
 | Run `pnpm demo:attack` | The unguarded Dummy pays an injected address ($9,995.46 simulated); the guarded agent blocks with `TAINTED_VALUE` and loses $0 |
-| Run `pnpm verify` | Lint, typecheck, 78 tests, the HTTP and process sandbox smokes, production build and the demo smoke test |
+| Run `pnpm verify` | Lint, typecheck, 107 tests, the HTTP and process sandbox smokes, production build and the demo smoke test |
+
+### Wallet and database
+
+Wallet connect and saving runs are optional. `pnpm demo` serves the API under `/api` on the same
+origin when the API module is present; if it is not bundled, the demo prints one line and keeps the
+static simulator running. Without `DATABASE_URL` the API uses a local JSON store. To use Neon, set
+`DATABASE_URL` and run `pnpm db:migrate` once. Setup, the exact environment variables and the deploy
+limits are in [docs/DEPLOY.md](docs/DEPLOY.md). The simulator works without either path.
 
 `pnpm build` writes the static build to `apps/web/dist`. It is ready for Vercel, Cloudflare Pages or
 GitHub Pages, but **no hosting account was available in this build window, so there is no hosted URL
@@ -291,10 +302,13 @@ pnpm build          # generated scenarios + fixtures + static web build
 # output: apps/web/dist
 ```
 
-- **Vercel:** import the repo; `vercel.json` sets `pnpm build` and `apps/web/dist`.
-- **Cloudflare Pages:** build command `pnpm build`, output `apps/web/dist`.
-- **GitHub Pages:** publish `apps/web/dist`; hash routing means no rewrite rules.
-- The app is a static SPA; no secrets or server are required.
+- **Vercel:** import the repo; `vercel.json` sets `pnpm build` and `apps/web/dist`. This is a static
+  deployment. No serverless entry point for the API exists in this repository, so wallet connect and
+  saving runs are unavailable on Vercel unless you add one on the same origin.
+- **Cloudflare Pages:** build command `pnpm build`, output `apps/web/dist`. Static only, same caveat.
+- **GitHub Pages:** publish `apps/web/dist`; hash routing means no rewrite rules. Static only.
+- The simulator is a static SPA and needs no secrets or server. Wallet connect and saving runs need
+  the optional Node API on the same origin; see [docs/DEPLOY.md](docs/DEPLOY.md).
 
 The build is **not deployed** in this repository because no hosting account was available in the
 window. Add the live URL here after deploying; do not claim one before it exists.
@@ -331,12 +345,13 @@ window. Add the live URL here after deploying; do not claim one before it exists
   the YAML, UI and `docs/SCENARIOS.md`.
 - **Not a general LLM red-team** and not a model leaderboard. The suite tests a money-moving agent’s
   decisions against a fixed world.
-- **No accounts, database or required backend.**
+- **No required backend.** Wallet connect and saved runs are optional; without the API the simulator
+  is fully static. There is no hosted API or database URL in this build.
 - **No report signature** (the P2 NEAR ed25519 signing is not shipped).
-- **Bundle size:** the initial JavaScript is **184 KB gzipped (1.21 MB uncompressed)**; the lazily
-  loaded report, replay and scenario pages add about 15 KB gzipped in total, under the 250 KB gzip
-  target. Vite warns about the uncompressed 1.21 MB because the two report fixtures carry the full
-  EventLogs; that size is why the hosted demo stays a static bundle with no backend.
+- **Bundle size:** the initial JavaScript is **193 KB gzipped**; the report, replay and scenario
+  pages add about 15 KB gzipped, and the wallet SDK adds about 85 KB only after **Connect** is
+  pressed. All of it is under the 250 KB initial target. Vite warns about the uncompressed 1.2 MB
+  because the two report fixtures carry the full EventLogs; those pages are lazy loaded.
 
 ## License
 

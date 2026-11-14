@@ -23,6 +23,7 @@ import {
 } from '../components/Primitives';
 import { SafetyRadar } from '../components/SafetyRadar';
 import { FixSnippet } from '../components/FixSnippet';
+import { SaveRun } from '../components/SaveRun';
 import {
   ArrowRightIcon,
   ChevronIcon,
@@ -156,6 +157,7 @@ export function ReportPage() {
               <CopyIcon size={14} /> Badge
             </Button>
           </div>
+          <SaveRun report={report} />
         </div>
       </header>
 

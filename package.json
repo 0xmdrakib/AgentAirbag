@@ -19,8 +19,10 @@
     "dev": "pnpm build:scenarios && pnpm build:fixtures && pnpm --filter @airbag/web dev",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:api": "vitest run packages/server",
     "test:http": "tsx scripts/http-smoke.ts",
     "test:process": "tsx scripts/process-smoke.ts",
+    "db:migrate": "tsx scripts/db-migrate.ts",
     "screenshots": "tsx scripts/screenshot.ts",
     "ui:interact": "tsx scripts/interact.ts",
     "ui:share": "tsx scripts/share-check.ts",
@@ -31,7 +33,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:http && pnpm test:process && pnpm build && pnpm demo --smoke",
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:api && pnpm test:http && pnpm test:process && pnpm build && pnpm demo --smoke",
     "docs:facts": "tsx scripts/docs-facts.ts"
   },
   "devDependencies": {

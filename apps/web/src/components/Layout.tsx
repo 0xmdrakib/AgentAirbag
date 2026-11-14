@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { cx } from '../lib/format';
 import { MarkerLogo } from './MarkerLogo';
 import { ArrowUpIcon, MenuIcon, XIcon } from './Icons';
+import { WalletButton } from './WalletButton';
 
 const NAV = [
   { href: '#/report', label: 'Report', path: '/report' },
@@ -57,6 +58,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
             ))}
           </nav>
           <div className="header-right">
+            <WalletButton className="header-wallet" />
             <a
               href={route === '/run' ? '#run-start' : '#/run'}
               className="btn btn-primary btn-sm header-cta"

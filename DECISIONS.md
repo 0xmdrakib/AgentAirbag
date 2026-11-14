@@ -22,7 +22,7 @@ judge and scenarios. ESLint bans Node imports in `packages/core`; a test scans t
 
 **Plain CSS design system instead of Tailwind v4.** Alternatives: Tailwind, CSS-in-JS. Reason: the
 design is a small, highly custom system (radar, scenario grid, replay scrubber). Hand-written tokens
-and components keep the initial JavaScript at 184 KB gzipped (the index chunk, 1.21 MB uncompressed)
+and components keep the initial JavaScript at 193 KB gzipped (the index chunk; the wallet SDK is a separate 85 KB chunk loaded on connect)
 and remove a build dependency. This is a deliberate
 deviation from the pinned stack in the prompt; the visual spec is implemented.
 
@@ -166,3 +166,25 @@ the core demo; the hash is still sha256 of canonical JSON. The README says so.
 
 **No Docker image.** Alternatives: a Dockerfile for the clean-clone test. Reason: P2 and time; the
 clean-clone test uses a fresh directory and pnpm instead.
+
+## Wallet connect and saved runs
+
+**Optional, not a gate on the simulator.** The crash suite, report and replay stay usable with no
+wallet so a judge can evaluate the product without installing a wallet. Connecting unlocks account
+features only: saving a report and the My runs list. Alternatives considered: gate the whole app.
+Rejected because it turns a 60 second demo into a wallet setup task.
+
+**NEAR wallet selector with MyNearWallet.** `@near-wallet-selector/*` is imported on first connect,
+so the landing page does not pay for the SDK (the initial bundle grows by about 9 KB, the wallet
+chunk is about 85 KB gzipped on demand). Sign-in uses NEP-413: the server issues a nonce, the wallet
+signs the standard payload, and the API verifies ed25519 or secp256k1 locally, then sets an HttpOnly
+session cookie. Sessions are stored hashed.
+
+**Postgres on Neon, with a local file store.** If `DATABASE_URL` is set the API uses
+`@neondatabase/serverless`; otherwise it writes `.data/airbag.json`. This keeps the demo runnable
+offline and still ships a real hosted path. The schema is idempotent and `pnpm db:migrate` applies it.
+The report body is capped at 512 KB.
+
+**Known limit:** signature verification proves key possession, not that the key is currently a
+full-access key of the claimed account, because the API does not call NEAR RPC. A production deploy
+should add that RPC check; it is listed in docs/DEPLOY.md.

@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Layout } from './components/Layout';
 import { AppStateProvider, useAppState } from './state/AppState';
+import { WalletProvider } from './wallet/WalletProvider';
 import { decodeReport } from './lib/share';
 import { LabPage } from './pages/LabPage';
 import { RunnerPage } from './pages/RunnerPage';
@@ -128,7 +129,9 @@ function AppInner() {
 export function App() {
   return (
     <AppStateProvider>
-      <AppInner />
+      <WalletProvider>
+        <AppInner />
+      </WalletProvider>
     </AppStateProvider>
   );
 }
