@@ -164,8 +164,7 @@ export function SaveRun({ report }: { report: RunReport }) {
 
   if (status !== 'connected') {
     return (
-      <div className="wallet-save wallet-save-note">
-        <span className="wallet-save-text">Connect a NEAR wallet to save this report</span>
+      <div className="wallet-save">
         <button
           type="button"
           className="btn btn-secondary btn-sm wallet-save-connect"
@@ -177,7 +176,7 @@ export function SaveRun({ report }: { report: RunReport }) {
           ) : (
             <WalletIcon size={14} />
           )}
-          {status === 'connecting' ? 'Connecting' : 'Connect'}
+          {status === 'connecting' ? 'Connecting' : 'Connect to save'}
         </button>
         {walletError && (
           <p className="wallet-save-error" role="alert">
