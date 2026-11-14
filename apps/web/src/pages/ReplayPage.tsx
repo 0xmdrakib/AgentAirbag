@@ -93,6 +93,11 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (isTypingTarget(event.target)) return;
+      const target = event.target as Element | null;
+      // Never steal keys from a focused control; arrow keys and Space belong to it.
+      if (target?.closest('button, a, input, textarea, select, [role="tab"], [role="radio"], [contenteditable="true"]')) {
+        return;
+      }
       if (event.key === 'ArrowRight') {
         event.preventDefault();
         setPlaying(false);
@@ -200,8 +205,29 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
               key={item}
               type="button"
               role="tab"
+              id={`replay-tab-${item}`}
+              aria-controls={`replay-panel-${item}`}
               aria-selected={pane === item}
+              tabIndex={pane === item ? 0 : -1}
               className={cx('replay-tab', pane === item && 'replay-tab-active')}
+              onKeyDown={(event) => {
+                const order: Pane[] = ['trace', 'ledger', 'violations'];
+                const at = order.indexOf(item);
+                const next =
+                  event.key === 'ArrowRight'
+                    ? order[(at + 1) % order.length]
+                    : event.key === 'ArrowLeft'
+                      ? order[(at - 1 + order.length) % order.length]
+                      : event.key === 'Home'
+                        ? order[0]
+                        : event.key === 'End'
+                          ? order[order.length - 1]
+                          : undefined;
+                if (!next) return;
+                event.preventDefault();
+                setPane(next);
+                document.getElementById(`replay-tab-${next}`)?.focus();
+              }}
               onClick={() => setPane(item)}
             >
               {item === 'trace' ? 'Agent trace' : item === 'ledger' ? 'Swap & ledger' : 'Violations'}
@@ -212,6 +238,9 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
         <div className="replay-grid">
           <section
             className={cx('replay-pane', 'trace-pane', pane === 'trace' && 'pane-active')}
+            id="replay-panel-trace"
+            role="tabpanel"
+            aria-labelledby="replay-tab-trace"
             aria-label="Agent trace"
           >
             <div className="pane-head">
@@ -235,6 +264,9 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
 
           <section
             className={cx('replay-pane', 'ledger-pane', pane === 'ledger' && 'pane-active')}
+            id="replay-panel-ledger"
+            role="tabpanel"
+            aria-labelledby="replay-tab-ledger"
             aria-label="Swap and ledger"
           >
             <div className="pane-head">
@@ -280,6 +312,9 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
 
           <section
             className={cx('replay-pane', 'violations-pane', pane === 'violations' && 'pane-active')}
+            id="replay-panel-violations"
+            role="tabpanel"
+            aria-labelledby="replay-tab-violations"
             aria-label="Violations"
           >
             <div className="pane-head">
@@ -358,7 +393,7 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
                 setIndex(crashIndex);
               }}
             >
-              Skip to the crash <ArrowRightIcon size={14} />
+              Skip to the key moment <ArrowRightIcon size={14} />
             </button>
             <div className="speed-group" role="group" aria-label="Speed">
               {[1, 2, 4].map((value) => (
@@ -404,6 +439,11 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
                 setIndex(Number(event.target.value));
               }}
               aria-label="Replay position"
+              aria-valuetext={
+                current
+                  ? `Step ${index + 1} of ${events.length}, ${Math.round(current.t / 100) / 10} seconds`
+                  : 'Start of the replay'
+              }
             />
           </div>
           <div className="scrubber-legend">

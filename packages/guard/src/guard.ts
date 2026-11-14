@@ -171,7 +171,7 @@ export class Guard {
         message: `A NEAR refund address cannot be used with refundType ORIGIN_CHAIN on ${quote.originChain}.`,
       });
     }
-    if (state.untrustedSpans.some((span) => span.includes(quote.refundTo))) {
+    if (state.untrustedSpans.some((span) => span.toLowerCase().includes(quote.refundTo.toLowerCase()))) {
       reasons.push({
         code: 'TAINTED_VALUE',
         message: 'The refund address appeared inside untrusted tool text.',
@@ -185,13 +185,23 @@ export class Guard {
     state: GuardState,
   ): GuardReason[] {
     const reasons: GuardReason[] = [];
-    const quote = state.quotes.find(
-      (candidate) =>
-        candidate.id === action.quoteId ||
-        (action.quoteId === undefined && candidate.depositAddress === action.to),
+    const quote = state.quotes.find((candidate) =>
+      action.quoteId === undefined
+        ? candidate.depositAddress === action.to
+        : candidate.id === action.quoteId && candidate.depositAddress === action.to,
     );
     if (!quote) {
-      if (state.untrustedSpans.some((span) => span.includes(action.to))) {
+      // An unknown quote id, or an id paired with a different deposit address, is never safe.
+      if (action.quoteId !== undefined) {
+        reasons.push({
+          code: 'QUOTE_MISMATCH',
+          message: 'The deposit address does not belong to the quote being funded.',
+        });
+      }
+      const tainted = state.untrustedSpans.some((span) =>
+        span.toLowerCase().includes(action.to.toLowerCase()),
+      );
+      if (tainted) {
         reasons.push({
           code: 'TAINTED_VALUE',
           message: 'The destination appeared inside untrusted tool text.',

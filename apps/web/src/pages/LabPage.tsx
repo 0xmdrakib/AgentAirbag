@@ -19,10 +19,10 @@ const LAW_SENTENCES: Record<Law, string> = {
 const STEPS = [
   {
     title: 'Point your agent at Airbag',
-    body: 'Change one base URL. The 1Click routes stay the same, the money is fake.',
+    body: 'Point your agent’s 1Click calls at one base URL and send deposits through the sandbox wallet.',
   },
   {
-    title: `It runs ${SCENARIOS.length} crashes`,
+    title: `It runs ${SCENARIOS.length} crash scenarios`,
     body: 'Timeouts, expired quotes, poisoned token names, decimal traps and broken refunds.',
   },
   {
@@ -32,17 +32,17 @@ const STEPS = [
 ];
 
 const TRUTH = [
-  ['1Click API contract', 'Mirrored from the public docs'],
+  ['1Click API contract', 'Mirrored from docs.near-intents.org, 13 Nov 2026'],
   ['Token list and prices', 'Real snapshot, 13 Nov 2026'],
   ['Swaps, deposits, refunds', 'Simulated. No funds move.'],
-  ['Solver behavior', 'Modeled, and labelled as modeled'],
+  ['Solver behavior', 'Not in the real API; tagged “modeled” in results'],
 ];
 
 export function LabPage() {
   const { reports } = useAppState();
   const agents = [
     { report: reports.naive, setup: 'No guards', name: 'Dummy agent' },
-    { report: reports.hardened, setup: 'With Airbag Guard', name: 'Seatbelt agent' },
+    { report: reports.hardened, setup: 'With Airbag Guard checks', name: 'Seatbelt agent' },
   ];
 
   return (
@@ -54,8 +54,9 @@ export function LabPage() {
         </p>
         <h1 className="landing-title">Crash-test your AI agent before it touches real money.</h1>
         <p className="landing-sub">
-          Airbag is a copy of the NEAR Intents 1Click API that fails on purpose. Run your agent
-          through {SCENARIOS.length} crashes and see what it would have lost, and how to fix it.
+          Airbag is a simulated version of the NEAR Intents 1Click swap API that fails on
+          purpose. Run your agent through {SCENARIOS.length} crash scenarios and see what it would
+          have lost, and how to fix it.
         </p>
         <div className="landing-actions">
           <LinkButton href="#/run?auto=naive" variant="primary" size="lg">
@@ -77,7 +78,7 @@ export function LabPage() {
           </div>
           <div>
             <dt>Real funds at risk</dt>
-            <dd>$0</dd>
+            <dd>$0.00</dd>
           </div>
         </dl>
       </section>
@@ -86,7 +87,7 @@ export function LabPage() {
         <div className="proof-panel">
           <div className="proof-head">
             <h2 className="proof-title" id="proof-title">
-              Same {SCENARIOS.length} crashes, two agents
+              Same {SCENARIOS.length} crash scenarios, two agents
             </h2>
             <a href="#/report" className="proof-link">
               Open the report <ArrowRightIcon size={14} />
@@ -122,8 +123,8 @@ export function LabPage() {
             })}
           </div>
           <p className="proof-foot">
-            Both are scripted reference agents. Dummy follows the API tutorial; Seatbelt checks
-            before it signs.
+            Both are scripted reference agents. Dummy follows the 1Click tutorial; Seatbelt checks
+            before it signs. Seatbelt’s $1.00 is a modeled refund fee, not an observed loss.
           </p>
         </div>
       </section>
@@ -147,7 +148,7 @@ export function LabPage() {
         <div className="landing-section-head">
           <div>
             <h2 className="h2 landing-h2" id="laws-title">
-              What it catches
+              The seven laws
             </h2>
             <p className="section-sub">
               Seven laws for agents that move money. Each crash breaks one of them.
@@ -197,7 +198,7 @@ export function LabPage() {
       <section className="container section" data-reveal>
         <div className="cta-band">
           <div>
-            <h2 className="h2">Would your agent pay a scammer because a token’s name told it to?</h2>
+            <h2 className="h2">A token name that carries an instruction</h2>
             <p className="section-sub">
               One of the {SCENARIOS.length} crashes. Watch it happen, then switch to Seatbelt.
             </p>

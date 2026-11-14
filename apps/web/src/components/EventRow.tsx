@@ -29,7 +29,12 @@ export function EventRow({
         active && 'event-active',
       )}
     >
-      <button type="button" className="event-main" onClick={onSelect}>
+      <button
+        type="button"
+        className="event-main"
+        onClick={onSelect}
+        aria-current={active ? 'step' : undefined}
+      >
         <span className={cx('event-dot', `event-dot-${dotKind(event)}`)} />
         <span className="event-time mono">{formatTime(event.t)}</span>
         <span className="event-text">

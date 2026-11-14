@@ -13,7 +13,7 @@ page.on('console', (message) => {
 });
 await page.goto(`${PREVIEW_URL}#/run`, { waitUntil: 'networkidle' });
 await page.getByLabel('Suite seed').fill('seed-check-42');
-await page.getByRole('button', { name: 'Crash', exact: true }).click();
+await page.getByRole('button', { name: 'Run the suite', exact: true }).click();
 await page.waitForSelector('.cell-fail', { timeout: 20_000 });
 await page.waitForTimeout(800);
 const cells = await page.locator('.cell-fail').count();

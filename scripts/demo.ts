@@ -105,7 +105,36 @@ server.listen(port, '127.0.0.1', async () => {
       server.close();
       process.exit(1);
     }
-    console.log('\nDemo smoke passed.');
+    // Load the real app in Chrome and read the report, so a broken bundle or empty route fails.
+    try {
+      const { chromium } = await import('playwright-core');
+      const { chromePath } = await import('./preview');
+      const browser = await chromium.launch({ executablePath: chromePath(), headless: true });
+      const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const errors: string[] = [];
+      page.on('pageerror', (error) => errors.push(error.message));
+      await page.goto(reportUrl, { waitUntil: 'networkidle' });
+      await page.waitForSelector('.report-hero', { timeout: 15_000 });
+      const text = await page.locator('main').innerText();
+      const checks: [string, boolean][] = [
+        ['grade F headline', text.includes('$10,907.04')],
+        ['21 crashes', text.includes('21 crashes')],
+        ['Seatbelt row', text.includes('Seatbelt')],
+        ['no page errors', errors.length === 0],
+      ];
+      const failed = checks.filter(([, ok]) => !ok).map(([name]) => name);
+      await browser.close();
+      if (failed.length > 0) {
+        console.error(`Demo smoke failed: ${failed.join(', ')}`);
+        server.close();
+        process.exit(1);
+      }
+      console.log('\nDemo smoke passed: the report card rendered in Chrome.');
+    } catch (error) {
+      console.error(`Demo smoke failed: ${(error as Error).message}`);
+      server.close();
+      process.exit(1);
+    }
     server.close();
     process.exit(0);
   }

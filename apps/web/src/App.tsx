@@ -39,6 +39,17 @@ function AppInner() {
 
   useEffect(() => {
     const onHash = () => {
+      const rawHash = window.location.hash.replace(/^#/, '');
+      // In-page anchors (#main, #report-shape) are not routes. Scroll to them and keep the page.
+      if (rawHash && !rawHash.startsWith('/')) {
+        const target = document.getElementById(rawHash);
+        if (target) {
+          target.scrollIntoView({ block: 'start' });
+          target.setAttribute('tabindex', '-1');
+          (target as HTMLElement).focus({ preventScroll: true });
+          return;
+        }
+      }
       const next = readRoute();
       setRoute(next);
       window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
@@ -60,7 +71,7 @@ function AppInner() {
 
   useEffect(() => {
     const titles: Record<string, string> = {
-      '/': 'Airbag — crash-test dummies for AI agents that hold money',
+      '/': 'Airbag — crash-test lab for AI agents that move money',
       '/run': 'Crash suite — Airbag',
       '/report': 'Report card — Airbag',
       '/replay': 'Crash replay — Airbag',

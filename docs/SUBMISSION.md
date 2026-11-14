@@ -11,9 +11,9 @@ leave a retry buffer.
 | When (Dhaka) | Action |
 | --- | --- |
 | Before the freeze | Create a mainnet NEAR payout account; provide the project name, lead name, email, team size, and hosting choice |
-| 02:30 Sun | Record the demo video from `docs/DEMO_SCRIPT.md` |
-| 03:00 Sun | Say **yes** to making the repo public |
-| 03:30 Sun | Post the X thread with the video; send the post URL |
+| 02:30 Sun | Record the demo video from `docs/DEMO_SCRIPT.md`; the human records it |
+| 03:00 Sun | Say **yes** to making the repo public, then send the public repo URL |
+| 03:30 Sun | Post the X thread with the video; send the X post URL |
 | 04:00 Sun | Read the printed payload and the consent notice, then say **submit** |
 | 04:30 Sun | Target a confirmed 201 |
 
@@ -93,9 +93,9 @@ ledger and a clock. Then we crash it 21 ways across 7 laws: pay only what you qu
 respect the clock, verify, do not obey data, stay in limits, keep an exit.
 
 **Post 3:**
-Intents has no testnet, so people test with real money. Airbag mirrors the 1Click API, takes real
-prices from read-only dry-run quotes, and ships an LLM adapter for NEAR AI Cloud. Same code, zero
-funds. No LLM replay is claimed in this build; the scripted Dummy is labelled modeled.
+Intents has no testnet, so people test with real money. Airbag mirrors the 1Click API, uses a real
+token/price snapshot and a read-only dry run, and ships an LLM adapter for NEAR AI Cloud. Same code,
+zero funds. No LLM replay is claimed; the Dummy is labelled modeled.
 
 **Post 4:**
 Try the local demo: <repo or demo URL>. Code: <repo URL>. A question for builders: which failure

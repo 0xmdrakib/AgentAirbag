@@ -153,7 +153,7 @@ export function ReportPage() {
 
       <nav className="section-nav" aria-label="On this report">
         <a href="#report-shape" data-section-link="report-shape">
-          Safety shape
+          Law scores
         </a>
         <a href="#report-failures" data-section-link="report-failures">
           Failures
@@ -174,10 +174,10 @@ export function ReportPage() {
         <Stat label="Score" value={`${report.overall.score}/100`} />
       </div>
 
-      <section className="report-shape" id="report-shape">
+      <section className="report-shape" id="report-shape" aria-labelledby="report-shape-title">
         <div className="report-shape-chart">
           <div className="panel-head">
-            <p className="eyebrow">Safety shape</p>
+            <h2 className="eyebrow" id="report-shape-title">Law scores</h2>
             {!sharedReport && (report.agent.id === 'naive' || report.agent.id === 'hardened') && (
               <span className="muted panel-hint">Dashed: the other reference agent</span>
             )}
@@ -199,7 +199,7 @@ export function ReportPage() {
         </div>
         <div className="report-law-bars">
           <div className="panel-head">
-            <p className="eyebrow">Law by law</p>
+            <h2 className="eyebrow" id="report-laws-title">Law by law</h2>
             <span className="muted panel-hint">Score out of 100</span>
           </div>
           {report.laws.map((law) => {
@@ -211,7 +211,9 @@ export function ReportPage() {
                 <button
                   type="button"
                   className="law-acc-head"
+                  id={`law-button-${law.law}`}
                   aria-expanded={open}
+                  aria-controls={`law-panel-${law.law}`}
                   onClick={() => setOpenLaw(open ? null : (law.law as Law))}
                 >
                   <span className="law-acc-text">
@@ -229,7 +231,12 @@ export function ReportPage() {
                   </span>
                 </button>
                 {open && (
-                  <div className="law-scenario-pills">
+                  <div
+                    className="law-scenario-pills"
+                    id={`law-panel-${law.law}`}
+                    role="region"
+                    aria-labelledby={`law-button-${law.law}`}
+                  >
                     {law.scenarios.map((scenario) => (
                       <a
                         key={scenario.id}
@@ -251,11 +258,11 @@ export function ReportPage() {
 
       <section className="section report-failures" id="report-failures">
         <SectionHead
-          title={failures.length ? 'Costliest failures' : 'No invariant violated'}
+          title={failures.length ? 'Costliest failures' : 'No laws broken'}
           body={
             failures.length
               ? 'The three crashes that lost the most. Each shows what went wrong, the law it broke and a fix you can paste into the agent.'
-              : 'This agent survived these crashes. That is not a claim that it is safe; it is a claim about this suite.'
+              : 'Every law held in simulation. That is a claim about these crashes, not a claim that the agent is safe.'
           }
           right={
             failures.length ? (
@@ -269,10 +276,10 @@ export function ReportPage() {
           <div className="survived-card">
             <ShieldIcon size={26} />
             <div>
-              <h3 className="h3">Survived {total} of {total} crashes.</h3>
+              <h3 className="h3">Survived all {total} scenarios.</h3>
               <p>
-                Every invariant held in simulation. The card still never says “safe”. It says this
-                agent survived these specific crashes.
+                Every law held in simulation. The card still never says “safe”. It says this
+                agent survived these specific scenarios.
               </p>
             </div>
           </div>
@@ -292,15 +299,18 @@ export function ReportPage() {
         />
         <div className="compare-table-wrap">
           <table className="compare-table">
+            <caption className="sr-only">Compare agents: grade, score, survived, simulated loss and false claims</caption>
             <thead>
               <tr>
-                <th>Agent</th>
-                <th>Grade</th>
-                <th>Score</th>
-                <th>Survived</th>
-                <th>Simulated loss</th>
-                <th>False claims</th>
-                <th />
+                <th scope="col">Agent</th>
+                <th scope="col">Grade</th>
+                <th scope="col">Score</th>
+                <th scope="col">Survived</th>
+                <th scope="col">Simulated loss</th>
+                <th scope="col">False claims</th>
+                <th scope="col">
+                  <span className="sr-only">Open report</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -412,7 +422,7 @@ function FailureCard({ result }: { result: ScenarioResult }) {
       <div className="failure-card-head">
         <span className="failure-law">Law {result.law}</span>
         {result.modeled && <span className="modeled-tag">modeled</span>}
-        <span className="failure-loss mono">{formatUsd(result.lossUsd)} lost</span>
+        <span className="failure-loss mono">{formatUsd(result.lossUsd)} simulated loss</span>
       </div>
       <h3 className="h3">{result.title}</h3>
       <p className="failure-story">{result.story}</p>

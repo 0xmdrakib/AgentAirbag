@@ -10,9 +10,9 @@ import { cx } from '../lib/format';
 type Pick = AgentId | 'llm' | 'byo';
 
 const PICK_LABELS: { id: Pick; title: string; sub: string }[] = [
-  { id: 'naive', title: 'Dummy', sub: 'No guards. Crashes on purpose.' },
-  { id: 'hardened', title: 'Seatbelt', sub: 'Airbag Guard. Survives.' },
-  { id: 'llm', title: 'LLM replay', sub: 'Needs a recorded cassette.' },
+  { id: 'naive', title: 'Dummy', sub: 'No guards. Fails all 21 scenarios.' },
+  { id: 'hardened', title: 'Seatbelt', sub: 'With Airbag Guard. Passes all 21.' },
+  { id: 'llm', title: 'LLM replay', sub: 'Needs a recorded model session.' },
   { id: 'byo', title: 'Bring your own', sub: 'HTTP, process or in-process.' },
 ];
 
@@ -71,13 +71,38 @@ export function RunnerPage() {
       <div className="run-layout">
         <aside className="run-sidebar">
           <p className="label">Agent under test</p>
-          <div className="agent-picker" role="radiogroup" aria-label="Agent under test">
+          <div
+            className="agent-picker"
+            role="radiogroup"
+            aria-label="Agent under test"
+            onKeyDown={(event) => {
+              const current = PICK_LABELS.findIndex((item) => item.id === pick);
+              const at =
+                event.key === 'ArrowDown' || event.key === 'ArrowRight'
+                  ? (current + 1) % PICK_LABELS.length
+                  : event.key === 'ArrowUp' || event.key === 'ArrowLeft'
+                    ? (current - 1 + PICK_LABELS.length) % PICK_LABELS.length
+                    : event.key === 'Home'
+                      ? 0
+                      : event.key === 'End'
+                        ? PICK_LABELS.length - 1
+                        : -1;
+              if (at < 0) return;
+              event.preventDefault();
+              const next = PICK_LABELS[at]!.id;
+              setPick(next);
+              setFinished(null);
+              document.getElementById(`agent-option-${next}`)?.focus();
+            }}
+          >
             {PICK_LABELS.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 role="radio"
+                id={`agent-option-${item.id}`}
                 aria-checked={pick === item.id}
+                tabIndex={pick === item.id ? 0 : -1}
                 className={cx('agent-option', pick === item.id && 'agent-option-active')}
                 onClick={() => {
                   setPick(item.id);
@@ -102,19 +127,19 @@ export function RunnerPage() {
               disabled={running !== null}
             >
               <PlayIcon size={17} />
-              {running === pick ? 'Crashing…' : 'Crash'}
+              {running === pick ? 'Running…' : 'Run the suite'}
             </Button>
           ) : (
             <div className="run-note">
               {pick === 'llm' ? (
                 <>
-                  <strong>No recording bundled.</strong> This build has no NEAR AI Cloud key, so
-                  there is no honest LLM cassette to replay. The adapter and recorder ship; record
-                  one with a key. The scripted runs stay fully reproducible.
+                  <strong>No model run bundled.</strong> This build has no NEAR AI Cloud API key, so no LLM
+                  run is included. The adapter and recorder ship; record one with a key. The scripted
+                  runs stay fully reproducible.
                 </>
               ) : (
                 <>
-                  <strong>Bring your own agent.</strong> Live runs need the local CLI or sandbox.
+                  <strong>Bring your own agent.</strong> Your own agent runs use the local CLI or sandbox.
                   <LinkButton href="#/connect" size="sm" variant="ghost">
                     See the three steps <ArrowRightIcon size={14} />
                   </LinkButton>
@@ -153,7 +178,7 @@ export function RunnerPage() {
                     : 'Setting up the crash lab…'
                   : finished
                     ? `Suite complete. ${currentReport?.overall.failed ?? 0} crashed.`
-                    : 'Pick an agent and press Crash.'}
+                    : 'Pick an agent and run the suite.'}
               </p>
             </div>
             <div className="run-count mono">

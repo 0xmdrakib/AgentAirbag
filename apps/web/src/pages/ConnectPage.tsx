@@ -51,9 +51,8 @@ export function ConnectPage() {
         <div>
           <h1 className="h1">Test your own agent</h1>
           <p className="page-sub">
-            Change one base URL. If your agent follows the 1Click docs and sends its deposit through
-            the sandbox wallet, it can run the whole suite. Live runs use the local CLI; this page
-            only shows the steps.
+            Point your agent’s 1Click calls at one base URL and send deposits through the sandbox
+            wallet. Your own agent runs use the local CLI; this page only shows the steps.
           </p>
         </div>
       </div>
@@ -61,16 +60,16 @@ export function ConnectPage() {
       <div className="connect-grid">
         <div className="connect-steps">
           <article className="connect-step">
-            <span className="step-num mono">01</span>
             <div>
+              <p className="connect-step-label">Step 1</p>
               <h2 className="h3">Start the sandbox</h2>
               <p>Runs on 4321, picks the next free port if that one is taken. No network needed.</p>
               <CodeLine code={SERVE} />
             </div>
           </article>
           <article className="connect-step">
-            <span className="step-num mono">02</span>
             <div>
+              <p className="connect-step-label">Step 2</p>
               <h2 className="h3">Point your agent at one run</h2>
               <p>
                 Every run has its own URL prefix, ledger and virtual clock. Create more runs with{' '}
@@ -80,8 +79,8 @@ export function ConnectPage() {
             </div>
           </article>
           <article className="connect-step">
-            <span className="step-num mono">03</span>
             <div>
+              <p className="connect-step-label">Step 3</p>
               <h2 className="h3">Run every crash</h2>
               <p>
                 The harness starts your process once per scenario, exports a fresh base URL, and
@@ -154,7 +153,7 @@ export function ConnectPage() {
             <TerminalIcon size={16} /> <span className="mono">terminal</span>
           </div>
           <pre className="mono">
-            <code>{`$ pnpm install\n$ pnpm airbag serve\nAirbag sandbox listening on http://localhost:4321\nDefault run: http://localhost:4321/r/demo\n$ pnpm airbag run --cmd "node my-agent.js"\n\nDummy (no guards)      0 survived · 21 crashed · $10,907.04 simulated loss\nSeatbelt (Guard)      21 survived · 0 crashed · $1.00 simulated loss`}</code>
+            <code>{`$ pnpm install\n$ pnpm airbag serve\nAirbag sandbox listening on http://localhost:4321\nDefault run: http://localhost:4321/r/demo\n$ pnpm airbag run --cmd "node my-agent.js"\n\nDummy (no guards)      0 survived · 21 crashed · $10,907.04 simulated loss\nSeatbelt (Guard)      21 survived · 0 crashed · $1.00 modeled refund fee`}</code>
           </pre>
         </div>
       </section>

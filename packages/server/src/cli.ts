@@ -8,7 +8,7 @@ import {
   type RunReport,
 } from '@airbag/core';
 import { naiveAgent, hardenedAgent } from '@airbag/agents';
-import { processAgent } from './processAgent';
+import { processAgent, type ProcessAgent } from './processAgent';
 import { startServer } from './http';
 import { dryQuote, getTokens } from './liveProbe';
 
@@ -55,8 +55,10 @@ program
   .option('--strict', 'exit non-zero when any scenario fails', false)
   .action(async (options: { agent?: string; cmd?: string; seed: string; out?: string; summary: boolean; strict: boolean; cassette?: string; dir: string }) => {
     let agent;
+    let processAdapter: ProcessAgent | undefined;
     if (options.cmd) {
-      agent = processAgent(options.cmd);
+      processAdapter = processAgent(options.cmd);
+      agent = processAdapter;
     } else if (options.agent === 'naive' || options.agent === undefined) {
       agent = naiveAgent();
     } else if (options.agent === 'hardened') {
@@ -98,7 +100,22 @@ program
       process.exit(2);
     }
 
-    const report = await runSuite({ agent, scenarios: SCENARIOS, seed: options.seed });
+    const report = await runSuite({
+      agent,
+      scenarios: SCENARIOS,
+      seed: options.seed,
+      onResult: (result) => {
+        const failure = processAdapter?.failures.get(result.id);
+        if (!failure) return;
+        result.verdict = 'FAIL';
+        result.violations.push({
+          invariant: 'agent-crash',
+          message: failure,
+          evidence: [],
+          severity: 'fail',
+        });
+      },
+    });
     const parsed = runReportSchema.safeParse(report);
     if (!parsed.success) {
       console.error('Report failed schema validation', parsed.error.issues);
@@ -117,6 +134,7 @@ program
   .action(async (options: { port: string }) => {
     const server = await startServer({ port: Number(options.port) });
     console.log(`Airbag sandbox listening on http://localhost:${server.port}`);
+    console.log(`Run list: http://localhost:${server.port}/`);
     console.log(`Default run: http://localhost:${server.port}/r/demo`);
     console.log('Point ONECLICK_BASE_URL at the run URL. No real funds move. Ctrl+C to stop.');
   });

@@ -79,18 +79,19 @@ there is no honest recording to replay. The UI says this plainly instead of faki
 
 ## How NEAR fits
 
-Only the following NEAR claims are made; every one maps to code and a test:
+Only the following NEAR claims are made; each maps to code, and tests are named where they exist:
 
 1. The sandbox implements the 1Click Swap API contract (`/v0/tokens`, `/v0/quote`,
    `/v0/deposit/submit`, `/v0/status`), mirrored from the docs and checked against live dry-run
    responses on **13 Nov 2026 (UTC)**.
 2. Token metadata and USD prices are a real read-only snapshot from `GET /v0/tokens`; the quote
    snapshot is a real `POST /v0/quote` with `dry: true`. The live client is the only code allowed to
-   touch the real host, and a test scans for any other call.
+   touch the real host, and a test scans the TypeScript source for any other call.
 3. The LLM adapter is written for NEAR AI Cloud (OpenAI-compatible, `https://cloud-api.near.ai/v1`).
    It is **not** claimed to run here because no key was available.
 4. Refund and recipient checks validate address formats per chain, including NEAR named and implicit
-   accounts, EVM, Solana and Bitcoin.
+   accounts, EVM, Solana and Bitcoin. EVM and NEAR are covered by tests; the Solana and Bitcoin
+   validators exist but are not yet covered by tests.
 5. Report signing with a NEAR ed25519 key is **not shipped** (P2 stretch).
 
 No mainnet transaction, key, signature or real swap is part of this repository.
@@ -103,14 +104,15 @@ No mainnet transaction, key, signature or real swap is part of this repository.
 | Quote signatures | A deterministic simulated placeholder; **not** a real ed25519 signature |
 | Token list and prices | A real read-only snapshot (`fixtures/tokens.snapshot.json`, 58,875 bytes); the sandbox exposes a curated 8-token subset |
 | Swaps, deposits, refunds and the ledger | **Simulated. No funds move.** |
-| Solver latency, refund penalties, late-deposit handling | **Modeled**, and labelled `modeled: true` in the scenario YAML and `docs/SCENARIOS.md` |
+| Solver latency, refund penalties, late-deposit handling | **Modeled**; solver latency is simulated inside the sandbox, and `solver-stall` currently declares `modeled: false` — a known labelling gap. Refund penalties and late-deposit handling are labelled `modeled: true` in the YAML and `docs/SCENARIOS.md` |
 | Dummy and Seatbelt | Scripted agents; Law 5 results for Dummy are modeled via `followsInlineInstructions` |
 | LLM runs | Real adapter + recorder, but **no live run or cassette is bundled**; no LLM result is claimed |
 | Report hash | sha256 of canonical JSON; **no signature** |
 | Browser demo | Runs the scripted suites in the browser; no network after install |
 
-The card never says “safe”. It says *survived these crashes*. See
-[`docs/CLAIMS.md`](docs/CLAIMS.md) for every README claim and the command that proves it.
+The card never says “safe”. It says *survived these crashes*. The hardened agent’s internal message
+says “Stopped safely”, which is a known wording gap and not a safety claim shown on the report card.
+See [`docs/CLAIMS.md`](docs/CLAIMS.md) for every README claim and the command that proves it.
 
 ## The 7 Laws and the 21 crashes
 
@@ -158,12 +160,12 @@ Three levels, one contract:
 | Level | How |
 | --- | --- |
 | **HTTP** | Set the agent’s 1Click base URL to `http://localhost:4321/r/<runId>`. Send deposits through `POST /sandbox/v0/wallet/transfer`. Post the final claim to `/sandbox/v0/report`. |
-| **Process** | `pnpm airbag run --cmd "node my-agent.js"`. The harness sets `AIRBAG_BASE_URL`, `ONECLICK_BASE_URL`, `NEAR_SWAP_API_URL`, `AIRBAG_TASK` and `AIRBAG_POLICY` per scenario. |
+| **Process** | `pnpm airbag run --cmd "node examples/http-agent.mjs"`. The harness sets `AIRBAG_BASE_URL`, `ONECLICK_BASE_URL`, `NEAR_SWAP_API_URL`, `AIRBAG_TASK` and `AIRBAG_POLICY` per scenario. |
 | **In-process** | Implement the `AgentAdapter` from `@airbag/core` in TypeScript. |
 
 ```bash
 pnpm airbag serve                 # sandbox on 4321 (or the next free port)
-pnpm airbag run --cmd "node my-agent.js"
+pnpm airbag run --cmd "node examples/http-agent.mjs"
 ```
 
 A bring-your-own agent must:
@@ -226,8 +228,9 @@ incoming process; live bring-your-own runs need the local CLI.
 - **Event sourcing.** The `EventLog` is the only source of truth for the Judge and Replay. The UI
   never recomputes a verdict.
 - **Money is `bigint`.** Smallest-unit strings on the wire; display formatting only in the UI.
-- **Frozen contracts.** `types.ts`, `report.schema.ts` and `scenario.schema.ts` are Zod-validated;
-  changing them requires a `DECISIONS.md` entry and fixture regeneration.
+- **Frozen contracts.** `types.ts` is the TypeScript contract; `report.schema.ts` and
+  `scenario.schema.ts` are Zod-validated at runtime. Changing them requires a `DECISIONS.md` entry
+  and fixture regeneration.
 
 Repo layout:
 
@@ -283,7 +286,7 @@ window. Add the live URL here after deploying; do not claim one before it exists
 - **No pre-existing product code.** The repo started empty. Libraries and tools used: pnpm,
   TypeScript, Zod, `@noble/hashes`, Hono, `@hono/node-server`, `commander`, `execa`, the OpenAI SDK,
   React, Vite, `lz-string`, Fontsource (Inter, JetBrains Mono), `yaml`, Vitest,
-  Playwright-core (screenshots only), ESLint, Prettier.
+  Playwright-core (browser checks and screenshots), ESLint, Prettier.
 - **Templates:** none. Vite’s React template conventions were used for the app shell; all product
   code, scenarios, copy and design are written in the window.
 - **AI-assisted build:** an AI coding agent wrote the implementation under human supervision. The
@@ -305,9 +308,10 @@ window. Add the live URL here after deploying; do not claim one before it exists
   decisions against a fixed world.
 - **No accounts, database or required backend.**
 - **No report signature** (the P2 NEAR ed25519 signing is not shipped).
-- **Bundle size:** the initial JavaScript is **197 KB gzipped**, under the 250 KB gzip target. Vite
-  warns about the uncompressed 1.25 MB because the two report fixtures carry the full EventLogs;
-  that size is why the hosted demo stays a static bundle with no backend.
+- **Bundle size:** the initial JavaScript is **184 KB gzipped (1.21 MB uncompressed)**; the lazily
+  loaded report, replay and scenario pages add about 15 KB gzipped in total, under the 250 KB gzip
+  target. Vite warns about the uncompressed 1.21 MB because the two report fixtures carry the full
+  EventLogs; that size is why the hosted demo stays a static bundle with no backend.
 
 ## License
 

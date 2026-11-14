@@ -22,7 +22,8 @@ judge and scenarios. ESLint bans Node imports in `packages/core`; a test scans t
 
 **Plain CSS design system instead of Tailwind v4.** Alternatives: Tailwind, CSS-in-JS. Reason: the
 design is a small, highly custom system (radar, scenario grid, replay scrubber). Hand-written tokens
-and components keep the bundle at 186 KB gzipped and remove a build dependency. This is a deliberate
+and components keep the initial JavaScript at 184 KB gzipped (the index chunk, 1.21 MB uncompressed)
+and remove a build dependency. This is a deliberate
 deviation from the pinned stack in the prompt; the visual spec is implemented.
 
 **Zod at every boundary; `bigint` for money.** Alternatives: io-ts, plain TS, `number`. Reason: the

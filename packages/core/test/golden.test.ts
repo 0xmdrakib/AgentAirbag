@@ -13,6 +13,26 @@ function failing(results: ScenarioResult[]): string[] {
 }
 
 describe('golden agents', () => {
+  it('pins the published demo numbers and hashes', async () => {
+    // The README, docs/FACTS.md and the Report Card screenshots quote these exact values.
+    const dummy = await runSuite({ agent: naiveAgent(), scenarios: SCENARIOS, seed: 'airbag-demo-2026' });
+    expect(dummy.overall.grade).toBe('F');
+    expect(dummy.overall.score).toBe(0);
+    expect(dummy.overall.failed).toBe(21);
+    expect(dummy.overall.falseClaims).toBe(8);
+    expect(dummy.overall.simulatedLossUsd).toBe('10907.04');
+    expect(dummy.hash).toBe('04b59907e7df1bec6d2e2c2abc7b82196e396ef08b345ba6d20c5830a6634072');
+  }, 60_000);
+
+  it('pins the published Seatbelt numbers and hash', async () => {
+    const seatbelt = await runSuite({ agent: hardenedAgent(), scenarios: SCENARIOS, seed: 'airbag-demo-2026' });
+    expect(seatbelt.overall.grade).toBe('A');
+    expect(seatbelt.overall.score).toBe(100);
+    expect(seatbelt.overall.passed).toBe(21);
+    expect(seatbelt.overall.simulatedLossUsd).toBe('1.00');
+    expect(seatbelt.hash).toBe('c70fc010e3e258dc519fe9faeeb86309ac1de98c88e98331ff3eedd6bab1dca6');
+  }, 60_000);
+
   it('Dummy crashes on at least 14 crashes, and in this build on all 21', async () => {
     const report = await runSuite({ agent: naiveAgent(), scenarios: SCENARIOS, seed });
     const failed = failing(report.laws.flatMap((law) => law.scenarios));

@@ -26,7 +26,7 @@ is not here, it is not a shipped claim.
 | The report card is generated from ledger truth | `pnpm build:fixtures` | `fixtures/report.naive.json` and `report.hardened.json`; violations cite event indexes |
 | Dummy’s simulated loss is $10,907.04 | `pnpm build:fixtures` or README report card | `F · 21 crashed · $10907.04 simulated loss` |
 | Seatbelt’s simulated loss is $1.00 (modeled refund fee) | `pnpm build:fixtures` | `A · 0 crashed · $1.00 simulated loss` |
-| The token/price snapshot is from a live read-only call | `fixtures/tokens.snapshot.json` | 58,875 bytes; `priceUpdatedAt` 2026-11-13T19:15:01.290Z |
+| The token/price snapshot is from a live read-only call | `fixtures/tokens.snapshot.json` | 58,875 bytes; 223 of 231 tokens carry `priceUpdatedAt` 2026-11-13T19:15:01.290Z, and the other 8 carry older timestamps |
 | The dry quote snapshot is from a live read-only call | `fixtures/quotes.snapshot.json` | `quote.amountOut` present; `dry: true` in the echo |
 | No real swap is executed | code + tests | The only live calls are GET tokens and POST quote with `dry: true`; the read-only test scans the source |
 | The hosted static app needs no backend | `pnpm build` | `apps/web/dist` contains only static assets |

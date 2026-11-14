@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { cx } from '../lib/format';
 import { MarkerLogo } from './MarkerLogo';
 import { ArrowUpIcon, MenuIcon, XIcon } from './Icons';
@@ -6,11 +6,12 @@ import { ArrowUpIcon, MenuIcon, XIcon } from './Icons';
 const NAV = [
   { href: '#/report', label: 'Report', path: '/report' },
   { href: '#/scenarios', label: 'Scenarios', path: '/scenarios' },
-  { href: '#/connect', label: 'Connect', path: '/connect' },
+  { href: '#/connect', label: 'Test your agent', path: '/connect' },
 ];
 
 export function Layout({ route, children }: { route: string; children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -19,7 +20,10 @@ export function Layout({ route, children }: { route: string; children: ReactNode
   useEffect(() => {
     if (!menuOpen) return undefined;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMenuOpen(false);
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+        menuButton.current?.focus();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -62,6 +66,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
             </a>
             <button
               type="button"
+              ref={menuButton}
               className="icon-button menu-button"
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={menuOpen}
@@ -73,7 +78,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
           </div>
         </div>
       </header>
-      <main id="main" className="app-main">
+      <main id="main" className="app-main" tabIndex={-1}>
         {children}
       </main>
       <footer className="app-footer">
@@ -92,7 +97,7 @@ export function Layout({ route, children }: { route: string; children: ReactNode
             <a href="#/run">Run the suite</a>
             <a href="#/report">Report</a>
             <a href="#/scenarios">Scenarios</a>
-            <a href="#/connect">Connect</a>
+            <a href="#/connect">Test your agent</a>
           </nav>
         </div>
         <div className="container footer-bottom">

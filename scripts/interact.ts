@@ -17,7 +17,7 @@ const base = PREVIEW_URL;
 
 // Runner: press Crash, wait for the grid to fill, then open the report.
 await page.goto(`${base}#/run`, { waitUntil: 'networkidle' });
-await page.getByRole('button', { name: 'Crash', exact: true }).click();
+await page.getByRole('button', { name: 'Run the suite', exact: true }).click();
 await page.waitForSelector('.cell-fail, .cell-pass', { timeout: 15_000 });
 await page.waitForTimeout(1500);
 await page.screenshot({ path: `${out}/runner-after.png`, fullPage: true });
@@ -35,7 +35,7 @@ if (hasReportLink) {
 
 // Replay: skip to the crash.
 await page.goto(`${base}#/replay/timeout-after-transfer`, { waitUntil: 'networkidle' });
-await page.getByRole('button', { name: /Skip to the crash/ }).click();
+await page.getByRole('button', { name: /Skip to the key moment/ }).click();
 await page.waitForTimeout(400);
 await page.evaluate(() => {
   (document.activeElement as HTMLElement | null)?.blur();

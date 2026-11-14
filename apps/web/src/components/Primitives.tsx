@@ -64,15 +64,6 @@ export function VerdictPill({ verdict, subtle = false }: { verdict: Verdict; sub
   );
 }
 
-export function LawBadge({ law, short = false }: { law: number; short?: boolean }) {
-  return (
-    <span className="law-badge" aria-label={`Law ${law}${short ? '' : ': the seven laws'}`}>
-      <span className="law-badge-num">{law}</span>
-      {!short && <span className="law-badge-label">LAW {law}</span>}
-    </span>
-  );
-}
-
 export function GradeBadge({ grade, size = 'lg' }: { grade: string; size?: 'sm' | 'lg' }) {
   return (
     <span className={cx('grade-badge', `grade-${gradeTone(grade)}`, `grade-${size}`)}>
@@ -176,7 +167,7 @@ export function EmptyState({
   return (
     <div className="state-card">
       <span className="state-glyph">◇</span>
-      <h2>{title}</h2>
+      <h1>{title}</h1>
       <p>{body}</p>
       {action}
     </div>
@@ -187,7 +178,7 @@ export function ErrorState({ title, body }: { title: string; body: string }) {
   return (
     <div className="state-card state-error">
       <span className="state-glyph">!</span>
-      <h2>{title}</h2>
+      <h1>{title}</h1>
       <p>{body}</p>
     </div>
   );

@@ -36,11 +36,40 @@ export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
 
   useEffect(() => {
     if (!open) return;
+    const drawer = document.querySelector<HTMLElement>('.drawer');
+    const heading = drawer?.querySelector<HTMLElement>('h2');
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus({ preventScroll: true });
+
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpenId(null);
+      if (event.key === 'Escape') {
+        setOpenId(null);
+        return;
+      }
+      if (event.key !== 'Tab' || !drawer) return;
+      const focusable = drawer.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+      // Return focus to the card that opened the drawer.
+      const trigger = document.querySelector<HTMLElement>('[aria-expanded="true"][data-yaml-trigger]');
+      trigger?.focus({ preventScroll: true });
+    };
   }, [open]);
 
   return (
@@ -49,7 +78,7 @@ export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
         <div>
           <h1 className="h1">Scenario library</h1>
           <p className="page-sub">
-            {SCENARIOS.length} crashes across seven laws. Each is one YAML file with a story, the
+            {SCENARIOS.length} crash scenarios across seven laws. Each is one YAML file with a story, the
             fault Airbag injects, the check the judge runs and a fix.
           </p>
         </div>
@@ -91,7 +120,7 @@ export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
       </div>
 
       <div className="library-count mono">
-        {filtered.length} of {SCENARIOS.length} crashes
+        {filtered.length} of {SCENARIOS.length} scenarios
       </div>
 
       <div className="library-grid">
@@ -102,22 +131,25 @@ export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
                 <span className="library-law-num mono">{scenario.law}</span>
                 <span className="library-law-name">{LAW_NAMES[scenario.law as Law]}</span>
               </span>
-            </div>
-            <h2 className="h3">{scenario.title}</h2>
-            <p className="library-story">{scenario.story}</p>
-            <div className="library-tags">
               <span className={cx('library-priority mono', `priority-${scenario.priority.toLowerCase()}`)}>
                 {scenario.priority}
               </span>
               {scenario.modeled && <span className="modeled-tag">modeled</span>}
-              {scenario.llmSensitive && <span className="llm-tag">LLM-sensitive</span>}
-              <span className="library-id mono">{scenario.id}</span>
+              {scenario.llmSensitive && <span className="llm-tag">LLM</span>}
             </div>
+            <h2 className="h3">{scenario.title}</h2>
+            <p className="library-story">{scenario.story}</p>
             <div className="library-actions">
               <a href={`#/replay/${scenario.id}`} className="library-watch">
                 Watch Dummy crash <ArrowRightIcon size={14} />
               </a>
-              <button type="button" className="library-yaml" onClick={() => setOpenId(scenario.id)}>
+              <button
+                type="button"
+                className="library-yaml"
+                aria-expanded={openId === scenario.id}
+                data-yaml-trigger
+                onClick={() => setOpenId(scenario.id)}
+              >
                 <CodeIcon size={14} /> View YAML
               </button>
             </div>
@@ -158,7 +190,7 @@ export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
             </div>
             <div className="drawer-actions">
               <CopyButton value={YAML[open.id] ?? ''} label="Copy YAML" />
-              <span className="mono">{open.priority} · law {open.law}</span>
+              <span className="mono">{open.priority} · Law {open.law}</span>
             </div>
             <pre className="drawer-code mono">
               <code>{YAML[open.id] ?? 'YAML not found.'}</code>

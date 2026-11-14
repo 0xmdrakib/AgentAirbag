@@ -41,7 +41,7 @@ export function SafetyRadar({
   return (
     <figure className={`radar radar-${tone}`}>
       <div className="radar-stage">
-        <svg viewBox="0 0 100 100" className="radar-svg" role="img" aria-label="Safety shape: seven law scores">
+        <svg viewBox="0 0 100 100" className="radar-svg" role="img" aria-label="Law scores: seven laws from 0 to 100">
           {rings.map((ring) => (
             <polygon
               key={ring}
@@ -108,7 +108,7 @@ export function SafetyRadar({
         )}
       </figcaption>
       <table className="sr-only">
-        <caption>Safety shape: scores for the seven laws</caption>
+        <caption>Law scores: seven laws from 0 to 100</caption>
         <thead>
           <tr>
             <th>Law</th>
