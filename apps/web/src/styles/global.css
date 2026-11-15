@@ -38,9 +38,9 @@
   --warn-soft: #fdf2e6;
   --warn-line: #f0cfa8;
   --warn-ink: #ffffff;
-  --fail: #c01f31;
-  --fail-soft: #fcedef;
-  --fail-line: #f0c2c8;
+  --fail: #b3261e;
+  --fail-soft: #fbeeec;
+  --fail-line: #eec6c1;
   --fail-ink: #ffffff;
 
   --glow-1: transparent;
@@ -7168,5 +7168,98 @@ h2.eyebrow {
 
   .wallet-picker-footnote {
     padding: 12px 18px calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Report hero: one tidy right column. The three actions share equal widths, the save control
+   spans the same width, and the amount lines up to the same right edge. */
+.report-hero-money {
+  width: 100%;
+  max-width: 340px;
+  justify-self: end;
+  align-items: stretch;
+  gap: 12px;
+  text-align: right;
+}
+
+.report-hero-money .money-meter {
+  align-items: flex-end;
+}
+
+.report-hero .report-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  gap: 8px;
+}
+
+.report-hero .report-actions .btn {
+  width: 100%;
+  padding-inline: 8px;
+  justify-content: center;
+}
+
+.report-hero-money .wallet-save {
+  width: 100%;
+}
+
+.report-hero-money .wallet-save-connect {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Report section links: quiet underline tabs instead of a heavy pill bar. */
+.section-nav {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  margin-top: 28px;
+  padding: 0;
+  overflow-x: auto;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.section-nav a {
+  padding: 10px 0;
+  border-radius: 0;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.section-nav a:hover {
+  color: var(--text);
+  background: transparent;
+}
+
+.section-nav a.section-nav-active {
+  margin-bottom: -1px;
+  border-bottom: 2px solid var(--text);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+}
+
+.stats-legend {
+  margin-top: 12px;
+  color: var(--text-3);
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 640px) {
+  .report-hero-money {
+    max-width: none;
+    text-align: left;
+  }
+
+  .report-hero-money .money-meter {
+    align-items: flex-start;
+  }
+
+  .section-nav {
+    gap: 20px;
   }
 }
