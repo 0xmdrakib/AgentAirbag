@@ -42,7 +42,7 @@ export function LabPage() {
   const { reports } = useAppState();
   const agents = [
     { report: reports.naive, setup: 'No guards', name: 'Dummy agent' },
-    { report: reports.hardened, setup: 'With Airbag Guard checks', name: 'Seatbelt agent' },
+    { report: reports.hardened, setup: 'With Agent Airbag Guard', name: 'Seatbelt agent' },
   ];
 
   return (
@@ -85,45 +85,50 @@ export function LabPage() {
       </section>
 
       <section className="landing-proof" data-reveal aria-labelledby="proof-title">
-        <div className="proof-panel">
-          <div className="proof-head">
-            <h2 className="proof-title" id="proof-title">
-              Same {SCENARIOS.length} crash scenarios, two agents
+        <div className="result-card">
+          <header className="result-head">
+            <h2 className="result-title" id="proof-title">
+              Same {SCENARIOS.length} crashes, two agents
             </h2>
             <a href="/report" className="proof-link">
               Open the report <ArrowRightIcon size={14} />
             </a>
-          </div>
-          <div className="proof-grid">
+          </header>
+          <div className="result-rows">
             {agents.map(({ report, setup, name }) => {
               const tone = gradeTone(report.overall.grade);
+              const total = report.suite.scenarioCount;
+              const passed = report.overall.passed;
               return (
-                <div className="proof-agent" key={name}>
-                  <div className="proof-agent-top">
-                    <div>
-                      <p className="proof-setup">{setup}</p>
-                      <p className="proof-name">{name}</p>
+                <article className={cx('result-row', `result-${tone}`)} key={name}>
+                  <span className="result-grade" aria-label={`Grade ${report.overall.grade}`}>
+                    {report.overall.grade}
+                  </span>
+                  <div className="result-who">
+                    <h3 className="result-name">{name}</h3>
+                    <p className="result-setup">{setup}</p>
+                  </div>
+                  <div className="result-loss">
+                    <p className="result-money">{formatUsd(report.overall.simulatedLossUsd)}</p>
+                    <p className="result-caption">simulated loss</p>
+                  </div>
+                  <div className="result-survival">
+                    <div
+                      className="result-bar"
+                      role="img"
+                      aria-label={`Survived ${passed} of ${total}`}
+                    >
+                      <span style={{ width: `${(passed / total) * 100}%` }} />
                     </div>
-                    <span className={cx('proof-grade', `text-${tone}`)}>{report.overall.grade}</span>
+                    <p className="result-count">
+                      <strong>{passed}</strong> of {total} survived
+                    </p>
                   </div>
-                  <p className={cx('proof-money', `text-${tone}`)}>
-                    {formatUsd(report.overall.simulatedLossUsd)}
-                  </p>
-                  <p className="proof-caption">simulated loss</p>
-                  <div className="proof-bar" aria-hidden="true">
-                    <span
-                      className={cx('proof-bar-fill', `fill-${tone}`)}
-                      style={{ width: `${(report.overall.passed / report.suite.scenarioCount) * 100}%` }}
-                    />
-                  </div>
-                  <p className="proof-survived">
-                    Survived {report.overall.passed} of {report.suite.scenarioCount}
-                  </p>
-                </div>
+                </article>
               );
             })}
           </div>
-          <p className="proof-foot">
+          <p className="result-foot">
             Both are scripted reference agents. Dummy follows the 1Click tutorial; Seatbelt checks
             before it signs. Seatbelt’s $1.00 is a modeled refund fee, not an observed loss.
           </p>

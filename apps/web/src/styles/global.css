@@ -7263,3 +7263,323 @@ h2.eyebrow {
     gap: 20px;
   }
 }
+
+
+/* ---------- Home result card (v2) ----------
+   One result row per agent: a grade medallion, the name, the loss and a survival bar. The card
+   adapts to its own width, not the screen: a single wide row, a compact row, or two columns. */
+
+.result-card {
+  container-type: inline-size;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow:
+    0 1px 2px rgba(18, 18, 18, 0.04),
+    0 28px 56px -36px rgba(18, 18, 18, 0.22);
+}
+
+.result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.result-title {
+  font-size: 14.5px;
+  font-weight: 620;
+  letter-spacing: -0.005em;
+  color: var(--text);
+}
+
+.result-rows {
+  display: grid;
+}
+
+.result-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  grid-template-areas:
+    'grade who loss'
+    'grade surv surv';
+  align-items: center;
+  column-gap: 16px;
+  row-gap: 16px;
+  padding: 24px;
+}
+
+.result-row + .result-row {
+  border-top: 1px solid var(--line);
+}
+
+.result-pass {
+  --tone: var(--pass);
+  --tone-soft: var(--pass-soft);
+  --tone-line: var(--pass-line);
+}
+
+.result-warn {
+  --tone: var(--warn);
+  --tone-soft: var(--warn-soft);
+  --tone-line: var(--warn-line);
+}
+
+.result-fail {
+  --tone: var(--fail);
+  --tone-soft: var(--fail-soft);
+  --tone-line: var(--fail-line);
+}
+
+.result-grade {
+  grid-area: grade;
+  align-self: start;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 1.5px solid var(--tone-line);
+  border-radius: 50%;
+  background: var(--tone-soft);
+  color: var(--tone);
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.result-who {
+  grid-area: who;
+  min-width: 0;
+}
+
+.result-name {
+  font-size: 16px;
+  font-weight: 640;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.result-setup {
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.result-loss {
+  grid-area: loss;
+  text-align: right;
+}
+
+.result-money {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  color: var(--tone);
+}
+
+.result-caption {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.result-survival {
+  grid-area: surv;
+}
+
+.result-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+
+.result-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--tone);
+}
+
+.result-count {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.result-count strong {
+  color: var(--text);
+  font-weight: 650;
+}
+
+.result-foot {
+  padding: 16px 24px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* Compact row: a narrow card, or two columns side by side. The loss moves under the name. */
+@container (max-width: 379px) or (min-width: 640px) {
+  .result-row {
+    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-areas:
+      'grade who'
+      'loss loss'
+      'surv surv';
+    row-gap: 14px;
+    padding: 22px;
+  }
+
+  .result-grade {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .result-loss {
+    text-align: left;
+  }
+
+  .result-money {
+    font-size: 30px;
+  }
+}
+
+@container (min-width: 640px) {
+  .result-rows {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .result-row + .result-row {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+  }
+}
+
+@container (max-width: 379px) {
+  .result-head {
+    padding: 14px 18px;
+  }
+
+  .result-row {
+    padding: 20px 18px;
+  }
+
+  .result-foot {
+    padding: 14px 18px;
+  }
+}
+
+/* ---------- Report hero (v3) ----------
+   Wide: grade, headline, then a fixed right column. Tablet: the amount and the actions become a
+   tidy band under the headline. Phones keep their own stacked layout (rules above). */
+
+@media (min-width: 641px) {
+  header.report-hero {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr) minmax(280px, 320px);
+    grid-template-areas: 'grade copy money';
+    align-items: center;
+    column-gap: clamp(28px, 3.4vw, 56px);
+    row-gap: 0;
+  }
+
+  header.report-hero .report-grade {
+    grid-area: grade;
+  }
+
+  header.report-hero .report-hero-copy {
+    grid-area: copy;
+  }
+
+  header.report-hero .report-hero-money {
+    grid-area: money;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    gap: 12px;
+    text-align: right;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1179px) {
+  header.report-hero {
+    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-areas:
+      'grade copy'
+      'money money';
+    row-gap: 28px;
+    padding: 30px;
+  }
+
+  header.report-hero .report-hero-money {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+    grid-template-areas:
+      'meter actions'
+      'meter save';
+    align-items: center;
+    column-gap: 32px;
+    row-gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    text-align: left;
+  }
+
+  header.report-hero .report-hero-money .money-meter {
+    grid-area: meter;
+    align-items: flex-start;
+  }
+
+  header.report-hero .report-hero-money .report-actions {
+    grid-area: actions;
+  }
+
+  header.report-hero .report-hero-money .wallet-save {
+    grid-area: save;
+  }
+}
+
+@media (min-width: 1180px) {
+  header.report-hero .report-hero-money .money-meter {
+    align-items: flex-end;
+  }
+}
+
+header.report-hero .report-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+header.report-hero .report-actions .btn {
+  width: 100%;
+  justify-content: center;
+  padding-inline: 8px;
+}
+
+header.report-hero .wallet-save {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  header.report-hero .report-hero-money .money-meter {
+    align-items: flex-start;
+  }
+}
