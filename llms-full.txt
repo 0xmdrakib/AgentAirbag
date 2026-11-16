@@ -409,6 +409,7 @@ Only the first column exists today.
 | 21 crashes, Judge, Guard, report card, replay | A real LLM run on NEAR AI Cloud, recorded as a cassette | More laws and scenario packs contributed as YAML |
 | HTTP, process and in-process agents | Reports signed with a NEAR key | Sandboxes for other agent payment rails |
 | Live app, wallet sign-in, saved runs | A CI step that fails a pull request when an agent's grade drops | Multi-trial statistics and trend tracking |
+| | Wallet sign-in moved from the deprecated `@near-wallet-selector/*` to NEAR Connect | |
 
 ## Related work
 

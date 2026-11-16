@@ -222,6 +222,21 @@ SPA rewrite answered it with the app shell and a 200, which is worse than a 404.
 paths with a file extension, `vercel.json` sets content types, and `pnpm check:site` (part of
 `verify`) fails if a published file is missing or is the app shell.
 
+## Wallet order, MyNearWallet and near.com
+
+**Meteor leads the picker and MyNearWallet is last.** The order is Meteor, Nightly, OKX, Sender, then
+Here, Coin98, Ledger and MyNearWallet, which carries a "Retiring" tag. MyNearWallet's own site says it
+is in limited mode and planned for deprecation on 31 Oct 2026, with Meteor as the recommended path, so
+it no longer gets promotional copy and the old footer line about it is gone.
+
+**There is no near.com button.** near.com is NEAR's account app, not a wallet a third-party site can
+connect to: a near.com account is controlled by a passkey or by another wallet, and near.com is not in
+the NEAR Connect wallet manifest. A button that claimed to connect it would not work, so none exists.
+
+**Known debt: the NEAR docs now call `@near-wallet-selector/*` deprecated** and recommend NEAR Connect
+(`@hot-labs/near-connect`). The custom picker is independent of the library, so a migration changes
+`selector.ts` and the provider, not the UI. It is listed on the roadmap as not built.
+
 ## Wallet picker and provider list
 
 **The hand written Buffer shim was the reason most wallet modules failed.** It lacked

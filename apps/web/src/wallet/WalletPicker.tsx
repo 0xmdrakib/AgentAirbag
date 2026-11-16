@@ -12,8 +12,11 @@ import { cx } from '../lib/format';
 import { ArrowRightIcon, ChevronIcon, WalletIcon, XIcon } from '../components/Icons';
 import { loadWallet } from './selector';
 
-/** The wallets most NEAR users reach for, kept in a stable order ahead of the rest. */
-const PRIMARY_WALLET_IDS = ['my-near-wallet', 'sender', 'okx-wallet', 'nightly'];
+/** The wallets shown first, in this order. Meteor leads: it is the wallet NEAR points users to. */
+const PRIMARY_WALLET_IDS = ['meteor-wallet', 'nightly', 'okx-wallet', 'sender'];
+
+/** MyNearWallet is being retired (limited mode since Oct 2026), so it always sits last. */
+const RETIRING_WALLET_IDS = ['my-near-wallet'];
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -78,7 +81,12 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
   const primaryWallets = PRIMARY_WALLET_IDS.map((walletId) =>
     wallets.find((wallet) => wallet.id === walletId),
   ).filter((wallet): wallet is PickerWallet => Boolean(wallet));
-  const extraWallets = wallets.filter((wallet) => !isPrimaryWallet(wallet.id));
+  const extraWallets = wallets
+    .filter((wallet) => !isPrimaryWallet(wallet.id))
+    .sort(
+      (left, right) =>
+        Number(RETIRING_WALLET_IDS.includes(left.id)) - Number(RETIRING_WALLET_IDS.includes(right.id)),
+    );
   const visibleWallets = showAll ? [...primaryWallets, ...extraWallets] : primaryWallets;
 
   useEffect(() => {
@@ -272,6 +280,9 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
                         )}
                       </span>
                       <span className="wallet-picker-row-name">{wallet.name}</span>
+                      {RETIRING_WALLET_IDS.includes(wallet.id) && (
+                        <span className="wallet-picker-row-tag">Retiring</span>
+                      )}
                       <span className="wallet-picker-row-chevron" aria-hidden="true">
                         <ArrowRightIcon size={16} />
                       </span>
@@ -307,9 +318,6 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
         )}
         </div>
 
-        <p className="wallet-picker-footnote">
-          New to NEAR? MyNearWallet works in any browser, no extension needed.
-        </p>
       </div>
     </div>,
     document.body,

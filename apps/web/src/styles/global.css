@@ -7583,3 +7583,22 @@ header.report-hero .wallet-save {
     align-items: flex-start;
   }
 }
+
+/* Wallet picker: no footer any more, so the list ends at the panel edge. A small tag marks a wallet
+   that is being retired. */
+.wallet-picker-body {
+  padding-bottom: calc(18px + env(safe-area-inset-bottom));
+}
+
+.wallet-picker-row-tag {
+  flex: 0 0 auto;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border: 1px solid var(--warn-line);
+  border-radius: 999px;
+  background: var(--warn-soft);
+  color: var(--warn);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
