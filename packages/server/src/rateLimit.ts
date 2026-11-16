@@ -84,15 +84,24 @@ export async function checkRate(
 }
 
 /**
- * The caller's address as the host reports it. Vercel overwrites these headers, so a visitor
- * cannot choose their own value there. Behind no proxy they can be forged, which only weakens the
- * limit; it never grants access.
+ * The caller's address. The live site sits behind Cloudflare, so Vercel's own headers name a
+ * Cloudflare edge address that many visitors share; Cloudflare puts the real visitor address in
+ * CF-Connecting-IP, which comes first. Without Cloudflare the host's headers are used (Vercel
+ * sets them itself). A forged value only moves the forger to another bucket: it never grants
+ * access, and the limits are loose enough that one address is never a whole site.
  */
+const ADDRESS_HEADERS = [
+  'cf-connecting-ip',
+  'x-vercel-forwarded-for',
+  'x-real-ip',
+  'x-forwarded-for',
+];
+
 export function clientAddress(headers: { get(name: string): string | null }): string {
-  const direct = headers.get('x-vercel-forwarded-for') ?? headers.get('x-real-ip');
-  if (direct && direct.trim()) return direct.split(',')[0]!.trim();
-  const forwarded = headers.get('x-forwarded-for');
-  if (forwarded && forwarded.trim()) return forwarded.split(',')[0]!.trim();
+  for (const name of ADDRESS_HEADERS) {
+    const value = headers.get(name);
+    if (value && value.trim()) return value.split(',')[0]!.trim();
+  }
   return 'unknown';
 }
 

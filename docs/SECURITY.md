@@ -52,8 +52,11 @@ using the site, and a shared office address still has room. A limited request ge
 `Retry-After` header and a plain message. If the counter store cannot answer, the request goes
 through: refusing real users is the worse failure.
 
-Counters are keyed on the address the host reports. Vercel overwrites those headers, so a visitor
-cannot choose their own. Behind no proxy they can be forged, which only weakens a limit.
+Counters are keyed on the visitor's address. The live site sits behind Cloudflare, so Vercel only
+sees a Cloudflare edge address that many visitors share; the real address comes from
+`CF-Connecting-IP`, which is read first. A header sent straight to Vercel, around Cloudflare, can be
+forged. That lets a forger pick their own bucket, or fill the bucket of an address they know, but
+it never grants access to anything.
 
 ## Not covered
 

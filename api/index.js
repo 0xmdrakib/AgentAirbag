@@ -26205,11 +26205,17 @@ async function checkRate(hit, rule, subject, nowMs) {
     return { allowed: true, retryAfterSeconds: 0 };
   }
 }
+var ADDRESS_HEADERS = [
+  "cf-connecting-ip",
+  "x-vercel-forwarded-for",
+  "x-real-ip",
+  "x-forwarded-for"
+];
 function clientAddress(headers) {
-  const direct = headers.get("x-vercel-forwarded-for") ?? headers.get("x-real-ip");
-  if (direct && direct.trim()) return direct.split(",")[0].trim();
-  const forwarded = headers.get("x-forwarded-for");
-  if (forwarded && forwarded.trim()) return forwarded.split(",")[0].trim();
+  for (const name of ADDRESS_HEADERS) {
+    const value = headers.get(name);
+    if (value && value.trim()) return value.split(",")[0].trim();
+  }
   return "unknown";
 }
 function subjectForAddress(address) {

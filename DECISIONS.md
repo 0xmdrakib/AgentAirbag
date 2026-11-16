@@ -260,7 +260,11 @@ fixed-window limits kept in Postgres so every serverless instance shares one cou
 40 nonces and 20 sign-ins per minute per address, 20 saves per minute per account), 50 saved runs and
 10 sessions per account with the oldest removed, a 16 KB cap on sign-in bodies, a refusal of browser
 POSTs that name a foreign origin, and `Cache-Control: no-store` on /api. If the counter store fails the
-request goes through, because refusing real users is the worse failure. A strict CSP and
+request goes through, because refusing real users is the worse failure. The first version keyed the
+limits on Vercel's forwarded address, but agentairbag.xyz is proxied by Cloudflare, so that address is
+a Cloudflare edge shared by every visitor of a region and one limit would have covered them all (found
+by comparing the stored bucket name with the hash of the caller's own address); the key now reads
+CF-Connecting-IP first. A strict CSP and
 Cross-Origin-Opener-Policy were left out because wallet popups and frames would break. Details and what
 remains uncovered are in docs/SECURITY.md. The CLAIMS row that said "no known production dependency
 vulnerabilities" was no longer true (three advisories, all inside the browser wallet libraries), so it

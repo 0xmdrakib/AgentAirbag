@@ -193,6 +193,36 @@ describe('rate limiting', () => {
     expect(clientAddress(headers)).toBe('203.0.113.5');
     expect(clientAddress(new Headers({ 'x-real-ip': '198.51.100.1' }))).toBe('198.51.100.1');
     expect(clientAddress(new Headers())).toBe('unknown');
+    // Behind Cloudflare the real visitor is in CF-Connecting-IP, not in the edge address.
+    const proxied = new Headers({
+      'cf-connecting-ip': '203.0.113.99',
+      'x-vercel-forwarded-for': '104.21.33.191',
+      'x-forwarded-for': '104.21.33.191',
+    });
+    expect(clientAddress(proxied)).toBe('203.0.113.99');
+  });
+
+  it('keeps visitors behind one Cloudflare edge address apart', async () => {
+    const edge = '104.21.33.191';
+    for (let index = 0; index <= RATE_RULES.nonce.limit; index += 1) {
+      await post(
+        '/api/auth/nonce',
+        {},
+        { 'x-forwarded-for': edge, 'cf-connecting-ip': '203.0.113.1' },
+      );
+    }
+    const first = await post(
+      '/api/auth/nonce',
+      {},
+      { 'x-forwarded-for': edge, 'cf-connecting-ip': '203.0.113.1' },
+    );
+    const other = await post(
+      '/api/auth/nonce',
+      {},
+      { 'x-forwarded-for': edge, 'cf-connecting-ip': '203.0.113.2' },
+    );
+    expect(first.status).toBe(429);
+    expect(other.status).toBe(200);
   });
 
   it('counts in fixed windows', async () => {
