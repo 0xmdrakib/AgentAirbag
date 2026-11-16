@@ -280,9 +280,6 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
                         )}
                       </span>
                       <span className="wallet-picker-row-name">{wallet.name}</span>
-                      {RETIRING_WALLET_IDS.includes(wallet.id) && (
-                        <span className="wallet-picker-row-tag">Retiring</span>
-                      )}
                       <span className="wallet-picker-row-chevron" aria-hidden="true">
                         <ArrowRightIcon size={16} />
                       </span>

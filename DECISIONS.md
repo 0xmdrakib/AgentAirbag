@@ -225,7 +225,7 @@ paths with a file extension, `vercel.json` sets content types, and `pnpm check:s
 ## Wallet order, MyNearWallet and near.com
 
 **Meteor leads the picker and MyNearWallet is last.** The order is Meteor, Nightly, OKX, Sender, then
-Here, Coin98, Ledger and MyNearWallet, which carries a "Retiring" tag. MyNearWallet's own site says it
+Here, Coin98, Ledger and MyNearWallet. MyNearWallet's own site says it
 is in limited mode and planned for deprecation on 31 Oct 2026, with Meteor as the recommended path, so
 it no longer gets promotional copy and the old footer line about it is gone.
 
