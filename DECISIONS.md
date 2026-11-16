@@ -329,6 +329,18 @@ are: the `@airbag/*` packages, the `pnpm airbag` command, `AIRBAG_*` variables, 
 social preview is `apps/web/public/og.png` (1200x630), rendered by `pnpm og`, because X and most
 unfurlers ignore SVG.
 
+## Saved runs: idempotent, removable, comparable
+
+**A report is saved once per account, can be deleted by its owner, and shows its change.** Saving
+the same report hash again returns the first run instead of adding a duplicate (both stores check
+before inserting), so pressing Save twice or opening two tabs cannot pile up identical rows.
+`DELETE /api/runs/:id` removes one run of the signed-in account: anonymous gets 401, another
+account gets 404, and the owner gets 200. The My runs dialog uses a two-step delete (Delete, then
+Confirm) and shows "since the run before" with the score change and whether the simulated loss went
+up or down, which answers the question a saved run is for: did the fix help. A scenario can be
+linked directly with `/scenarios?scenario=<id>`, and the YAML drawer copies that link. Tests:
+`abuse.test.ts` covers the duplicate, the owner check and the delete.
+
 ## Editorial UI system
 
 **Redesign the components, not only the palette.** The maintainer supplied Eleken and VITA as

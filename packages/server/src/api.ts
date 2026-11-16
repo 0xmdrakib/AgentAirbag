@@ -198,7 +198,7 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
         if (allowedOrigin) return origin === allowedOrigin ? origin : undefined;
         return origin === new URL(c.req.url).origin ? origin : undefined;
       },
-      allowMethods: ['GET', 'POST', 'OPTIONS'],
+      allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
       allowHeaders: ['Content-Type'],
       credentials: true,
       maxAge: 600,
@@ -409,6 +409,19 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
     if (!run) return c.json({ error: 'Run not found.' }, 404);
     return c.json(run.report);
   });
+
+  api.delete(
+    '/runs/:id',
+    requireSession,
+    limitBy(RATE_RULES.saveAccount, byAccount),
+    async (c) => {
+      const id = c.req.param('id');
+      if (!id || id.length > 128) return c.json({ error: 'Run not found.' }, 404);
+      const removed = await store.deleteRun(c.get('accountId'), id);
+      if (!removed) return c.json({ error: 'Run not found.' }, 404);
+      return c.json({ ok: true });
+    },
+  );
 
   const app = new Hono<ApiEnv>();
   app.route('/api', api);

@@ -199,7 +199,10 @@ export function ReportPage() {
         />
         <Stat label="Score" value={`${report.overall.score}/100`} />
       </div>
-      <p className="stats-legend">Average of the seven laws. A 95+ · B 85+ · C 70+ · D 50+</p>
+      <p className="stats-legend">
+        Average of the seven laws. A 95+ · B 85+ · C 70+ · D 50+. A false claim about the ledger
+        caps the grade.
+      </p>
 
       <section className="report-shape" id="report-shape" aria-labelledby="report-shape-title">
         <div className="report-shape-chart">

@@ -32,6 +32,21 @@ const STEPS = [
   },
 ];
 
+const USE_CASES = [
+  {
+    title: 'Before an agent goes live',
+    body: 'Run the suite against the same HTTP contract your agent calls, then fix the crashes that lost the most money first.',
+  },
+  {
+    title: 'When you inherit an agent',
+    body: 'Read the report card, then replay the costliest crash step by step with the ledger beside it. No guessing from logs.',
+  },
+  {
+    title: 'When a failure needs explaining',
+    body: 'Scrub to the exact event that broke a law, copy the fix into the code, and share the report link or JSON with the team.',
+  },
+];
+
 const TRUTH = [
   ['1Click API contract', 'Mirrored from docs.near-intents.org, 13 Nov 2026'],
   ['Token list and prices', 'Real snapshot, 13 Nov 2026'],
@@ -154,6 +169,39 @@ export function LabPage() {
                 <div>
                   <h3 className="h3">{step.title}</h3>
                   <p>{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="container section section-rule" aria-labelledby="use-title" data-reveal>
+        <div className="split">
+          <div className="split-label">
+            <p className="eyebrow">Use cases</p>
+            <h2 className="h2" id="use-title">
+              Where this helps
+            </h2>
+            <p className="lead">
+              The lab is for the moment before an agent touches a real balance, and for the moment
+              after it behaves in a way nobody can explain.
+            </p>
+            <LinkButton href="/run" variant="secondary" size="md" className="home-use-cta">
+              Run it now, no setup <ArrowRightIcon size={16} />
+            </LinkButton>
+          </div>
+          <ol className="rows home-uses">
+            {USE_CASES.map((useCase, index) => (
+              <li key={useCase.title}>
+                <div className="home-use">
+                  <span className="home-use-num" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div>
+                    <h3 className="h3">{useCase.title}</h3>
+                    <p>{useCase.body}</p>
+                  </div>
                 </div>
               </li>
             ))}

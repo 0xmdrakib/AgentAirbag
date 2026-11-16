@@ -40,6 +40,7 @@ beforeEach(async () => {
     saveRun: (accountId, report) => base.saveRun(accountId, report),
     listRuns: (accountId, limit) => base.listRuns(accountId, limit),
     getRun: (accountId, id) => base.getRun(accountId, id),
+    deleteRun: (accountId, id) => base.deleteRun(accountId, id),
     saveNonce: async (nonce, pending) => {
       calls.saves += 1;
       saved.set(nonce, pending);

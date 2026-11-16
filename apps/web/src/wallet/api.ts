@@ -69,7 +69,7 @@ async function errorDetail(response: Response): Promise<string | null> {
 }
 
 interface RequestOptions {
-  method?: 'GET' | 'POST';
+  method?: 'GET' | 'POST' | 'DELETE';
   body?: unknown;
 }
 
@@ -316,6 +316,11 @@ export async function getRun(id: string): Promise<SavedRun> {
     throw new ApiError('That run could not be read.', 502);
   }
   return run;
+}
+
+/** Removes one saved run of the signed-in account. */
+export async function deleteRun(id: string): Promise<void> {
+  await request<unknown>(`/runs/${encodeURIComponent(id)}`, { method: 'DELETE' });
 }
 
 export function isApiUnavailable(error: unknown): boolean {

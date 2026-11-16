@@ -17,7 +17,7 @@ A sandboxed NEAR Intents 1Click API that fails on purpose, 21 scripted crashes, 
 [Live demo](https://agentairbag.xyz) · [Quick start](#quick-start) · [How it works](#how-it-works) · [The 21 crashes](#the-seven-laws-and-21-crashes) · [Roadmap](#roadmap) · [For agents](#for-agents-and-llms)
 
 [![verify](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml/badge.svg)](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml)
-![tests](https://img.shields.io/badge/tests-147%20passing-0d7a4e)
+![tests](https://img.shields.io/badge/tests-149%20passing-0d7a4e)
 ![crashes](https://img.shields.io/badge/crashes-21-ffd21f)
 ![real funds](https://img.shields.io/badge/real%20funds-0-c01f31)
 ![license](https://img.shields.io/badge/license-MIT-6b6b67)
@@ -30,7 +30,7 @@ A sandboxed NEAR Intents 1Click API that fails on purpose, 21 scripted crashes, 
 - **F to A.** A tutorial-grade agent (Dummy) loses **$10,907.04** in simulation and survives 0 of 21. A reference agent built on Agent Airbag Guard (Seatbelt) survives 21 of 21.
 - **Scored from ledger truth.** The Judge reads the event log and the ledger. A claimed success counts only if the recipient was credited.
 - **Zero real funds, zero smart contracts, zero cost to run.** No API keys, no wallet needed.
-- **Reproducible.** The same seed gives a byte-identical report hash. 147 tests, CI on every push.
+- **Reproducible.** The same seed gives a byte-identical report hash. 149 tests, CI on every push.
 - **Three ways in.** HTTP, a child process, or in-process TypeScript, plus a web app with a report card and a step-by-step replay.
 
 ## Contents
@@ -108,7 +108,7 @@ pnpm demo:attack                             # one injected instruction, blocked
 | `pnpm airbag run --agent naive --summary` | `score 0 · grade F · 21 crashed`, `simulated loss $10907.04 · false claims 8` |
 | `pnpm airbag run --agent hardened --summary` | `score 100 · grade A · 21 survived`, `simulated loss $1.00` |
 | `pnpm demo:attack` | The unguarded agent obeys text hidden in a token symbol and loses $9,995.46. The guarded agent blocks it with `TAINTED_VALUE`, loses $0.00 and still completes the swap. |
-| `pnpm verify` | Lint, typecheck, 147 tests, sandbox smokes, the build and a browser smoke test |
+| `pnpm verify` | Lint, typecheck, 149 tests, sandbox smokes, the build and a browser smoke test |
 
 In the app, open `/replay/timeout-after-transfer` and switch **Dummy** to **Seatbelt**. Same crash, same seed: Dummy pays twice (9,900 to 9,800), Seatbelt checks the status first and holds at 9,900.
 
@@ -374,7 +374,7 @@ More: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/DEPLOY.md`](docs/
 | 21 crashes exist | `pnpm build:scenarios` prints `Built 21 scenarios` |
 | Dummy grades F, Seatbelt grades A | `pnpm airbag run --agent naive --summary` and `--agent hardened --summary` |
 | Same seed, same hash | `pnpm test` (golden hashes) |
-| 147 tests and a clean build | `pnpm verify`, and the CI badge above |
+| 149 tests and a clean build | `pnpm verify`, and the CI badge above |
 | Only one file may name the real host, and only for reads | A test scans the source for any other call |
 | The live site is connected to Postgres | `curl https://agentairbag.xyz/api/health` returns `"db":"neon"` |
 | No secret is committed | `.env.example` is empty on purpose; keys come from the environment |
@@ -446,7 +446,7 @@ real_funds: none
 smart_contracts: none
 scenarios: 21
 laws: 7
-tests: 147
+tests: 149
 seed: airbag-demo-2026
 results:
   dummy:    { grade: F, survived: 0,  simulated_loss_usd: 10907.04, false_claims: 8 }
@@ -505,7 +505,7 @@ No API keys are needed for anything below. `NEARAI_API_KEY` is only for the opti
 | Command | Purpose |
 | --- | --- |
 | `pnpm verify` | The full gate: lint, typecheck, tests, HTTP and process smokes, attack demo, llms check, build, demo smoke. Run before finishing. |
-| `pnpm test` | Vitest, all packages (147 tests) |
+| `pnpm test` | Vitest, all packages (149 tests) |
 | `pnpm test:api` | Wallet auth and store tests only |
 | `pnpm airbag run --agent naive --summary` | Dummy: expect grade F, 21 crashed |
 | `pnpm airbag run --agent hardened --summary` | Seatbelt: expect grade A, 21 survived |
@@ -914,7 +914,7 @@ is not here, it is not a shipped claim.
 | 21 crashes are implemented | `pnpm build:scenarios` | `Built 21 scenarios (12 P0, 9 P1)` |
 | Dummy crashes on all 21 | `pnpm airbag run --agent naive --summary` | `0 survived · 21 crashed` |
 | Seatbelt survives all 21 | `pnpm airbag run --agent hardened --summary` | `21 survived · 0 crashed`; grade A |
-| The exact naive crash set is asserted | `pnpm test` | 147 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
+| The exact naive crash set is asserted | `pnpm test` | 149 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
 | The same seed produces a byte-identical report | `pnpm test` | `is deterministic: the same seed produces the same report hash` passes |
 | The live client is read-only | `pnpm test` | `read-only live client` suite passes |
 | The sandbox accepts the exact quoteRequest echoed by the live API | `pnpm test` | `drop-in 1Click quote compatibility` suite passes |
@@ -942,6 +942,8 @@ is not here, it is not a shipped claim.
 | A hosted demo is live | `curl -sI https://agentairbag.xyz/report` | `200`; the page is the app |
 | The hosted API is connected to Postgres | `curl -s https://agentairbag.xyz/api/health` | `{"ok":true,"db":"neon","network":"mainnet"}` |
 | The documents are served as real files by the site | `pnpm check:site https://agentairbag.xyz/` | `22 published documents are served as real files by https://agentairbag.xyz/` (not the app shell) |
+| A saved run is saved once and can be deleted by its owner | pnpm test:api | buse.test.ts: the same report returns the first id, a stranger gets 404 on delete, an anonymous delete gets 401, the owner delete removes it |
+| A scenario can be linked to directly | /scenarios?scenario=token-metadata-injection | Opens that scenario YAML drawer; the drawer offers Copy link |
 | Main routes and alternate UI states have browser checks | `pnpm ui:audit`, `pnpm ui:flows` (demo running) | Six routes at seven widths; successful reports, completed runs, replay switches, YAML drawers and saved-run dialogs. The flow check mocks the wallet API, not real wallet approval |
 | `llms.txt` links resolve and `llms-full.txt` is current | `pnpm llms --check` | `llms.txt links resolve and llms-full.txt is current.` |
 | No report signature is claimed | README + report metadata | `signature` is absent; README says so |

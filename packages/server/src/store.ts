@@ -53,9 +53,12 @@ export interface RunStore {
   /** Returns the account id for a live session, or null when missing/expired. */
   getSession(tokenHash: string): Promise<string | null>;
   deleteSession(tokenHash: string): Promise<void>;
+  /** Saves a report once per account and hash; saving the same one again returns the first. */
   saveRun(accountId: string, report: RunReportInput): Promise<{ id: string; createdAt: string }>;
   listRuns(accountId: string, limit?: number): Promise<RunSummary[]>;
   getRun(accountId: string, id: string): Promise<SavedRun | null>;
+  /** Removes one saved run of this account. False when it does not exist. */
+  deleteRun(accountId: string, id: string): Promise<boolean>;
 }
 
 export interface CreateStoreOptions {
@@ -280,6 +283,17 @@ class NeonStore implements RunStore {
     report: RunReportInput,
   ): Promise<{ id: string; createdAt: string }> {
     await this.ready();
+    // Idempotent: the same report hash for the same account is one saved run.
+    const existing = (await this.sql.query(
+      `SELECT id, created_at FROM runs
+       WHERE account_id = $1 AND report->>'hash' = $2
+       ORDER BY created_at ASC LIMIT 1`,
+      [accountId, report.hash],
+    )) as unknown as Array<{ id: string; created_at: unknown }>;
+    if (existing[0]) {
+      return { id: existing[0].id, createdAt: toIso(existing[0].created_at) };
+    }
+
     const id = randomUUID();
     const rows = (await this.sql.query(
       `INSERT INTO runs (id, account_id, grade, score, loss_usd, passed, failed, report)
@@ -344,6 +358,15 @@ class NeonStore implements RunStore {
       createdAt: toIso(row.created_at),
       report: parseStoredReport(row.report),
     };
+  }
+
+  async deleteRun(accountId: string, id: string): Promise<boolean> {
+    await this.ready();
+    const rows = (await this.sql.query(
+      'DELETE FROM runs WHERE account_id = $1 AND id = $2 RETURNING id',
+      [accountId, id],
+    )) as unknown as Array<{ id: string }>;
+    return rows.length > 0;
   }
 }
 
@@ -501,6 +524,12 @@ class LocalStore implements RunStore {
     report: RunReportInput,
   ): Promise<{ id: string; createdAt: string }> {
     return this.mutate((data) => {
+      // Idempotent: the same report hash for the same account is one saved run.
+      const existing = data.runs.find(
+        (run) => run.accountId === accountId && run.report.hash === report.hash,
+      );
+      if (existing) return { id: existing.id, createdAt: existing.createdAt };
+
       const id = randomUUID();
       const createdAt = new Date().toISOString();
       data.runs.push({
@@ -551,6 +580,14 @@ class LocalStore implements RunStore {
       const run = data.runs.find((item) => item.id === id && item.accountId === accountId);
       if (!run) return null;
       return { id: run.id, createdAt: run.createdAt, report: run.report };
+    });
+  }
+
+  async deleteRun(accountId: string, id: string): Promise<boolean> {
+    return this.mutate((data) => {
+      const before = data.runs.length;
+      data.runs = data.runs.filter((run) => !(run.id === id && run.accountId === accountId));
+      return data.runs.length < before;
     });
   }
 }

@@ -264,6 +264,57 @@ describe('request checks', () => {
   });
 });
 
+describe('saved runs', () => {
+  it('saves the same report once and returns the first id', async () => {
+    const alice = await signIn(41, '203.0.113.71');
+    const first = await post(
+      '/api/runs',
+      { report },
+      { cookie: alice.cookie, 'x-real-ip': '203.0.113.71' },
+    );
+    const second = await post(
+      '/api/runs',
+      { report },
+      { cookie: alice.cookie, 'x-real-ip': '203.0.113.71' },
+    );
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(200);
+    const firstBody = (await first.json()) as { id: string };
+    const secondBody = (await second.json()) as { id: string };
+    expect(secondBody.id).toBe(firstBody.id);
+    const list = await app.request('/api/runs', { headers: { cookie: alice.cookie } });
+    expect(((await list.json()) as unknown[]).length).toBe(1);
+  });
+
+  it('deletes only the owner run, and only with a session', async () => {
+    const alice = await signIn(42, '203.0.113.72');
+    const bob = await signIn(43, '203.0.113.73');
+    const saved = await post(
+      '/api/runs',
+      { report },
+      { cookie: alice.cookie, 'x-real-ip': '203.0.113.72' },
+    );
+    const { id } = (await saved.json()) as { id: string };
+
+    const anonymous = await app.request(`/api/runs/${id}`, { method: 'DELETE' });
+    expect(anonymous.status).toBe(401);
+
+    const stranger = await app.request(`/api/runs/${id}`, {
+      method: 'DELETE',
+      headers: { cookie: bob.cookie },
+    });
+    expect(stranger.status).toBe(404);
+
+    const owner = await app.request(`/api/runs/${id}`, {
+      method: 'DELETE',
+      headers: { cookie: alice.cookie },
+    });
+    expect(owner.status).toBe(200);
+    const gone = await app.request(`/api/runs/${id}`, { headers: { cookie: alice.cookie } });
+    expect(gone.status).toBe(404);
+  });
+});
+
 describe('storage limits', () => {
   it('keeps only the newest runs for an account', async () => {
     const account = 'limit-check.near';

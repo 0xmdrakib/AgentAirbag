@@ -21,14 +21,38 @@ function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
 
-export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
+export function ScenariosPage({
+  lawParam,
+  scenarioParam,
+}: {
+  lawParam?: string | null;
+  scenarioParam?: string | null;
+}) {
   const [law, setLaw] = useState<Law | 0>(() => parseLaw(lawParam));
 
   useEffect(() => {
     setLaw(parseLaw(lawParam));
   }, [lawParam]);
   const [query, setQuery] = useState('');
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(() =>
+    scenarioParam && SCENARIOS.some((scenario) => scenario.id === scenarioParam)
+      ? scenarioParam
+      : null,
+  );
+
+  // /scenarios?scenario=<id> opens that YAML, so a scenario can be linked to directly.
+  useEffect(() => {
+    if (scenarioParam && SCENARIOS.some((scenario) => scenario.id === scenarioParam)) {
+      setOpenId(scenarioParam);
+    }
+  }, [scenarioParam]);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (openId) url.searchParams.set('scenario', openId);
+    else url.searchParams.delete('scenario');
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+  }, [openId]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -225,6 +249,10 @@ export function ScenariosPage({ lawParam }: { lawParam?: string | null }) {
             </div>
             <div className="drawer-actions">
               <CopyButton value={YAML[open.id] ?? ''} label="Copy YAML" />
+              <CopyButton
+                value={`${window.location.origin}/scenarios?scenario=${open.id}`}
+                label="Copy link"
+              />
               <span className="mono">
                 {open.priority} · Law {open.law}
               </span>

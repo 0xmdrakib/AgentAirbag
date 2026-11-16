@@ -163,6 +163,73 @@
   margin-bottom: 12px;
 }
 
+.wallet-run-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  border-bottom: 1px solid var(--line);
+}
+
+.wallet-run-item .wallet-run {
+  border-bottom: 0;
+}
+
+.wallet-run-delete {
+  align-self: center;
+  min-height: 40px;
+  margin-left: 12px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    color 160ms var(--ease),
+    border-color 160ms var(--ease),
+    background 160ms var(--ease);
+}
+
+.wallet-run-delete:hover:not(:disabled) {
+  border-color: var(--fail-line);
+  background: var(--fail-soft);
+  color: var(--fail);
+}
+
+.wallet-run-delete.is-confirming {
+  border-color: var(--fail-line);
+  background: var(--fail-soft);
+  color: var(--fail);
+  font-weight: 600;
+}
+
+.wallet-run-detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.wallet-run-compare {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin: 20px 0;
+  padding: 14px 16px;
+  border-left: 2px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+.wallet-run-compare .label {
+  color: var(--text-3);
+}
+
 .wallet-run {
   min-height: 84px;
   border-bottom: 1px solid var(--line);

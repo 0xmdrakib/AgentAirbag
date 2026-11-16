@@ -31650,6 +31650,15 @@ var NeonStore = class {
   }
   async saveRun(accountId, report) {
     await this.ready();
+    const existing = await this.sql.query(
+      `SELECT id, created_at FROM runs
+       WHERE account_id = $1 AND report->>'hash' = $2
+       ORDER BY created_at ASC LIMIT 1`,
+      [accountId, report.hash]
+    );
+    if (existing[0]) {
+      return { id: existing[0].id, createdAt: toIso(existing[0].created_at) };
+    }
     const id = randomUUID();
     const rows = await this.sql.query(
       `INSERT INTO runs (id, account_id, grade, score, loss_usd, passed, failed, report)
@@ -31711,6 +31720,14 @@ var NeonStore = class {
       createdAt: toIso(row.created_at),
       report: parseStoredReport(row.report)
     };
+  }
+  async deleteRun(accountId, id) {
+    await this.ready();
+    const rows = await this.sql.query(
+      "DELETE FROM runs WHERE account_id = $1 AND id = $2 RETURNING id",
+      [accountId, id]
+    );
+    return rows.length > 0;
   }
 };
 function parseStoredReport(value) {
@@ -31821,6 +31838,10 @@ var LocalStore = class {
   }
   async saveRun(accountId, report) {
     return this.mutate((data) => {
+      const existing = data.runs.find(
+        (run) => run.accountId === accountId && run.report.hash === report.hash
+      );
+      if (existing) return { id: existing.id, createdAt: existing.createdAt };
       const id = randomUUID();
       const createdAt = (/* @__PURE__ */ new Date()).toISOString();
       data.runs.push({
@@ -31868,6 +31889,13 @@ var LocalStore = class {
       const run = data.runs.find((item) => item.id === id && item.accountId === accountId);
       if (!run) return null;
       return { id: run.id, createdAt: run.createdAt, report: run.report };
+    });
+  }
+  async deleteRun(accountId, id) {
+    return this.mutate((data) => {
+      const before = data.runs.length;
+      data.runs = data.runs.filter((run) => !(run.id === id && run.accountId === accountId));
+      return data.runs.length < before;
     });
   }
 };
@@ -31988,7 +32016,7 @@ function createApiApp(options = {}) {
         if (allowedOrigin) return origin === allowedOrigin ? origin : void 0;
         return origin === new URL(c.req.url).origin ? origin : void 0;
       },
-      allowMethods: ["GET", "POST", "OPTIONS"],
+      allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
       allowHeaders: ["Content-Type"],
       credentials: true,
       maxAge: 600
@@ -32174,6 +32202,18 @@ function createApiApp(options = {}) {
     if (!run) return c.json({ error: "Run not found." }, 404);
     return c.json(run.report);
   });
+  api.delete(
+    "/runs/:id",
+    requireSession,
+    limitBy(RATE_RULES.saveAccount, byAccount),
+    async (c) => {
+      const id = c.req.param("id");
+      if (!id || id.length > 128) return c.json({ error: "Run not found." }, 404);
+      const removed = await store.deleteRun(c.get("accountId"), id);
+      if (!removed) return c.json({ error: "Run not found." }, 404);
+      return c.json({ ok: true });
+    }
+  );
   const app2 = new Hono3();
   app2.route("/api", api);
   app2.onError((error62, c) => {

@@ -122,7 +122,10 @@ for (const width of widths) {
     let body: unknown = {};
     let status = 200;
     if (path === '/api/me') body = { accountId: 'design-check.near' };
-    if (path === '/api/runs') {
+    if (path === '/api/runs/design-test-run' && route.request().method() === 'DELETE') {
+      hasSaved = false;
+      body = { ok: true };
+    } else if (path === '/api/runs') {
       if (route.request().method() === 'POST') {
         hasSaved = true;
         storedReport = route.request().postDataJSON().report;
@@ -164,6 +167,16 @@ for (const width of widths) {
   await savedRow.click();
   await connected.locator('.wallet-run-detail-body').waitFor();
   await shot(connected, 'saved-detail', width);
+  await connected.getByRole('button', { name: 'All runs', exact: true }).click();
+  const deleteButton = connected.getByRole('button', { name: /^Delete the run from/ }).first();
+  await deleteButton.click();
+  await connected
+    .getByRole('button', { name: /^Confirm deleting the run from/ })
+    .first()
+    .click();
+  await connected.getByText('No saved runs yet', { exact: true }).waitFor();
+  check(!hasSaved, `deleted run @${width}`);
+  await shot(connected, 'saved-deleted', width);
   await connected.getByRole('button', { name: 'Close my runs' }).click();
   forceError = true;
   await connected.getByRole('button', { name: 'View my runs', exact: true }).click();

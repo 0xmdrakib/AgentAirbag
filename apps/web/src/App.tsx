@@ -9,8 +9,12 @@ import { RunnerPage } from './pages/RunnerPage';
 import { ConnectPage } from './pages/ConnectPage';
 
 // The replay trace and the scenario YAML are the two heavy pages; they load on first visit.
-const ReportPage = lazy(() => import('./pages/ReportPage').then((m) => ({ default: m.ReportPage })));
-const ReplayPage = lazy(() => import('./pages/ReplayPage').then((m) => ({ default: m.ReplayPage })));
+const ReportPage = lazy(() =>
+  import('./pages/ReportPage').then((m) => ({ default: m.ReportPage })),
+);
+const ReplayPage = lazy(() =>
+  import('./pages/ReplayPage').then((m) => ({ default: m.ReplayPage })),
+);
 const ScenariosPage = lazy(() =>
   import('./pages/ScenariosPage').then((m) => ({ default: m.ScenariosPage })),
 );
@@ -102,7 +106,12 @@ function AppInner() {
       case '/replay':
         return <ReplayPage scenarioId={route.replayId} />;
       case '/scenarios':
-        return <ScenariosPage lawParam={route.query.get('law')} />;
+        return (
+          <ScenariosPage
+            lawParam={route.query.get('law')}
+            scenarioParam={route.query.get('scenario')}
+          />
+        );
       case '/connect':
         return <ConnectPage />;
       case '/':

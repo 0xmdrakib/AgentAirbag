@@ -3,12 +3,29 @@ import type { RunReport } from '@airbag/core';
 import { cx, formatUsd } from '../lib/format';
 import { ArrowRightIcon, BookmarkIcon, ChevronIcon, XIcon } from '../components/Icons';
 import {
+  deleteRun as deleteSavedRun,
   describeError,
   getRun,
   listRuns,
   type RunSummary,
   type SavedRun,
 } from './api';
+
+/** The report page remembers saved ids locally; drop the one that was deleted. */
+function forgetLocalSave(id: string): void {
+  try {
+    const raw = window.localStorage.getItem('airbag:saved-runs');
+    if (!raw) return;
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return;
+    const kept = parsed.filter(
+      (entry) => !(typeof entry === 'object' && entry !== null && (entry as { id?: string }).id === id),
+    );
+    window.localStorage.setItem('airbag:saved-runs', JSON.stringify(kept));
+  } catch {
+    // Local history is a convenience only.
+  }
+}
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -66,6 +83,31 @@ export function MyRuns({ open, accountId, onClose }: MyRunsProps) {
   const [detailState, setDetailState] = useState<LoadState>('idle');
   const [detailError, setDetailError] = useState('');
   const [detailReload, setDetailReload] = useState(0);
+
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  const remove = async (id: string) => {
+    if (confirmId !== id) {
+      setConfirmId(id);
+      setDeleteError('');
+      return;
+    }
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      await deleteSavedRun(id);
+      forgetLocalSave(id);
+      setRuns((current) => current.filter((run) => run.id !== id));
+      setConfirmId(null);
+      setActiveRun((current) => (current?.id === id ? null : current));
+    } catch (error) {
+      setDeleteError(describeError(error, 'The run could not be deleted. Try again.'));
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -139,7 +181,12 @@ export function MyRuns({ open, accountId, onClose }: MyRunsProps) {
 
   const close = () => {
     onClose();
+    setConfirmId(null);
+    setDeleteError('');
   };
+
+  const activeIndex = activeRun ? runs.findIndex((run) => run.id === activeRun.id) : -1;
+  const previousRun = activeIndex >= 0 ? runs[activeIndex + 1] : undefined;
 
   return (
     <dialog
@@ -175,12 +222,31 @@ export function MyRuns({ open, accountId, onClose }: MyRunsProps) {
 
         {activeRun ? (
           <div className="wallet-run-detail">
-            <button type="button" className="btn btn-ghost btn-sm wallet-run-back" onClick={() => setActiveRun(null)}>
-              <span className="wallet-run-back-icon" aria-hidden="true">
-                <ArrowRightIcon size={14} />
-              </span>
-              All runs
-            </button>
+            <div className="wallet-run-detail-actions">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm wallet-run-back"
+                onClick={() => setActiveRun(null)}
+              >
+                <span className="wallet-run-back-icon" aria-hidden="true">
+                  <ArrowRightIcon size={14} />
+                </span>
+                All runs
+              </button>
+              <button
+                type="button"
+                className={cx('wallet-run-delete', confirmId === activeRun.id && 'is-confirming')}
+                onClick={() => void remove(activeRun.id)}
+                disabled={deleting}
+              >
+                {confirmId === activeRun.id ? 'Confirm delete' : 'Delete this run'}
+              </button>
+            </div>
+            {deleteError && (
+              <p className="wallet-runs-error" role="alert">
+                {deleteError}
+              </p>
+            )}
 
             {detailState === 'loading' && (
               <p className="wallet-runs-loading" role="status">
@@ -210,7 +276,9 @@ export function MyRuns({ open, accountId, onClose }: MyRunsProps) {
               </div>
             )}
 
-            {detailState === 'ready' && detail && <RunDetail run={detail} />}
+            {detailState === 'ready' && detail && (
+              <RunDetail run={detail} previous={previousRun} />
+            )}
           </div>
         ) : (
           <>
@@ -252,9 +320,14 @@ export function MyRuns({ open, accountId, onClose }: MyRunsProps) {
                   <span>Loss</span>
                   <span />
                 </div>
+                {deleteError && (
+                  <p className="wallet-runs-error" role="alert">
+                    {deleteError}
+                  </p>
+                )}
                 <ul className="wallet-runs-list">
                   {runs.map((run) => (
-                    <li key={run.id}>
+                    <li className="wallet-run-item" key={run.id}>
                       <button
                         type="button"
                         className="wallet-run"
@@ -279,6 +352,19 @@ export function MyRuns({ open, accountId, onClose }: MyRunsProps) {
                           <ChevronIcon size={16} />
                         </span>
                       </button>
+                      <button
+                        type="button"
+                        className={cx('wallet-run-delete', confirmId === run.id && 'is-confirming')}
+                        onClick={() => void remove(run.id)}
+                        disabled={deleting}
+                        aria-label={
+                          confirmId === run.id
+                            ? `Confirm deleting the run from ${formatRunDate(run.createdAt)}`
+                            : `Delete the run from ${formatRunDate(run.createdAt)}`
+                        }
+                      >
+                        {confirmId === run.id ? 'Confirm' : 'Delete'}
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -291,9 +377,11 @@ export function MyRuns({ open, accountId, onClose }: MyRunsProps) {
   );
 }
 
-function RunDetail({ run }: { run: SavedRun }) {
+function RunDetail({ run, previous }: { run: SavedRun; previous?: RunSummary }) {
   const overall = reportOverall(run);
   const report = run.report;
+  const scoreDelta = previous ? overall.score - previous.score : null;
+  const lossDelta = previous ? Number(overall.loss) - Number(previous.lossUsd) : null;
 
   return (
     <div className="wallet-run-detail-body">
@@ -333,6 +421,21 @@ function RunDetail({ run }: { run: SavedRun }) {
           <dd className="mono">{overall.failed}</dd>
         </div>
       </dl>
+
+      {previous && scoreDelta !== null && lossDelta !== null && (
+        <p className="wallet-run-compare">
+          <span className="label">Since {formatRunDate(previous.createdAt)}</span>
+          <span>
+            Score {scoreDelta > 0 ? `+${scoreDelta}` : scoreDelta}. Simulated loss{' '}
+            {lossDelta === 0
+              ? 'unchanged'
+              : lossDelta < 0
+                ? `${formatUsd(-lossDelta)} lower`
+                : `${formatUsd(lossDelta)} higher`}
+            .
+          </span>
+        </p>
+      )}
 
       {report && report.laws.length > 0 ? (
         <ul className="wallet-run-laws" aria-label="Law scores">

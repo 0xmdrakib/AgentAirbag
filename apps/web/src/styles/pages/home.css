@@ -297,6 +297,34 @@
   line-height: 1.55;
 }
 
+/* ---------- Use cases ---------- */
+
+.home-use-cta {
+  margin-top: 24px;
+}
+
+.home-use {
+  display: grid;
+  grid-template-columns: clamp(40px, 4vw, 56px) minmax(0, 1fr);
+  gap: 4px 20px;
+  padding-block: clamp(20px, 2.4vw, 28px);
+}
+
+.home-use-num {
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.9;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-use p {
+  max-width: 58ch;
+  margin-top: 8px;
+  color: var(--text-2);
+}
+
 /* ---------- Section heads and shared list text ---------- */
 
 .home-head {
