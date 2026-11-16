@@ -69,8 +69,8 @@
   --max: 1240px;
   --gutter: clamp(20px, 4.5vw, 64px);
   --header-h: 76px;
-  --section-gap: clamp(88px, 11vw, 168px);
-  --block-gap: clamp(40px, 5vw, 72px);
+  --section-gap: clamp(64px, 8vw, 120px);
+  --block-gap: clamp(32px, 4vw, 56px);
 
   --footer-bg: #1a1812;
   --footer-text: #ece8da;

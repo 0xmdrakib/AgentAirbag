@@ -269,15 +269,17 @@ export function LabPage() {
         </div>
       </section>
 
-      <section className="container section" data-reveal aria-labelledby="cta-title">
+      <section className="container section section-rule" data-reveal aria-labelledby="cta-title">
         <div className="home-cta">
-          <span className="tag">Law 5 · {LAW_NAMES[5]}</span>
-          <h2 className="h2" id="cta-title">
-            A token name that carries an instruction
-          </h2>
-          <p className="home-cta-sub">
-            One of the {SCENARIOS.length} crashes. Watch it happen, then switch to Seatbelt.
-          </p>
+          <div className="home-cta-copy">
+            <span className="tag">Law 5 · {LAW_NAMES[5]}</span>
+            <h2 className="h2" id="cta-title">
+              A token name that carries an instruction
+            </h2>
+            <p className="home-cta-sub">
+              One of the {SCENARIOS.length} crashes. Watch it happen, then switch to Seatbelt.
+            </p>
+          </div>
           <LinkButton
             href="/replay/token-metadata-injection"
             variant="primary"
