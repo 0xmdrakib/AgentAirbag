@@ -8,7 +8,7 @@ is not here, it is not a shipped claim.
 | 21 crashes are implemented | `pnpm build:scenarios` | `Built 21 scenarios (12 P0, 9 P1)` |
 | Dummy crashes on all 21 | `pnpm airbag run --agent naive --summary` | `0 survived · 21 crashed` |
 | Seatbelt survives all 21 | `pnpm airbag run --agent hardened --summary` | `21 survived · 0 crashed`; grade A |
-| The exact naive crash set is asserted | `pnpm test` | 149 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
+| The exact naive crash set is asserted | `pnpm test` | 154 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
 | The same seed produces a byte-identical report | `pnpm test` | `is deterministic: the same seed produces the same report hash` passes |
 | The live client is read-only | `pnpm test` | `read-only live client` suite passes |
 | The sandbox accepts the exact quoteRequest echoed by the live API | `pnpm test` | `drop-in 1Click quote compatibility` suite passes |
@@ -36,6 +36,7 @@ is not here, it is not a shipped claim.
 | A hosted demo is live | `curl -sI https://agentairbag.xyz/report` | `200`; the page is the app |
 | The hosted API is connected to Postgres | `curl -s https://agentairbag.xyz/api/health` | `{"ok":true,"db":"neon","network":"mainnet"}` |
 | The documents are served as real files by the site | `pnpm check:site https://agentairbag.xyz/` | `22 published documents are served as real files by https://agentairbag.xyz/` (not the app shell) |
+| All 21 crashes fail Dummy with evidence and pass Seatbelt | `pnpm test` | `scenario-strength.test.ts`: every scenario has a violation whose evidence points at real events, breaks an invariant its YAML declares, carries a unique fix snippet, and passes under Seatbelt with no violation and no loss except the documented $1.00 refund fee |
 | A saved run is saved once and can be deleted by its owner | pnpm test:api | buse.test.ts: the same report returns the first id, a stranger gets 404 on delete, an anonymous delete gets 401, the owner delete removes it |
 | A scenario can be linked to directly | /scenarios?scenario=token-metadata-injection | Opens that scenario YAML drawer; the drawer offers Copy link |
 | Main routes and alternate UI states have browser checks | `pnpm ui:audit`, `pnpm ui:flows` (demo running) | Six routes at seven widths; successful reports, completed runs, replay switches, YAML drawers and saved-run dialogs. The flow check mocks the wallet API, not real wallet approval |

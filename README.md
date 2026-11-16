@@ -11,7 +11,7 @@ A sandboxed NEAR Intents 1Click API that fails on purpose, 21 scripted crashes, 
 [Live demo](https://agentairbag.xyz) · [Quick start](#quick-start) · [How it works](#how-it-works) · [The 21 crashes](#the-seven-laws-and-21-crashes) · [Roadmap](#roadmap) · [For agents](#for-agents-and-llms)
 
 [![verify](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml/badge.svg)](https://github.com/0xmdrakib/AgentAirbag/actions/workflows/verify.yml)
-![tests](https://img.shields.io/badge/tests-149%20passing-0d7a4e)
+![tests](https://img.shields.io/badge/tests-154%20passing-0d7a4e)
 ![crashes](https://img.shields.io/badge/crashes-21-ffd21f)
 ![real funds](https://img.shields.io/badge/real%20funds-0-c01f31)
 ![license](https://img.shields.io/badge/license-MIT-6b6b67)
@@ -24,7 +24,7 @@ A sandboxed NEAR Intents 1Click API that fails on purpose, 21 scripted crashes, 
 - **F to A.** A tutorial-grade agent (Dummy) loses **$10,907.04** in simulation and survives 0 of 21. A reference agent built on Agent Airbag Guard (Seatbelt) survives 21 of 21.
 - **Scored from ledger truth.** The Judge reads the event log and the ledger. A claimed success counts only if the recipient was credited.
 - **Zero real funds, zero smart contracts, zero cost to run.** No API keys, no wallet needed.
-- **Reproducible.** The same seed gives a byte-identical report hash. 149 tests, CI on every push.
+- **Reproducible.** The same seed gives a byte-identical report hash. 154 tests, CI on every push.
 - **Three ways in.** HTTP, a child process, or in-process TypeScript, plus a web app with a report card and a step-by-step replay.
 
 ## Contents
@@ -102,7 +102,7 @@ pnpm demo:attack                             # one injected instruction, blocked
 | `pnpm airbag run --agent naive --summary` | `score 0 · grade F · 21 crashed`, `simulated loss $10907.04 · false claims 8` |
 | `pnpm airbag run --agent hardened --summary` | `score 100 · grade A · 21 survived`, `simulated loss $1.00` |
 | `pnpm demo:attack` | The unguarded agent obeys text hidden in a token symbol and loses $9,995.46. The guarded agent blocks it with `TAINTED_VALUE`, loses $0.00 and still completes the swap. |
-| `pnpm verify` | Lint, typecheck, 149 tests, sandbox smokes, the build and a browser smoke test |
+| `pnpm verify` | Lint, typecheck, 154 tests, sandbox smokes, the build and a browser smoke test |
 
 In the app, open `/replay/timeout-after-transfer` and switch **Dummy** to **Seatbelt**. Same crash, same seed: Dummy pays twice (9,900 to 9,800), Seatbelt checks the status first and holds at 9,900.
 
@@ -368,7 +368,7 @@ More: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/DEPLOY.md`](docs/
 | 21 crashes exist | `pnpm build:scenarios` prints `Built 21 scenarios` |
 | Dummy grades F, Seatbelt grades A | `pnpm airbag run --agent naive --summary` and `--agent hardened --summary` |
 | Same seed, same hash | `pnpm test` (golden hashes) |
-| 149 tests and a clean build | `pnpm verify`, and the CI badge above |
+| 154 tests and a clean build | `pnpm verify`, and the CI badge above |
 | Only one file may name the real host, and only for reads | A test scans the source for any other call |
 | The live site is connected to Postgres | `curl https://agentairbag.xyz/api/health` returns `"db":"neon"` |
 | No secret is committed | `.env.example` is empty on purpose; keys come from the environment |
@@ -440,7 +440,7 @@ real_funds: none
 smart_contracts: none
 scenarios: 21
 laws: 7
-tests: 149
+tests: 154
 seed: airbag-demo-2026
 results:
   dummy:    { grade: F, survived: 0,  simulated_loss_usd: 10907.04, false_claims: 8 }
