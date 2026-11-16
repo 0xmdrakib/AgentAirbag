@@ -200,7 +200,8 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
               Choose a wallet
             </h2>
             <p className="wallet-picker-note" id={noteId}>
-              Pick the NEAR wallet you use. Your wallet approves the connection in its own window.
+              Pick the wallet that controls your account. Using near.com? Choose the wallet you sign
+              in with there.
             </p>
           </div>
           <button

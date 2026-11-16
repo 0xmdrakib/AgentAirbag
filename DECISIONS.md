@@ -229,9 +229,14 @@ Here, Coin98, Ledger and MyNearWallet. MyNearWallet's own site says it
 is in limited mode and planned for deprecation on 31 Oct 2026, with Meteor as the recommended path, so
 it no longer gets promotional copy and the old footer line about it is gone.
 
-**There is no near.com button.** near.com is NEAR's account app, not a wallet a third-party site can
-connect to: a near.com account is controlled by a passkey or by another wallet, and near.com is not in
-the NEAR Connect wallet manifest. A button that claimed to connect it would not work, so none exists.
+**There is no near.com button, and the picker says so instead.** near.com is NEAR's account app, not
+a wallet a third-party site can connect to. Its own sign-in offers other wallets (NEAR wallets, a
+browser wallet, Solana, WalletConnect, TON, Stellar, Tron, Coinbase, Binance Web3) or a passkey, the
+NEAR Intents knowledge base says a wallet user signs in to near.com with the same wallet to reach the
+same balances, and near.com is not in the NEAR Connect wallet manifest. No documentation describes a
+"sign in with near.com" flow for other sites. So the working path is the wallet that controls the
+near.com account, and the picker note now says that. A button claiming to connect near.com itself
+would not work. If NEAR publishes such a flow, it becomes one more row at the top.
 
 **Known debt: the NEAR docs now call `@near-wallet-selector/*` deprecated** and recommend NEAR Connect
 (`@hot-labs/near-connect`). The custom picker is independent of the library, so a migration changes
