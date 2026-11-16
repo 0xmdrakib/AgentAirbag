@@ -5,8 +5,30 @@
 
 /* ---------- Hero ---------- */
 
+/* One centered composition that fills the first screen: the headline sits in the middle and the
+   results card starts on the next screen, so nothing is ever caught half way at the fold. */
+.page-home {
+  padding-top: 0;
+}
+
+.home-hero {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  min-height: calc(100dvh - var(--header-h));
+  padding-block: clamp(28px, 5vh, 64px);
+  text-align: center;
+}
+
+.home-hero-main {
+  display: grid;
+  justify-items: center;
+  max-width: 1000px;
+}
+
 .home-tag {
   max-width: 100%;
+  margin-bottom: 22px;
   padding-block: 9px;
   font-size: 12px;
   letter-spacing: 0.11em;
@@ -18,54 +40,76 @@
   flex: none;
 }
 
-/* Two columns from the first line: the card starts beside the headline, so it is never pushed
-   below the fold by the text column. */
-.home-hero {
-  display: grid;
-  gap: clamp(28px, 3.4vw, 48px);
-  align-items: start;
-}
-
-.page-home {
-  padding-top: clamp(24px, 3vw, 48px);
-}
-
-.home-hero-main {
-  display: grid;
-  justify-items: start;
-}
-
-.home-tag {
-  margin-bottom: 18px;
-}
-
 .home-title {
-  max-width: 21ch;
-  margin: 0 0 clamp(18px, 2vw, 24px);
-  font-size: clamp(32px, 4.2vw, 58px);
+  max-width: 18ch;
+  margin: 0 0 22px;
+  font-size: clamp(36px, 4.8vw, 68px);
 }
 
 .home-hero-main .lead {
-  margin: 0 0 clamp(22px, 2.6vw, 30px);
+  max-width: 58ch;
+  margin: 0 0 clamp(24px, 3vh, 32px);
 }
 
-/* The three numbers close the left column, so it ends near the card instead of trailing off. */
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.home-note {
+  color: var(--text-3);
+  font-size: 14.5px;
+}
+
+/* ---------- Results ---------- */
+
+.home-proof {
+  display: grid;
+  gap: clamp(20px, 3vw, 32px);
+}
+
+.home-result {
+  width: 100%;
+}
+
+.home-result-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-result-list .home-agent {
+  border-top: 0;
+}
+
+.home-result-list .home-agent + .home-agent {
+  padding-left: clamp(20px, 3vw, 40px);
+  border-left: 1px solid var(--line);
+}
+
+.home-result-list .home-agent:first-child {
+  padding-right: clamp(20px, 3vw, 40px);
+}
+
+/* The three numbers frame the result panel. */
 .home-facts {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
   width: 100%;
   margin: 0;
-  padding-top: clamp(16px, 2vw, 22px);
+  padding-top: 18px;
   border-top: 1px solid var(--line);
 }
 
 .home-facts > div {
-  padding-right: 20px;
+  padding-right: 24px;
 }
 
 .home-facts > div + div {
-  padding-left: 20px;
+  padding-left: 24px;
   border-left: 1px solid var(--line);
 }
 
@@ -84,76 +128,29 @@
   font-variant-numeric: tabular-nums;
 }
 
-.home-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.home-note {
-  margin-bottom: clamp(18px, 2vw, 24px);
-  color: var(--text-3);
-  font-size: 14.5px;
-}
-
-@media (min-width: 901px) {
-  .home-hero {
-    grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
-    grid-template-areas:
-      'main card'
-      'facts facts';
-    gap: 28px clamp(32px, 3.6vw, 60px);
+@media (max-width: 800px) {
+  .home-result-list {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .home-hero-main {
-    grid-area: main;
+  .home-result-list .home-agent + .home-agent {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
   }
 
-  .home-result {
-    grid-area: card;
-  }
-
-  /* One hairline closes the hero, with the three numbers spread across the page. */
-  .home-facts {
-    grid-area: facts;
-    padding-top: 18px;
-  }
-}
-
-/* Short laptop screens (browser chrome takes the rest): smaller headline, tighter facts. */
-@media (min-width: 901px) and (max-height: 760px) {
-  .home-title {
-    font-size: clamp(30px, 3.2vw, 44px);
-  }
-
-  .home-facts {
-    padding-top: 12px;
-  }
-
-  .home-facts dd {
-    font-size: 20px;
-  }
-
-  .home-facts dt {
-    font-size: 12px;
-  }
-}
-
-/* Phones and tablets: the copy fills the first screen, so the card starts on the next one. */
-@media (max-width: 900px) {
-  .home-hero-main {
-    min-height: calc(100dvh - var(--header-h) - 48px);
-  }
-
-  .home-facts {
-    margin-top: auto;
+  .home-result-list .home-agent:first-child {
+    padding-right: 0;
   }
 }
 
 @media (max-width: 520px) {
   .home-actions .btn {
     flex: 1 1 100%;
+  }
+
+  .home-title {
+    font-size: clamp(32px, 9.5vw, 42px);
   }
 
   .home-facts > div {
@@ -171,10 +168,6 @@
   .home-facts dt {
     font-size: 12px;
     line-height: 1.35;
-  }
-
-  .home-tag {
-    letter-spacing: 0.08em;
   }
 }
 

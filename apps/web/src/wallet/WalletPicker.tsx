@@ -85,7 +85,8 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
     .filter((wallet) => !isPrimaryWallet(wallet.id))
     .sort(
       (left, right) =>
-        Number(RETIRING_WALLET_IDS.includes(left.id)) - Number(RETIRING_WALLET_IDS.includes(right.id)),
+        Number(RETIRING_WALLET_IDS.includes(left.id)) -
+        Number(RETIRING_WALLET_IDS.includes(right.id)),
     );
   const visibleWallets = showAll ? [...primaryWallets, ...extraWallets] : primaryWallets;
 
@@ -195,7 +196,6 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
       <div className="wallet-picker-panel">
         <header className="wallet-picker-head">
           <div className="wallet-picker-heading">
-            <p className="eyebrow">Connect</p>
             <h2 className="wallet-picker-title" id={titleId}>
               Choose a wallet
             </h2>
@@ -216,106 +216,105 @@ export function WalletPicker({ open, onClose, onSelect }: WalletPickerProps) {
         </header>
 
         <div className="wallet-picker-body">
-        {loadState === 'loading' && (
-          <>
-            <p className="sr-only" role="status">
-              Loading wallets
-            </p>
-            <ul className="wallet-picker-list wallet-picker-skeleton" aria-hidden="true">
-              {[0, 1, 2, 3].map((row) => (
-                <li className="wallet-picker-item" key={row}>
-                  <div className="wallet-picker-row wallet-picker-skeleton-row">
-                    <span className="wallet-picker-row-icon wallet-picker-skeleton-icon" />
-                    <span className="wallet-picker-skeleton-name" />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-
-        {loadState === 'error' && (
-          <div className="wallet-picker-error" role="alert">
-            <p className="wallet-picker-error-text">
-              The wallets could not load. Check your connection and try again.
-            </p>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm wallet-picker-retry"
-              onClick={retry}
-            >
-              Retry
-            </button>
-          </div>
-        )}
-
-        {loadState === 'ready' && (
-          <>
-            <ul className="wallet-picker-list" id={listId} aria-label="Wallets">
-              {visibleWallets.map((wallet, index) => {
-                const iconFailed = failedIcons.has(wallet.id);
-                return (
-                  <li className="wallet-picker-item" key={wallet.id}>
-                    <button
-                      ref={(row) => {
-                        rowRefs.current[index] = row;
-                      }}
-                      type="button"
-                      className="wallet-picker-row"
-                      data-wallet-id={wallet.id}
-                      onClick={() => onSelect(wallet.id)}
-                    >
-                      <span className="wallet-picker-row-icon" aria-hidden="true">
-                        {wallet.iconUrl && !iconFailed ? (
-                          <img
-                            className="wallet-picker-row-icon-img"
-                            src={wallet.iconUrl}
-                            alt=""
-                            width={32}
-                            height={32}
-                            loading="lazy"
-                            onError={() => markIconFailed(wallet.id)}
-                          />
-                        ) : (
-                          <WalletIcon size={32} />
-                        )}
-                      </span>
-                      <span className="wallet-picker-row-name">{wallet.name}</span>
-                      <span className="wallet-picker-row-chevron" aria-hidden="true">
-                        <ArrowRightIcon size={16} />
-                      </span>
-                    </button>
+          {loadState === 'loading' && (
+            <>
+              <p className="sr-only" role="status">
+                Loading wallets
+              </p>
+              <ul className="wallet-picker-list wallet-picker-skeleton" aria-hidden="true">
+                {[0, 1, 2, 3].map((row) => (
+                  <li className="wallet-picker-item" key={row}>
+                    <div className="wallet-picker-row wallet-picker-skeleton-row">
+                      <span className="wallet-picker-row-icon wallet-picker-skeleton-icon" />
+                      <span className="wallet-picker-skeleton-name" />
+                    </div>
                   </li>
-                );
-              })}
-            </ul>
+                ))}
+              </ul>
+            </>
+          )}
 
-            {extraWallets.length > 0 && (
+          {loadState === 'error' && (
+            <div className="wallet-picker-error" role="alert">
+              <p className="wallet-picker-error-text">
+                The wallets could not load. Check your connection and try again.
+              </p>
               <button
                 type="button"
-                className="wallet-picker-more"
-                aria-expanded={showAll}
-                aria-controls={listId}
-                onClick={() => setShowAll((value) => !value)}
+                className="btn btn-secondary btn-sm wallet-picker-retry"
+                onClick={retry}
               >
-                <span className="wallet-picker-more-label">
-                  {showAll ? 'Show fewer' : 'More wallets'}
-                </span>
-                <span
-                  className={cx(
-                    'wallet-picker-more-icon',
-                    showAll && 'wallet-picker-more-icon-open',
-                  )}
-                  aria-hidden="true"
-                >
-                  <ChevronIcon size={16} />
-                </span>
+                Retry
               </button>
-            )}
-          </>
-        )}
-        </div>
+            </div>
+          )}
 
+          {loadState === 'ready' && (
+            <>
+              <ul className="wallet-picker-list" id={listId} aria-label="Wallets">
+                {visibleWallets.map((wallet, index) => {
+                  const iconFailed = failedIcons.has(wallet.id);
+                  return (
+                    <li className="wallet-picker-item" key={wallet.id}>
+                      <button
+                        ref={(row) => {
+                          rowRefs.current[index] = row;
+                        }}
+                        type="button"
+                        className="wallet-picker-row"
+                        data-wallet-id={wallet.id}
+                        onClick={() => onSelect(wallet.id)}
+                      >
+                        <span className="wallet-picker-row-icon" aria-hidden="true">
+                          {wallet.iconUrl && !iconFailed ? (
+                            <img
+                              className="wallet-picker-row-icon-img"
+                              src={wallet.iconUrl}
+                              alt=""
+                              width={32}
+                              height={32}
+                              loading="lazy"
+                              onError={() => markIconFailed(wallet.id)}
+                            />
+                          ) : (
+                            <WalletIcon size={32} />
+                          )}
+                        </span>
+                        <span className="wallet-picker-row-name">{wallet.name}</span>
+                        <span className="wallet-picker-row-chevron" aria-hidden="true">
+                          <ArrowRightIcon size={16} />
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {extraWallets.length > 0 && (
+                <button
+                  type="button"
+                  className="wallet-picker-more"
+                  aria-expanded={showAll}
+                  aria-controls={listId}
+                  onClick={() => setShowAll((value) => !value)}
+                >
+                  <span className="wallet-picker-more-label">
+                    {showAll ? 'Show fewer' : 'More wallets'}
+                  </span>
+                  <span
+                    className={cx(
+                      'wallet-picker-more-icon',
+                      showAll && 'wallet-picker-more-icon-open',
+                    )}
+                    aria-hidden="true"
+                  >
+                    <ChevronIcon size={16} />
+                  </span>
+                </button>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>,
     document.body,

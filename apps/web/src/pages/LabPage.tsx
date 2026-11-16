@@ -72,8 +72,10 @@ export function LabPage() {
           </div>
           <p className="home-note">Runs in your browser · No keys · No real funds</p>
         </div>
+      </section>
 
-        <aside className="card home-result" data-reveal aria-labelledby="proof-title">
+      <section className="container section home-proof" aria-labelledby="proof-title">
+        <aside className="card home-result" data-reveal>
           <header className="home-result-head">
             <h2 className="h3" id="proof-title">
               Same {SCENARIOS.length} crashes, two agents
