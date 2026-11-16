@@ -81,6 +81,18 @@ describe('NEP-413 verification', () => {
     expect(verifyNearSignature(input)).toEqual({ valid: true });
   });
 
+  it('accepts a wallet that signed without the callback URL the site sent (Meteor)', () => {
+    // The Meteor selector module never forwards callbackUrl, so it signs the payload without it.
+    const { input } = ed25519Login();
+    const sent = { ...input, callbackUrl: 'https://airbag.test' };
+    expect(verifyNearSignature(sent)).toEqual({ valid: true });
+  });
+
+  it('rejects a signature made over a different callback URL', () => {
+    const { input } = ed25519Login({ callbackUrl: 'https://other.test' });
+    expect(verifyNearSignature({ ...input, callbackUrl: 'https://airbag.test' }).valid).toBe(false);
+  });
+
   it('rejects a tampered message', () => {
     const { input } = ed25519Login();
     const result = verifyNearSignature({ ...input, message: `${input.message} tampered` });

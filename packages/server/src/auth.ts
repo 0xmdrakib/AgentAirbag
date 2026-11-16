@@ -223,14 +223,24 @@ export function verifyNearSignature(input: NearSignatureInput): NearSignatureVer
     );
   }
 
-  let hash: Uint8Array;
+  // callbackUrl is an optional NEP-413 field and some wallet modules never forward it (the
+  // Meteor selector module drops it), so the wallet may have signed with or without it. Both
+  // forms cover the same message, nonce and recipient, so either one proves the signature.
+  const callbackCandidates: Array<string | undefined> =
+    input.callbackUrl === undefined ? [undefined] : [input.callbackUrl, undefined];
+
+  const hashes: Uint8Array[] = [];
   try {
-    hash = nep413MessageHash({
-      message: input.message,
-      nonce,
-      recipient: input.recipient,
-      callbackUrl: input.callbackUrl,
-    });
+    for (const callbackUrl of callbackCandidates) {
+      hashes.push(
+        nep413MessageHash({
+          message: input.message,
+          nonce,
+          recipient: input.recipient,
+          callbackUrl,
+        }),
+      );
+    }
   } catch (error) {
     return invalid(
       error instanceof Error ? error.message : 'Could not encode the NEP-413 payload.',
@@ -238,17 +248,14 @@ export function verifyNearSignature(input: NearSignatureInput): NearSignatureVer
   }
 
   try {
-    if (key.curve === 'ed25519') {
-      return ed25519.verify(signature, hash, key.bytes, { zip215: false })
-        ? { valid: true }
-        : invalid('Signature does not match the NEP-413 payload.');
-    }
-
     // NEAR emits r || s || recoveryId (65 bytes); noble verifies r || s.
     const compact = signature.length === 65 ? signature.subarray(0, 64) : signature;
-    return secp256k1.verify(compact, hash, key.bytes, { prehash: false })
-      ? { valid: true }
-      : invalid('Signature does not match the NEP-413 payload.');
+    const matches = hashes.some((hash) =>
+      key.curve === 'ed25519'
+        ? ed25519.verify(signature, hash, key.bytes, { zip215: false })
+        : secp256k1.verify(compact, hash, key.bytes, { prehash: false }),
+    );
+    return matches ? { valid: true } : invalid('Signature does not match the NEP-413 payload.');
   } catch {
     return invalid('Signature verification failed for the supplied public key.');
   }

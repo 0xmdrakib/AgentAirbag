@@ -245,6 +245,14 @@ The login now tries to sign straight away; if the wallet reports a blocked popup
 sign-in" dialog asks for one more click and opens the signing popup from that click, with the login
 message fetched ahead so nothing is awaited in between. Wallets that need no popup are unaffected.
 
+**The server accepts a login signed with or without callbackUrl.** The Meteor selector module
+never forwards `callbackUrl` to the wallet, so Meteor signs the NEP-413 payload with that optional
+field empty while the site sent one, and the signature check failed with "Signature does not match the
+NEP-413 payload." (found by reading the module source and Meteor's own signing code, which is
+standard NEP-413). `verifyNearSignature` now checks the payload with the supplied callbackUrl and
+without it. Both forms cover the same message, nonce and recipient, so the one-time nonce still binds
+the login. A signature over a different callbackUrl is still rejected, and two tests pin both cases.
+
 **Known debt: the NEAR docs now call `@near-wallet-selector/*` deprecated** and recommend NEAR Connect
 (`@hot-labs/near-connect`). The custom picker is independent of the library, so a migration changes
 `selector.ts` and the provider, not the UI. It is listed on the roadmap as not built.

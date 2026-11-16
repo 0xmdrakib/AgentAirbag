@@ -25997,25 +25997,30 @@ function verifyNearSignature(input2) {
       `Invalid secp256k1 signature length: expected 64 or 65 bytes, got ${signature.length}.`
     );
   }
-  let hash2;
+  const callbackCandidates = input2.callbackUrl === void 0 ? [void 0] : [input2.callbackUrl, void 0];
+  const hashes = [];
   try {
-    hash2 = nep413MessageHash({
-      message: input2.message,
-      nonce,
-      recipient: input2.recipient,
-      callbackUrl: input2.callbackUrl
-    });
+    for (const callbackUrl of callbackCandidates) {
+      hashes.push(
+        nep413MessageHash({
+          message: input2.message,
+          nonce,
+          recipient: input2.recipient,
+          callbackUrl
+        })
+      );
+    }
   } catch (error62) {
     return invalid(
       error62 instanceof Error ? error62.message : "Could not encode the NEP-413 payload."
     );
   }
   try {
-    if (key.curve === "ed25519") {
-      return ed25519.verify(signature, hash2, key.bytes, { zip215: false }) ? { valid: true } : invalid("Signature does not match the NEP-413 payload.");
-    }
     const compact = signature.length === 65 ? signature.subarray(0, 64) : signature;
-    return secp256k1.verify(compact, hash2, key.bytes, { prehash: false }) ? { valid: true } : invalid("Signature does not match the NEP-413 payload.");
+    const matches = hashes.some(
+      (hash2) => key.curve === "ed25519" ? ed25519.verify(signature, hash2, key.bytes, { zip215: false }) : secp256k1.verify(compact, hash2, key.bytes, { prehash: false })
+    );
+    return matches ? { valid: true } : invalid("Signature does not match the NEP-413 payload.");
   } catch {
     return invalid("Signature verification failed for the supplied public key.");
   }
