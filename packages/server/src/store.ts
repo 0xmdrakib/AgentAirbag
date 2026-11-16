@@ -3,8 +3,14 @@ import { mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { neon } from '@neondatabase/serverless';
 import type { RunReportInput } from '@airbag/core';
+import { createMemoryHit, windowStart, type RateHit } from './rateLimit';
 
 export type StoreBackend = 'neon' | 'local';
+
+/** Newest runs kept per account. Older ones are removed when a new run is saved. */
+export const MAX_RUNS_PER_ACCOUNT = 50;
+/** Newest sessions kept per account, so repeated sign-ins cannot pile up rows. */
+export const MAX_SESSIONS_PER_ACCOUNT = 10;
 
 export interface RunSummary {
   id: string;
@@ -40,6 +46,8 @@ export interface RunStore {
   saveNonce?(nonce: string, pending: PendingNonce): Promise<void>;
   /** Atomically removes and returns a nonce, so it is single use. */
   takeNonce?(nonce: string): Promise<PendingNonce | null>;
+  /** Counts a request against a rate-limit bucket. When absent the API counts in memory. */
+  hit?: RateHit;
   ensureUser(accountId: string): Promise<void>;
   createSession(accountId: string, tokenHash: string, expiresAt: string): Promise<void>;
   /** Returns the account id for a live session, or null when missing/expired. */
@@ -212,6 +220,25 @@ class NeonStore implements RunStore {
     };
   }
 
+  hit: RateHit = async (bucket, windowMs, nowMs) => {
+    await this.ready();
+    const start = new Date(windowStart(nowMs, windowMs)).toISOString();
+    const rows = (await this.sql.query(
+      `INSERT INTO rate_limits (bucket, window_start, hits) VALUES ($1, $2, 1)
+       ON CONFLICT (bucket, window_start) DO UPDATE SET hits = rate_limits.hits + 1
+       RETURNING hits`,
+      [bucket, start],
+    )) as unknown as Array<{ hits: unknown }>;
+    const hits = Number(rows[0]?.hits ?? 1);
+    // A new window row was just created: a cheap moment to drop counters older than two days.
+    if (hits === 1) {
+      await this.sql.query(
+        `DELETE FROM rate_limits WHERE window_start < now() - interval '2 days'`,
+      );
+    }
+    return hits;
+  };
+
   async createSession(accountId: string, tokenHash: string, expiresAt: string): Promise<void> {
     await this.ready();
     await this.sql.query(
@@ -220,6 +247,17 @@ class NeonStore implements RunStore {
        ON CONFLICT (token_hash) DO UPDATE
        SET account_id = EXCLUDED.account_id, expires_at = EXCLUDED.expires_at`,
       [tokenHash, accountId, expiresAt],
+    );
+    // Housekeeping: drop expired sessions, and keep only the newest few for this account.
+    await this.sql.query('DELETE FROM sessions WHERE expires_at < now()');
+    await this.sql.query(
+      `DELETE FROM sessions
+       WHERE account_id = $1
+         AND token_hash NOT IN (
+           SELECT token_hash FROM sessions WHERE account_id = $1
+           ORDER BY created_at DESC LIMIT $2
+         )`,
+      [accountId, MAX_SESSIONS_PER_ACCOUNT],
     );
   }
 
@@ -258,6 +296,16 @@ class NeonStore implements RunStore {
         JSON.stringify(report),
       ],
     )) as unknown as Array<{ created_at: unknown }>;
+    // Keep only the newest runs for this account, so saving cannot grow the table without bound.
+    await this.sql.query(
+      `DELETE FROM runs
+       WHERE account_id = $1
+         AND id NOT IN (
+           SELECT id FROM runs WHERE account_id = $1
+           ORDER BY created_at DESC LIMIT $2
+         )`,
+      [accountId, MAX_RUNS_PER_ACCOUNT],
+    );
     return { id, createdAt: toIso(rows[0]?.created_at) };
   }
 
@@ -406,6 +454,8 @@ class LocalStore implements RunStore {
     });
   }
 
+  readonly hit: RateHit = createMemoryHit();
+
   async createSession(accountId: string, tokenHash: string, expiresAt: string): Promise<void> {
     await this.mutate((data) => {
       data.sessions[tokenHash] = {
@@ -413,6 +463,22 @@ class LocalStore implements RunStore {
         expiresAt,
         createdAt: new Date().toISOString(),
       };
+      // Housekeeping, as on Neon: drop expired sessions and keep the newest few per account.
+      const nowMs = Date.now();
+      const own: Array<[string, LocalSession]> = [];
+      for (const [hash, session] of Object.entries(data.sessions)) {
+        if (Date.parse(session.expiresAt) <= nowMs) {
+          delete data.sessions[hash];
+        } else if (session.accountId === accountId) {
+          own.push([hash, session]);
+        }
+      }
+      own
+        .sort((left, right) => right[1].createdAt.localeCompare(left[1].createdAt))
+        .slice(MAX_SESSIONS_PER_ACCOUNT)
+        .forEach(([hash]) => {
+          delete data.sessions[hash];
+        });
     });
   }
 
@@ -449,6 +515,12 @@ class LocalStore implements RunStore {
         failed: report.overall.failed,
         report,
       });
+      // Keep only the newest runs for this account.
+      const own = data.runs.filter((run) => run.accountId === accountId);
+      if (own.length > MAX_RUNS_PER_ACCOUNT) {
+        const drop = new Set(own.slice(0, own.length - MAX_RUNS_PER_ACCOUNT).map((run) => run.id));
+        data.runs = data.runs.filter((run) => !drop.has(run.id));
+      }
       return { id, createdAt };
     });
   }

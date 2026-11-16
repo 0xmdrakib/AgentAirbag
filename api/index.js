@@ -26161,6 +26161,65 @@ async function checkKeyOwnership(input2) {
   }
 }
 
+// packages/server/src/rateLimit.ts
+import { createHash as createHash2 } from "node:crypto";
+var MINUTE = 6e4;
+var DAY = 24 * 60 * MINUTE;
+var RATE_RULES = {
+  /** One sign-in asks for one or two nonces. */
+  nonce: { name: "nonce-ip-min", limit: 40, windowMs: MINUTE },
+  verify: { name: "verify-ip-min", limit: 20, windowMs: MINUTE },
+  verifyDay: { name: "verify-ip-day", limit: 200, windowMs: DAY },
+  saveIp: { name: "save-ip-min", limit: 30, windowMs: MINUTE },
+  saveIpDay: { name: "save-ip-day", limit: 300, windowMs: DAY },
+  saveAccount: { name: "save-acct-min", limit: 20, windowMs: MINUTE }
+};
+function windowStart(nowMs, windowMs) {
+  return Math.floor(nowMs / windowMs) * windowMs;
+}
+function createMemoryHit() {
+  const counters = /* @__PURE__ */ new Map();
+  return async (bucket, windowMs, nowMs) => {
+    const start = windowStart(nowMs, windowMs);
+    if (counters.size > 5e3) {
+      for (const [key, entry] of counters) {
+        if (entry.start < start) counters.delete(key);
+      }
+    }
+    const current = counters.get(bucket);
+    if (!current || current.start !== start) {
+      counters.set(bucket, { start, count: 1 });
+      return 1;
+    }
+    current.count += 1;
+    return current.count;
+  };
+}
+async function checkRate(hit, rule, subject, nowMs) {
+  try {
+    const count = await hit(`${rule.name}:${subject}`, rule.windowMs, nowMs);
+    if (count <= rule.limit) return { allowed: true, retryAfterSeconds: 0 };
+    const endsAt = windowStart(nowMs, rule.windowMs) + rule.windowMs;
+    return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil((endsAt - nowMs) / 1e3)) };
+  } catch {
+    return { allowed: true, retryAfterSeconds: 0 };
+  }
+}
+function clientAddress(headers) {
+  const direct = headers.get("x-vercel-forwarded-for") ?? headers.get("x-real-ip");
+  if (direct && direct.trim()) return direct.split(",")[0].trim();
+  const forwarded = headers.get("x-forwarded-for");
+  if (forwarded && forwarded.trim()) return forwarded.split(",")[0].trim();
+  return "unknown";
+}
+function subjectForAddress(address) {
+  return createHash2("sha256").update(`airbag-rate:${address}`).digest("hex").slice(0, 24);
+}
+function rateLimitedMessage(retryAfterSeconds) {
+  const wait = retryAfterSeconds >= 120 ? `${Math.ceil(retryAfterSeconds / 60)} minutes` : `${retryAfterSeconds} seconds`;
+  return `Too many requests. Wait ${wait} and try again.`;
+}
+
 // packages/server/src/store.ts
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
@@ -31448,6 +31507,8 @@ var export_escapeLiteral = ct.escapeLiteral;
 var export_types = ct.types;
 
 // packages/server/src/store.ts
+var MAX_RUNS_PER_ACCOUNT = 50;
+var MAX_SESSIONS_PER_ACCOUNT = 10;
 function createStore(options = {}) {
   const databaseUrl = options.databaseUrl === void 0 ? process.env.DATABASE_URL : options.databaseUrl;
   if (databaseUrl && databaseUrl.trim().length > 0) {
@@ -31532,6 +31593,23 @@ var NeonStore = class {
       expiresAt: Date.parse(toIso(row.expires_at))
     };
   }
+  hit = async (bucket, windowMs, nowMs) => {
+    await this.ready();
+    const start = new Date(windowStart(nowMs, windowMs)).toISOString();
+    const rows = await this.sql.query(
+      `INSERT INTO rate_limits (bucket, window_start, hits) VALUES ($1, $2, 1)
+       ON CONFLICT (bucket, window_start) DO UPDATE SET hits = rate_limits.hits + 1
+       RETURNING hits`,
+      [bucket, start]
+    );
+    const hits = Number(rows[0]?.hits ?? 1);
+    if (hits === 1) {
+      await this.sql.query(
+        `DELETE FROM rate_limits WHERE window_start < now() - interval '2 days'`
+      );
+    }
+    return hits;
+  };
   async createSession(accountId, tokenHash, expiresAt) {
     await this.ready();
     await this.sql.query(
@@ -31540,6 +31618,16 @@ var NeonStore = class {
        ON CONFLICT (token_hash) DO UPDATE
        SET account_id = EXCLUDED.account_id, expires_at = EXCLUDED.expires_at`,
       [tokenHash, accountId, expiresAt]
+    );
+    await this.sql.query("DELETE FROM sessions WHERE expires_at < now()");
+    await this.sql.query(
+      `DELETE FROM sessions
+       WHERE account_id = $1
+         AND token_hash NOT IN (
+           SELECT token_hash FROM sessions WHERE account_id = $1
+           ORDER BY created_at DESC LIMIT $2
+         )`,
+      [accountId, MAX_SESSIONS_PER_ACCOUNT]
     );
   }
   async getSession(tokenHash) {
@@ -31571,6 +31659,15 @@ var NeonStore = class {
         report.overall.failed,
         JSON.stringify(report)
       ]
+    );
+    await this.sql.query(
+      `DELETE FROM runs
+       WHERE account_id = $1
+         AND id NOT IN (
+           SELECT id FROM runs WHERE account_id = $1
+           ORDER BY created_at DESC LIMIT $2
+         )`,
+      [accountId, MAX_RUNS_PER_ACCOUNT]
     );
     return { id, createdAt: toIso(rows[0]?.created_at) };
   }
@@ -31682,6 +31779,7 @@ var LocalStore = class {
       }
     });
   }
+  hit = createMemoryHit();
   async createSession(accountId, tokenHash, expiresAt) {
     await this.mutate((data) => {
       data.sessions[tokenHash] = {
@@ -31689,6 +31787,18 @@ var LocalStore = class {
         expiresAt,
         createdAt: (/* @__PURE__ */ new Date()).toISOString()
       };
+      const nowMs = Date.now();
+      const own2 = [];
+      for (const [hash2, session] of Object.entries(data.sessions)) {
+        if (Date.parse(session.expiresAt) <= nowMs) {
+          delete data.sessions[hash2];
+        } else if (session.accountId === accountId) {
+          own2.push([hash2, session]);
+        }
+      }
+      own2.sort((left, right) => right[1].createdAt.localeCompare(left[1].createdAt)).slice(MAX_SESSIONS_PER_ACCOUNT).forEach(([hash2]) => {
+        delete data.sessions[hash2];
+      });
     });
   }
   async getSession(tokenHash) {
@@ -31719,6 +31829,11 @@ var LocalStore = class {
         failed: report.overall.failed,
         report
       });
+      const own2 = data.runs.filter((run) => run.accountId === accountId);
+      if (own2.length > MAX_RUNS_PER_ACCOUNT) {
+        const drop = new Set(own2.slice(0, own2.length - MAX_RUNS_PER_ACCOUNT).map((run) => run.id));
+        data.runs = data.runs.filter((run) => !drop.has(run.id));
+      }
       return { id, createdAt };
     });
   }
@@ -31753,6 +31868,8 @@ var LocalStore = class {
 
 // packages/server/src/api.ts
 var MAX_REPORT_BYTES = 512 * 1024;
+var MAX_AUTH_BODY_BYTES = 16 * 1024;
+var LOOPBACK_HOSTS = /* @__PURE__ */ new Set(["localhost", "127.0.0.1", "[::1]"]);
 var MAX_PENDING_NONCES = 1e4;
 var RUNS_LIMIT = 20;
 function isRecord2(value) {
@@ -31827,6 +31944,35 @@ function createApiApp(options = {}) {
       pendingNonces.delete(oldest);
     }
   }
+  const rateLimitOn = options.rateLimit !== false;
+  const hit = store.hit ?? createMemoryHit();
+  const byIp = (c) => subjectForAddress(clientAddress(c.req.raw.headers));
+  const byAccount = (c) => c.get("accountId");
+  const limitBy = (rule, subject) => async (c, next) => {
+    if (!rateLimitOn) return next();
+    const decision = await checkRate(hit, rule, subject(c), now().getTime());
+    if (!decision.allowed) {
+      c.header("Retry-After", String(decision.retryAfterSeconds));
+      return c.json({ error: rateLimitedMessage(decision.retryAfterSeconds) }, 429);
+    }
+    return next();
+  };
+  const isTrustedOrigin = (c) => {
+    const origin = c.req.header("origin");
+    if (!origin) return true;
+    let parsed;
+    try {
+      parsed = new URL(origin);
+    } catch {
+      return false;
+    }
+    if (allowedOrigin && parsed.origin === allowedOrigin) return true;
+    const requestUrl = new URL(c.req.url);
+    if (parsed.origin === requestUrl.origin) return true;
+    const host = c.req.header("x-forwarded-host") ?? c.req.header("host");
+    if (host && parsed.host === host) return true;
+    return LOOPBACK_HOSTS.has(parsed.hostname) && LOOPBACK_HOSTS.has(requestUrl.hostname);
+  };
   const api = new Hono3();
   api.use(
     "*",
@@ -31842,6 +31988,16 @@ function createApiApp(options = {}) {
       maxAge: 600
     })
   );
+  api.use("*", async (c, next) => {
+    await next();
+    c.header("Cache-Control", "no-store");
+  });
+  api.use("*", async (c, next) => {
+    if (c.req.method === "POST" && !isTrustedOrigin(c)) {
+      return c.json({ error: "Cross-origin request refused." }, 403);
+    }
+    await next();
+  });
   const requireSession = async (c, next) => {
     const token = readSessionCookie(c.req.header("cookie"));
     if (!token) return c.json({ error: "Authentication required" }, 401);
@@ -31854,7 +32010,11 @@ function createApiApp(options = {}) {
     "/health",
     (c) => c.json({ ok: true, db: store.backend, network: process.env.NEAR_NETWORK || "testnet" })
   );
-  api.post("/auth/nonce", async (c) => {
+  const authBodyLimit = bodyLimit({
+    maxSize: MAX_AUTH_BODY_BYTES,
+    onError: (c) => c.json({ error: "Request body is too large." }, 413)
+  });
+  api.post("/auth/nonce", limitBy(RATE_RULES.nonce, byIp), authBodyLimit, async (c) => {
     const body = await readJson(c) ?? {};
     const rawAccountId = body["accountId"];
     if (rawAccountId !== void 0 && typeof rawAccountId !== "string") {
@@ -31886,68 +32046,74 @@ function createApiApp(options = {}) {
     }
     return c.json(issued);
   });
-  api.post("/auth/verify", async (c) => {
-    const body = await readJson(c);
-    if (!body) return c.json({ error: "Expected a JSON body." }, 400);
-    const accountId = stringField(body, "accountId");
-    const publicKey = stringField(body, "publicKey");
-    const signature = stringField(body, "signature");
-    const nonce = stringField(body, "nonce");
-    const message = stringField(body, "message");
-    const recipient = stringField(body, "recipient");
-    if (!accountId || !publicKey || !signature || !nonce || !message || !recipient) {
-      return c.json(
-        { error: "accountId, publicKey, signature, nonce, message and recipient are required." },
-        400
-      );
-    }
-    if (!isValidAccountId(accountId)) {
-      return c.json({ error: "accountId is not a valid NEAR account id." }, 400);
-    }
-    const rawCallbackUrl = body["callbackUrl"];
-    if (rawCallbackUrl !== void 0 && typeof rawCallbackUrl !== "string") {
-      return c.json({ error: "callbackUrl must be a string when provided." }, 400);
-    }
-    const callbackUrl = typeof rawCallbackUrl === "string" ? rawCallbackUrl : void 0;
-    const time3 = now();
-    const pending = store.takeNonce ? await store.takeNonce(nonce) : pendingNonces.get(nonce);
-    if (!pending || pending.expiresAt <= time3.getTime()) {
-      if (!store.takeNonce) pendingNonces.delete(nonce);
-      return c.json({ error: "Nonce is unknown or expired. Request a new one." }, 400);
-    }
-    if (pending.accountId !== void 0 && pending.accountId !== accountId) {
-      return c.json({ error: "Nonce was issued for a different account." }, 400);
-    }
-    if (pending.recipient !== recipient || pending.message !== message) {
-      return c.json({ error: "Signed message does not match the issued challenge." }, 400);
-    }
-    const result = verifyNearSignature({
-      accountId,
-      publicKey,
-      signature,
-      nonce,
-      message,
-      recipient,
-      callbackUrl
-    });
-    if (!result.valid) return c.json({ error: result.error }, 401);
-    const ownership = await checkKey(accountId, publicKey);
-    if (!ownership.ok) {
-      if (ownership.reason === "not-owner") {
-        return c.json({ error: "That key is not an access key of this NEAR account." }, 401);
+  api.post(
+    "/auth/verify",
+    limitBy(RATE_RULES.verify, byIp),
+    limitBy(RATE_RULES.verifyDay, byIp),
+    authBodyLimit,
+    async (c) => {
+      const body = await readJson(c);
+      if (!body) return c.json({ error: "Expected a JSON body." }, 400);
+      const accountId = stringField(body, "accountId");
+      const publicKey = stringField(body, "publicKey");
+      const signature = stringField(body, "signature");
+      const nonce = stringField(body, "nonce");
+      const message = stringField(body, "message");
+      const recipient = stringField(body, "recipient");
+      if (!accountId || !publicKey || !signature || !nonce || !message || !recipient) {
+        return c.json(
+          { error: "accountId, publicKey, signature, nonce, message and recipient are required." },
+          400
+        );
       }
-      return c.json(
-        { error: "Could not check the key against the NEAR network. Try again in a moment." },
-        503
-      );
+      if (!isValidAccountId(accountId)) {
+        return c.json({ error: "accountId is not a valid NEAR account id." }, 400);
+      }
+      const rawCallbackUrl = body["callbackUrl"];
+      if (rawCallbackUrl !== void 0 && typeof rawCallbackUrl !== "string") {
+        return c.json({ error: "callbackUrl must be a string when provided." }, 400);
+      }
+      const callbackUrl = typeof rawCallbackUrl === "string" ? rawCallbackUrl : void 0;
+      const time3 = now();
+      const pending = store.takeNonce ? await store.takeNonce(nonce) : pendingNonces.get(nonce);
+      if (!pending || pending.expiresAt <= time3.getTime()) {
+        if (!store.takeNonce) pendingNonces.delete(nonce);
+        return c.json({ error: "Nonce is unknown or expired. Request a new one." }, 400);
+      }
+      if (pending.accountId !== void 0 && pending.accountId !== accountId) {
+        return c.json({ error: "Nonce was issued for a different account." }, 400);
+      }
+      if (pending.recipient !== recipient || pending.message !== message) {
+        return c.json({ error: "Signed message does not match the issued challenge." }, 400);
+      }
+      const result = verifyNearSignature({
+        accountId,
+        publicKey,
+        signature,
+        nonce,
+        message,
+        recipient,
+        callbackUrl
+      });
+      if (!result.valid) return c.json({ error: result.error }, 401);
+      const ownership = await checkKey(accountId, publicKey);
+      if (!ownership.ok) {
+        if (ownership.reason === "not-owner") {
+          return c.json({ error: "That key is not an access key of this NEAR account." }, 401);
+        }
+        return c.json(
+          { error: "Could not check the key against the NEAR network. Try again in a moment." },
+          503
+        );
+      }
+      if (!store.takeNonce) pendingNonces.delete(nonce);
+      await store.ensureUser(accountId);
+      const session = createSessionToken(time3);
+      await store.createSession(accountId, session.tokenHash, session.expiresAt);
+      c.header("Set-Cookie", sessionCookie(session.token, { secure: isSecureRequest(c) }));
+      return c.json({ accountId });
     }
-    if (!store.takeNonce) pendingNonces.delete(nonce);
-    await store.ensureUser(accountId);
-    const session = createSessionToken(time3);
-    await store.createSession(accountId, session.tokenHash, session.expiresAt);
-    c.header("Set-Cookie", sessionCookie(session.token, { secure: isSecureRequest(c) }));
-    return c.json({ accountId });
-  });
+  );
   api.post("/auth/logout", async (c) => {
     const token = readSessionCookie(c.req.header("cookie"));
     if (token) await store.deleteSession(hashSessionToken(token));
@@ -31963,6 +32129,9 @@ function createApiApp(options = {}) {
   api.post(
     "/runs",
     requireSession,
+    limitBy(RATE_RULES.saveIp, byIp),
+    limitBy(RATE_RULES.saveIpDay, byIp),
+    limitBy(RATE_RULES.saveAccount, byAccount),
     bodyLimit({
       maxSize: MAX_REPORT_BYTES,
       onError: (c) => c.json({ error: "Run report exceeds 512 KB." }, 413)

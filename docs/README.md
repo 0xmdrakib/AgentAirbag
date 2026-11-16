@@ -18,6 +18,7 @@ and [`llms-full.txt`](../llms-full.txt).
 | Document | What it answers |
 | --- | --- |
 | [DEPLOY.md](DEPLOY.md) | Static hosting, the Node API, Neon, wallet connect, environment variables |
+| [SECURITY.md](SECURITY.md) | What is stored, how sign-in and saving are controlled, rate limits, and what is not covered |
 | [DEMO_SCRIPT.md](DEMO_SCRIPT.md) | A two-minute walkthrough for a screen recording |
 
 ## Process records

@@ -8,7 +8,7 @@ is not here, it is not a shipped claim.
 | 21 crashes are implemented | `pnpm build:scenarios` | `Built 21 scenarios (12 P0, 9 P1)` |
 | Dummy crashes on all 21 | `pnpm airbag run --agent naive --summary` | `0 survived · 21 crashed` |
 | Seatbelt survives all 21 | `pnpm airbag run --agent hardened --summary` | `21 survived · 0 crashed`; grade A |
-| The exact naive crash set is asserted | `pnpm test` | 131 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
+| The exact naive crash set is asserted | `pnpm test` | 146 tests pass, including `Dummy crashes on at least 14 crashes, and in this build on all 21` |
 | The same seed produces a byte-identical report | `pnpm test` | `is deterministic: the same seed produces the same report hash` passes |
 | The live client is read-only | `pnpm test` | `read-only live client` suite passes |
 | The sandbox accepts the exact quoteRequest echoed by the live API | `pnpm test` | `drop-in 1Click quote compatibility` suite passes |
@@ -16,7 +16,8 @@ is not here, it is not a shipped claim.
 | Every report fixture validates against the schema | `pnpm test` | `report fixtures` suite passes |
 | Guard returns allow / warn / block with reasons | `pnpm test` | `Airbag Guard` suite passes (41 tests in `packages/guard`) |
 | A cassette response hash drift is caught | `pnpm test` | `fails loudly when a sandbox response drifts from the recording` passes |
-| No known production dependency vulnerabilities | `pnpm audit --prod` | `No known vulnerabilities found` |
+| No dependency advisory reaches the server or core | `pnpm audit --prod` | Three advisories (secp256k1, base-x, elliptic), every path starting at `apps/web > @near-wallet-selector/*`, the browser wallet libraries. Five more entries list no path in this install. See `docs/SECURITY.md` |
+| Sign-in and saving are rate limited, and storage per account is capped | `pnpm test:api` | `abuse.test.ts` passes: 429 with `Retry-After` past the limit, a fresh window after a minute, no blocking when the counter fails, 50 runs and 10 sessions per account, foreign-origin POST refused |
 | The attack demo blocks the injected transfer | `pnpm demo:attack` | Unguarded loss `$9995.46`; guarded blocks with `TAINTED_VALUE`, still completes the swap and ends `PASS · $0.00` |
 | The demo runs offline after install | `pnpm demo` (disconnect the network after `pnpm install`) | Report card at the printed URL; no API calls |
 | The demo smoke passes | `pnpm demo --smoke` | `Demo smoke passed.` |

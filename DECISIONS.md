@@ -253,6 +253,19 @@ standard NEP-413). `verifyNearSignature` now checks the payload with the supplie
 without it. Both forms cover the same message, nonce and recipient, so the one-time nonce still binds
 the login. A signature over a different callbackUrl is still rejected, and two tests pin both cases.
 
+**Abuse controls on sign-in and saving.** A review found no rate limits, unlimited accounts (an
+implicit account is free to create) each able to save unlimited 512 KB reports, sessions that were
+never pruned, and no Origin check behind the SameSite cookie. Added: per-address and per-account
+fixed-window limits kept in Postgres so every serverless instance shares one count (loose on purpose:
+40 nonces and 20 sign-ins per minute per address, 20 saves per minute per account), 50 saved runs and
+10 sessions per account with the oldest removed, a 16 KB cap on sign-in bodies, a refusal of browser
+POSTs that name a foreign origin, and `Cache-Control: no-store` on /api. If the counter store fails the
+request goes through, because refusing real users is the worse failure. A strict CSP and
+Cross-Origin-Opener-Policy were left out because wallet popups and frames would break. Details and what
+remains uncovered are in docs/SECURITY.md. The CLAIMS row that said "no known production dependency
+vulnerabilities" was no longer true (three advisories, all inside the browser wallet libraries), so it
+now says exactly that.
+
 **Known debt: the NEAR docs now call `@near-wallet-selector/*` deprecated** and recommend NEAR Connect
 (`@hot-labs/near-connect`). The custom picker is independent of the library, so a migration changes
 `selector.ts` and the provider, not the UI. It is listed on the roadmap as not built.

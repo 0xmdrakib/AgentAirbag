@@ -1,4 +1,4 @@
-import { Hono, type Context } from 'hono';
+import { Hono, type Context, type MiddlewareHandler } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
 import { runReportSchema } from '@airbag/core';
@@ -13,9 +13,22 @@ import {
   verifyNearSignature,
 } from './auth';
 import { checkKeyOwnership, type KeyCheckResult } from './nearKeys';
+import {
+  RATE_RULES,
+  checkRate,
+  clientAddress,
+  createMemoryHit,
+  rateLimitedMessage,
+  subjectForAddress,
+  type RateHit,
+  type RateRule,
+} from './rateLimit';
 import { createStore, type PendingNonce, type RunStore } from './store';
 
 const MAX_REPORT_BYTES = 512 * 1024;
+/** Sign-in bodies are a few hundred bytes; anything near this size is not a login. */
+const MAX_AUTH_BODY_BYTES = 16 * 1024;
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 const MAX_PENDING_NONCES = 10_000;
 const RUNS_LIMIT = 20;
 
@@ -38,14 +51,14 @@ export interface CreateApiOptions {
   /** Defaults to AIRBAG_ALLOWED_ORIGIN. Pass null to force same-origin only. */
   allowedOrigin?: string | null;
   nonceTtlMs?: number;
+  /** Set false to turn request rate limiting off (tests that make many calls). Default on. */
+  rateLimit?: boolean;
   /**
    * How sign-in proves the key belongs to the account. "rpc" (default) asks the NEAR JSON-RPC;
    * "off" skips the check and exists only so tests never touch the network.
    */
   keyCheck?:
-    | 'rpc'
-    | 'off'
-    | ((input: { accountId: string; publicKey: string }) => Promise<KeyCheckResult>);
+    'rpc' | 'off' | ((input: { accountId: string; publicKey: string }) => Promise<KeyCheckResult>);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -136,6 +149,45 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
     }
   }
 
+  const rateLimitOn = options.rateLimit !== false;
+  const hit: RateHit = store.hit ?? createMemoryHit();
+  const byIp = (c: Context<ApiEnv>): string => subjectForAddress(clientAddress(c.req.raw.headers));
+  const byAccount = (c: Context<ApiEnv>): string => c.get('accountId');
+
+  /** Counts the request against a rule and answers 429 once the limit is passed. */
+  const limitBy =
+    (rule: RateRule, subject: (c: Context<ApiEnv>) => string): MiddlewareHandler<ApiEnv> =>
+    async (c, next) => {
+      if (!rateLimitOn) return next();
+      const decision = await checkRate(hit, rule, subject(c), now().getTime());
+      if (!decision.allowed) {
+        c.header('Retry-After', String(decision.retryAfterSeconds));
+        return c.json({ error: rateLimitedMessage(decision.retryAfterSeconds) }, 429);
+      }
+      return next();
+    };
+
+  /**
+   * A second line behind the SameSite=Lax cookie: a browser POST that names a foreign origin is
+   * refused. Requests with no Origin header (scripts, curl, same-origin GET) are not affected.
+   */
+  const isTrustedOrigin = (c: Context<ApiEnv>): boolean => {
+    const origin = c.req.header('origin');
+    if (!origin) return true;
+    let parsed: URL;
+    try {
+      parsed = new URL(origin);
+    } catch {
+      return false;
+    }
+    if (allowedOrigin && parsed.origin === allowedOrigin) return true;
+    const requestUrl = new URL(c.req.url);
+    if (parsed.origin === requestUrl.origin) return true;
+    const host = c.req.header('x-forwarded-host') ?? c.req.header('host');
+    if (host && parsed.host === host) return true;
+    return LOOPBACK_HOSTS.has(parsed.hostname) && LOOPBACK_HOSTS.has(requestUrl.hostname);
+  };
+
   const api = new Hono<ApiEnv>();
 
   api.use(
@@ -153,6 +205,19 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
     }),
   );
 
+  // Responses carry account data or a session: never let a proxy or the browser cache them.
+  api.use('*', async (c, next) => {
+    await next();
+    c.header('Cache-Control', 'no-store');
+  });
+
+  api.use('*', async (c, next) => {
+    if (c.req.method === 'POST' && !isTrustedOrigin(c)) {
+      return c.json({ error: 'Cross-origin request refused.' }, 403);
+    }
+    await next();
+  });
+
   const requireSession = async (
     c: Context<ApiEnv>,
     next: () => Promise<void>,
@@ -169,7 +234,12 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
     c.json({ ok: true, db: store.backend, network: process.env.NEAR_NETWORK || 'testnet' }),
   );
 
-  api.post('/auth/nonce', async (c) => {
+  const authBodyLimit = bodyLimit({
+    maxSize: MAX_AUTH_BODY_BYTES,
+    onError: (c) => c.json({ error: 'Request body is too large.' }, 413),
+  });
+
+  api.post('/auth/nonce', limitBy(RATE_RULES.nonce, byIp), authBodyLimit, async (c) => {
     const body = (await readJson(c)) ?? {};
     const rawAccountId = body['accountId'];
     if (rawAccountId !== undefined && typeof rawAccountId !== 'string') {
@@ -203,76 +273,82 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
     return c.json(issued);
   });
 
-  api.post('/auth/verify', async (c) => {
-    const body = await readJson(c);
-    if (!body) return c.json({ error: 'Expected a JSON body.' }, 400);
+  api.post(
+    '/auth/verify',
+    limitBy(RATE_RULES.verify, byIp),
+    limitBy(RATE_RULES.verifyDay, byIp),
+    authBodyLimit,
+    async (c) => {
+      const body = await readJson(c);
+      if (!body) return c.json({ error: 'Expected a JSON body.' }, 400);
 
-    const accountId = stringField(body, 'accountId');
-    const publicKey = stringField(body, 'publicKey');
-    const signature = stringField(body, 'signature');
-    const nonce = stringField(body, 'nonce');
-    const message = stringField(body, 'message');
-    const recipient = stringField(body, 'recipient');
-    if (!accountId || !publicKey || !signature || !nonce || !message || !recipient) {
-      return c.json(
-        { error: 'accountId, publicKey, signature, nonce, message and recipient are required.' },
-        400,
-      );
-    }
-    if (!isValidAccountId(accountId)) {
-      return c.json({ error: 'accountId is not a valid NEAR account id.' }, 400);
-    }
-
-    const rawCallbackUrl = body['callbackUrl'];
-    if (rawCallbackUrl !== undefined && typeof rawCallbackUrl !== 'string') {
-      return c.json({ error: 'callbackUrl must be a string when provided.' }, 400);
-    }
-    const callbackUrl = typeof rawCallbackUrl === 'string' ? rawCallbackUrl : undefined;
-
-    const time = now();
-    // A shared store consumes the nonce atomically here; the in-memory path deletes it on success.
-    const pending = store.takeNonce ? await store.takeNonce(nonce) : pendingNonces.get(nonce);
-    if (!pending || pending.expiresAt <= time.getTime()) {
-      if (!store.takeNonce) pendingNonces.delete(nonce);
-      return c.json({ error: 'Nonce is unknown or expired. Request a new one.' }, 400);
-    }
-    if (pending.accountId !== undefined && pending.accountId !== accountId) {
-      return c.json({ error: 'Nonce was issued for a different account.' }, 400);
-    }
-    if (pending.recipient !== recipient || pending.message !== message) {
-      return c.json({ error: 'Signed message does not match the issued challenge.' }, 400);
-    }
-
-    const result = verifyNearSignature({
-      accountId,
-      publicKey,
-      signature,
-      nonce,
-      message,
-      recipient,
-      callbackUrl,
-    });
-    if (!result.valid) return c.json({ error: result.error }, 401);
-
-    // A valid signature only proves the caller holds some private key. Bind it to the account.
-    const ownership = await checkKey(accountId, publicKey);
-    if (!ownership.ok) {
-      if (ownership.reason === 'not-owner') {
-        return c.json({ error: 'That key is not an access key of this NEAR account.' }, 401);
+      const accountId = stringField(body, 'accountId');
+      const publicKey = stringField(body, 'publicKey');
+      const signature = stringField(body, 'signature');
+      const nonce = stringField(body, 'nonce');
+      const message = stringField(body, 'message');
+      const recipient = stringField(body, 'recipient');
+      if (!accountId || !publicKey || !signature || !nonce || !message || !recipient) {
+        return c.json(
+          { error: 'accountId, publicKey, signature, nonce, message and recipient are required.' },
+          400,
+        );
       }
-      return c.json(
-        { error: 'Could not check the key against the NEAR network. Try again in a moment.' },
-        503,
-      );
-    }
+      if (!isValidAccountId(accountId)) {
+        return c.json({ error: 'accountId is not a valid NEAR account id.' }, 400);
+      }
 
-    if (!store.takeNonce) pendingNonces.delete(nonce);
-    await store.ensureUser(accountId);
-    const session = createSessionToken(time);
-    await store.createSession(accountId, session.tokenHash, session.expiresAt);
-    c.header('Set-Cookie', sessionCookie(session.token, { secure: isSecureRequest(c) }));
-    return c.json({ accountId });
-  });
+      const rawCallbackUrl = body['callbackUrl'];
+      if (rawCallbackUrl !== undefined && typeof rawCallbackUrl !== 'string') {
+        return c.json({ error: 'callbackUrl must be a string when provided.' }, 400);
+      }
+      const callbackUrl = typeof rawCallbackUrl === 'string' ? rawCallbackUrl : undefined;
+
+      const time = now();
+      // A shared store consumes the nonce atomically here; the in-memory path deletes it on success.
+      const pending = store.takeNonce ? await store.takeNonce(nonce) : pendingNonces.get(nonce);
+      if (!pending || pending.expiresAt <= time.getTime()) {
+        if (!store.takeNonce) pendingNonces.delete(nonce);
+        return c.json({ error: 'Nonce is unknown or expired. Request a new one.' }, 400);
+      }
+      if (pending.accountId !== undefined && pending.accountId !== accountId) {
+        return c.json({ error: 'Nonce was issued for a different account.' }, 400);
+      }
+      if (pending.recipient !== recipient || pending.message !== message) {
+        return c.json({ error: 'Signed message does not match the issued challenge.' }, 400);
+      }
+
+      const result = verifyNearSignature({
+        accountId,
+        publicKey,
+        signature,
+        nonce,
+        message,
+        recipient,
+        callbackUrl,
+      });
+      if (!result.valid) return c.json({ error: result.error }, 401);
+
+      // A valid signature only proves the caller holds some private key. Bind it to the account.
+      const ownership = await checkKey(accountId, publicKey);
+      if (!ownership.ok) {
+        if (ownership.reason === 'not-owner') {
+          return c.json({ error: 'That key is not an access key of this NEAR account.' }, 401);
+        }
+        return c.json(
+          { error: 'Could not check the key against the NEAR network. Try again in a moment.' },
+          503,
+        );
+      }
+
+      if (!store.takeNonce) pendingNonces.delete(nonce);
+      await store.ensureUser(accountId);
+      const session = createSessionToken(time);
+      await store.createSession(accountId, session.tokenHash, session.expiresAt);
+      c.header('Set-Cookie', sessionCookie(session.token, { secure: isSecureRequest(c) }));
+      return c.json({ accountId });
+    },
+  );
 
   api.post('/auth/logout', async (c) => {
     const token = readSessionCookie(c.req.header('cookie'));
@@ -292,6 +368,9 @@ export function createApiApp(options: CreateApiOptions = {}): Hono<ApiEnv> {
   api.post(
     '/runs',
     requireSession,
+    limitBy(RATE_RULES.saveIp, byIp),
+    limitBy(RATE_RULES.saveIpDay, byIp),
+    limitBy(RATE_RULES.saveAccount, byAccount),
     bodyLimit({
       maxSize: MAX_REPORT_BYTES,
       onError: (c) => c.json({ error: 'Run report exceeds 512 KB.' }, 413),

@@ -34,6 +34,16 @@ CREATE TABLE IF NOT EXISTS auth_nonces (
   expires_at timestamptz NOT NULL
 );
 
+-- Fixed-window request counters for rate limiting. The key is a hashed address or an account id.
+CREATE TABLE IF NOT EXISTS rate_limits (
+  bucket text NOT NULL,
+  window_start timestamptz NOT NULL,
+  hits int NOT NULL,
+  PRIMARY KEY (bucket, window_start)
+);
+
+CREATE INDEX IF NOT EXISTS rate_limits_window_idx ON rate_limits (window_start);
+
 CREATE INDEX IF NOT EXISTS sessions_account_id_idx ON sessions (account_id);
 
 CREATE INDEX IF NOT EXISTS auth_nonces_expires_idx ON auth_nonces (expires_at);
