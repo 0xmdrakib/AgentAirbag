@@ -125,7 +125,7 @@
 /* ---------- Result card ---------- */
 
 .home-result {
-  padding: clamp(20px, 2.2vw, 30px);
+  padding: clamp(18px, 2vw, 26px);
 }
 
 .home-result-head {
@@ -153,16 +153,16 @@
 
 .home-agent {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 14px clamp(14px, 2vw, 24px);
-  padding: clamp(18px, 1.8vw, 24px) 0;
+  gap: 4px clamp(14px, 1.6vw, 20px);
+  padding: clamp(16px, 1.5vw, 20px) 0;
   border-top: 1px solid var(--line);
 }
 
 .home-grade {
-  min-width: 0.7em;
-  font-size: clamp(42px, 3.8vw, 58px);
+  min-width: 0.6em;
+  font-size: clamp(36px, 3vw, 44px);
   font-weight: 600;
   line-height: 0.9;
   letter-spacing: -0.05em;
@@ -213,16 +213,9 @@
   line-height: 1.3;
 }
 
-.home-survival {
-  display: flex;
-  grid-column: 1 / -1;
-  align-items: center;
-  gap: 16px;
-}
-
 .home-bar {
-  flex: 1;
-  height: 5px;
+  height: 4px;
+  margin-top: 10px;
   overflow: hidden;
   border-radius: 999px;
   background: var(--surface-3);
@@ -247,24 +240,12 @@
   background: var(--fail);
 }
 
-.home-count {
-  color: var(--text-2);
-  font-size: 14.5px;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.home-count strong {
-  color: var(--text);
-  font-weight: 600;
-}
-
 .home-foot {
-  padding-top: 16px;
+  padding-top: 14px;
   border-top: 1px solid var(--line);
   color: var(--text-3);
-  font-size: 13.5px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 /* ---------- Section heads and shared list text ---------- */

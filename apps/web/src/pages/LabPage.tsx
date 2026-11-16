@@ -111,13 +111,9 @@ export function LabPage() {
                     </span>
                     <div className="home-agent-who">
                       <h3 className="home-agent-name">{name}</h3>
-                      <p className="home-agent-setup">{setup}</p>
-                    </div>
-                    <div className="home-agent-loss">
-                      <p className="home-money">{formatUsd(report.overall.simulatedLossUsd)}</p>
-                      <p className="home-caption">simulated loss</p>
-                    </div>
-                    <div className="home-survival">
+                      <p className="home-agent-setup">
+                        {setup} · <strong>{passed}</strong> of {total} survived
+                      </p>
                       <div
                         className="home-bar"
                         role="img"
@@ -125,9 +121,10 @@ export function LabPage() {
                       >
                         <span style={{ width: `${(passed / total) * 100}%` }} />
                       </div>
-                      <p className="home-count">
-                        <strong>{passed}</strong> of {total} survived
-                      </p>
+                    </div>
+                    <div className="home-agent-loss">
+                      <p className="home-money">{formatUsd(report.overall.simulatedLossUsd)}</p>
+                      <p className="home-caption">simulated loss</p>
                     </div>
                   </article>
                 );
