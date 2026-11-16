@@ -11,6 +11,7 @@ import {
 import type { AccountState, WalletSelector } from '@near-wallet-selector/core';
 import {
   ApiError,
+  type AuthChallenge,
   describeError,
   fetchMe,
   getAuthNonce,
@@ -21,6 +22,7 @@ import {
 import { walletNonce } from './buffer-shim';
 import { MyRuns } from './MyRuns';
 import { loadWallet } from './selector';
+import { SignStep } from './SignStep';
 import { WalletPicker } from './WalletPicker';
 
 export type WalletStatus = 'loading' | 'disconnected' | 'connecting' | 'connected' | 'unavailable';
@@ -88,8 +90,59 @@ async function tryDirectSignIn(
   }
 }
 
+function isPopupBlocked(caught: unknown): boolean {
+  const message = caught instanceof Error ? caught.message : String(caught);
+  return /popup/i.test(message);
+}
+
+/** Ask the wallet to sign the login challenge and exchange it for a server session. */
+async function signAndVerify(
+  selector: WalletSelector,
+  walletId: string,
+  fallbackAccountId: string,
+  challenge: AuthChallenge,
+): Promise<string> {
+  const wallet = await selector.wallet(walletId);
+  if (!wallet.signMessage) {
+    throw new Error(
+      'This wallet cannot sign the Agent Airbag login message. Try another NEAR wallet.',
+    );
+  }
+
+  const callbackUrl = window.location.origin;
+  const signed = await wallet.signMessage({
+    message: challenge.message,
+    recipient: challenge.recipient,
+    nonce: walletNonce(challenge.nonce) as unknown as Buffer,
+    callbackUrl,
+  });
+  if (!signed?.signature || !signed.publicKey) {
+    throw new Error('The wallet did not return a signature. Try connecting again.');
+  }
+
+  const session = await verifyAuth({
+    accountId: signed.accountId || fallbackAccountId,
+    publicKey: signed.publicKey,
+    signature: signed.signature,
+    nonce: challenge.nonce,
+    message: challenge.message,
+    recipient: challenge.recipient,
+    callbackUrl,
+  });
+  return session.accountId ?? signed.accountId ?? fallbackAccountId;
+}
+
+interface PendingSign {
+  walletId: string;
+  accountId: string;
+}
+
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<WalletStatus>('loading');
+  const [pendingSign, setPendingSign] = useState<PendingSign | null>(null);
+  const [signing, setSigning] = useState(false);
+  const pendingChallengeRef = useRef<AuthChallenge | null>(null);
+  const signingRef = useRef(false);
   const [accountId, setAccountId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [runsOpen, setRunsOpen] = useState(false);
@@ -214,38 +267,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           throw new Error('The wallet connected but did not share a NEAR account.');
         }
 
-        const challenge = await getAuthNonce();
-        const wallet = await selector.wallet(state.selectedWalletId ?? walletId);
-        if (!wallet.signMessage) {
-          throw new Error(
-            'This wallet cannot sign the Agent Airbag login message. Try another NEAR wallet.',
-          );
+        const target = state.selectedWalletId ?? walletId;
+        try {
+          const challenge = await getAuthNonce();
+          const signedIn = await signAndVerify(selector, target, active.accountId, challenge);
+          setAccountId(signedIn);
+          setStatus('connected');
+          setError(null);
+        } catch (signError) {
+          // Some wallets (Meteor) open a second popup to sign. After the first popup the
+          // browser no longer counts this as a click and blocks it, so ask for one more
+          // click and open the popup from that.
+          if (!isPopupBlocked(signError)) throw signError;
+          setPendingSign({ walletId: target, accountId: active.accountId });
+          setStatus('disconnected');
         }
-
-        const callbackUrl = window.location.origin;
-        const signed = await wallet.signMessage({
-          message: challenge.message,
-          recipient: challenge.recipient,
-          nonce: walletNonce(challenge.nonce) as unknown as Buffer,
-          callbackUrl,
-        });
-        if (!signed?.signature || !signed.publicKey) {
-          throw new Error('The wallet did not return a signature. Try connecting again.');
-        }
-
-        const session = await verifyAuth({
-          accountId: signed.accountId || active.accountId,
-          publicKey: signed.publicKey,
-          signature: signed.signature,
-          nonce: challenge.nonce,
-          message: challenge.message,
-          recipient: challenge.recipient,
-          callbackUrl,
-        });
-
-        setAccountId(session.accountId ?? signed.accountId ?? active.accountId);
-        setStatus('connected');
-        setError(null);
       } catch (caught) {
         setAccountId(null);
         setStatus(isApiUnavailable(caught) ? 'unavailable' : 'disconnected');
@@ -257,6 +293,62 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     },
     [status],
   );
+
+  const finishSignIn = useCallback(async () => {
+    const pending = pendingSign;
+    const challenge = pendingChallengeRef.current;
+    if (!pending || signingRef.current) return;
+    signingRef.current = true;
+    setSigning(true);
+    setError(null);
+
+    try {
+      const { selector } = await loadWallet();
+      const fresh = challenge ?? (await getAuthNonce());
+      const signedIn = await signAndVerify(selector, pending.walletId, pending.accountId, fresh);
+      pendingChallengeRef.current = null;
+      setPendingSign(null);
+      setAccountId(signedIn);
+      setStatus('connected');
+    } catch (caught) {
+      pendingChallengeRef.current = null;
+      const message = describeError(caught, 'The wallet could not connect. Try again.');
+      setPendingSign(null);
+      setAccountId(null);
+      setStatus(isApiUnavailable(caught) ? 'unavailable' : 'disconnected');
+      setError(/cancel|closed|reject|denied/i.test(message) ? null : message);
+    } finally {
+      signingRef.current = false;
+      setSigning(false);
+    }
+  }, [pendingSign]);
+
+  const cancelSignIn = useCallback(() => {
+    pendingChallengeRef.current = null;
+    setPendingSign(null);
+    void (async () => {
+      try {
+        const { selector } = await loadWallet();
+        if (selector.isSignedIn()) await (await selector.wallet()).signOut();
+      } catch {
+        // A half-finished wallet session is harmless; the server session is the boundary.
+      }
+    })();
+  }, []);
+
+  // Fetch the sign-in message ahead of the click so the popup opens with no await in between.
+  useEffect(() => {
+    if (!pendingSign) return;
+    let cancelled = false;
+    void getAuthNonce()
+      .then((challenge) => {
+        if (!cancelled) pendingChallengeRef.current = challenge;
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [pendingSign]);
 
   const connect = useCallback(async () => {
     if (connectingRef.current || status === 'connected') return;
@@ -346,6 +438,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         onClose={closePicker}
         onSelect={(walletId) => void connectWithWallet(walletId)}
       />
+      {pendingSign && (
+        <SignStep
+          accountId={pendingSign.accountId}
+          busy={signing}
+          onApprove={() => void finishSignIn()}
+          onCancel={cancelSignIn}
+        />
+      )}
     </WalletContext.Provider>
   );
 }

@@ -238,6 +238,13 @@ same balances, and near.com is not in the NEAR Connect wallet manifest. No docum
 near.com account, and the picker note now says that. A button claiming to connect near.com itself
 would not work. If NEAR publishes such a flow, it becomes one more row at the top.
 
+**Sign-in has a second step when a wallet needs a second popup.** Meteor opens one popup to
+connect and another to sign the login message. Browsers allow a popup only straight after a click, so
+the second one was blocked and the visitor saw "Couldn't open popup window to complete wallet action".
+The login now tries to sign straight away; if the wallet reports a blocked popup, a small "Approve the
+sign-in" dialog asks for one more click and opens the signing popup from that click, with the login
+message fetched ahead so nothing is awaited in between. Wallets that need no popup are unaffected.
+
 **Known debt: the NEAR docs now call `@near-wallet-selector/*` deprecated** and recommend NEAR Connect
 (`@hot-labs/near-connect`). The custom picker is independent of the library, so a migration changes
 `selector.ts` and the provider, not the UI. It is listed on the roadmap as not built.
