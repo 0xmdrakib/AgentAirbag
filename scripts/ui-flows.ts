@@ -1,4 +1,6 @@
 import { mkdirSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { chromium, type Page } from 'playwright-core';
 import { PREVIEW_URL, chromePath } from './preview';
 import { settle } from './settle';
@@ -10,7 +12,8 @@ import { settle } from './settle';
  */
 const base = PREVIEW_URL.endsWith('/') ? PREVIEW_URL : `${PREVIEW_URL}/`;
 const widths = [1440, 768, 390];
-const dir = 'artifacts/flows';
+// Scratch output only, kept out of the repository.
+const dir = process.env.AIRBAG_FLOW_DIR ?? join(tmpdir(), 'airbag-flows');
 mkdirSync(dir, { recursive: true });
 const report = JSON.parse(readFileSync('fixtures/report.hardened.json', 'utf8'));
 const errors: string[] = [];

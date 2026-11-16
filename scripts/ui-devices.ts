@@ -1,10 +1,12 @@
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { PREVIEW_URL, chromePath } from './preview';
 
 /**
  * Above-the-fold check on real device viewports (CSS pixels, browser chrome excluded).
- * Writes artifacts/devices/<route>-<device>.png, one viewport-sized shot each, and reports
+ * Writes a viewport-sized shot per device to a temp folder (AIRBAG_DEVICE_DIR overrides), and reports
  * whether the primary call to action is visible without scrolling.
  *   tsx scripts/ui-devices.ts [route]
  */
@@ -23,7 +25,8 @@ const DEVICES = [
 
 const route = (process.argv[2] ?? '').replace(/^#?\/*/, '');
 const name = route.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'lab';
-mkdirSync('artifacts/devices', { recursive: true });
+const out = process.env.AIRBAG_DEVICE_DIR ?? join(tmpdir(), 'airbag-devices');
+mkdirSync(out, { recursive: true });
 
 const browser = await chromium.launch({ executablePath: chromePath(), headless: true });
 const results: string[] = [];
@@ -43,9 +46,16 @@ for (const device of DEVICES) {
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
-  const ctaVisible = fold.ctaBottom === null ? 'n/a' : fold.ctaBottom <= device.height ? 'yes' : `no (${fold.ctaBottom}px)`;
-  results.push(`${device.name.padEnd(13)} ${`${device.width}x${device.height}`.padEnd(10)} CTA above fold: ${ctaVisible}  overflow: ${fold.overflow}`);
-  await page.screenshot({ path: `artifacts/devices/${name}-${device.name}.png` });
+  const ctaVisible =
+    fold.ctaBottom === null
+      ? 'n/a'
+      : fold.ctaBottom <= device.height
+        ? 'yes'
+        : `no (${fold.ctaBottom}px)`;
+  results.push(
+    `${device.name.padEnd(13)} ${`${device.width}x${device.height}`.padEnd(10)} CTA above fold: ${ctaVisible}  overflow: ${fold.overflow}`,
+  );
+  await page.screenshot({ path: join(out, `${name}-${device.name}.png`) });
   await context.close();
 }
 await browser.close();

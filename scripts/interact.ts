@@ -1,9 +1,11 @@
 import { chromium } from 'playwright-core';
 import { PREVIEW_URL, chromePath } from './preview';
 import { mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const executablePath = chromePath();
-const out = 'artifacts/screens';
+const out = process.env.AIRBAG_SCREEN_DIR ?? join(tmpdir(), 'airbag-screens');
 mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ executablePath, headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 980 } });

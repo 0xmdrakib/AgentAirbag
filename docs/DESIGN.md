@@ -104,9 +104,9 @@ Then add `styles/pages/example.css` for anything the primitives do not cover, us
 ## Checking a change
 
 ```bash
-pnpm ui:shots                 # full-page screenshots in artifacts/shots/<tag>/
+pnpm ui:shots                 # full-page screenshots in a temp folder (never the repository)
 pnpm ui:audit                 # every route at 7 widths: overflow, text size, tap targets, errors
-pnpm ui:flows                 # alternate screens and saved-run dialogs, with a mocked wallet API
+pnpm ui:flows                 # alternate screens and saved-run dialogs, mocked wallet API, temp output
 pnpm verify                   # the full gate
 ```
 

@@ -1,4 +1,6 @@
 import { mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { chromium } from 'playwright-core';
 import { PREVIEW_URL, chromePath } from './preview';
 import { settle } from './settle';
@@ -26,7 +28,8 @@ const tag = process.env.SHOT_TAG ?? 'now';
 const widths = (process.env.SHOT_WIDTHS ?? '1440,390').split(',').map(Number);
 const names = (process.env.SHOT_ROUTES ?? Object.keys(ROUTES).join(',')).split(',');
 const base = PREVIEW_URL.endsWith('/') ? PREVIEW_URL : `${PREVIEW_URL}/`;
-const dir = `artifacts/shots/${tag}`;
+// Screenshots are scratch output: a temp folder, never the repository.
+const dir = process.env.AIRBAG_SHOT_DIR ?? join(tmpdir(), 'airbag-shots', tag);
 mkdirSync(dir, { recursive: true });
 
 const browser = await chromium.launch({ executablePath: chromePath(), headless: true });

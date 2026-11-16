@@ -1,5 +1,7 @@
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { PREVIEW_URL, chromePath } from './preview';
 import { settle } from './settle';
 
@@ -36,9 +38,10 @@ await sheet.setContent(
     .map((src) => `<img src="${src}" width="${width}" height="${sliceHeight}">`)
     .join('')}</body>`,
 );
-mkdirSync('artifacts/audit', { recursive: true });
+const dir = process.env.AIRBAG_AUDIT_DIR ?? join(tmpdir(), 'airbag-audit');
+mkdirSync(dir, { recursive: true });
 const name = route.replace(/[^a-z0-9]+/gi, '-');
-const out = `artifacts/audit/sheet${name}-${width}.png`;
+const out = join(dir, `sheet${name}-${width}.png`);
 await sheet.screenshot({ path: out });
 await browser.close();
 console.log(out);

@@ -49,93 +49,90 @@ export function LabPage() {
   return (
     <div className="page page-lab page-home">
       <section className="container home-hero" aria-labelledby="home-title">
-        <span className="tag home-tag">
-          <MarkerLogo size={16} />
-          Crash-test lab for NEAR Intents agents
-        </span>
-        <h1 className="display home-title" id="home-title">
-          Crash-test your AI agent before it touches real money.
-        </h1>
-
-        <div className="home-hero-body">
-          <div className="home-hero-copy">
-            <p className="lead">
-              Agent Airbag is a simulated version of the NEAR Intents 1Click swap API that fails on
-              purpose. Run your agent through {SCENARIOS.length} crash scenarios and see what it
-              would have lost, and how to fix it.
-            </p>
-            <div className="home-actions">
-              <LinkButton href="/run?auto=naive" variant="primary" size="lg">
-                Run the crash suite <ArrowRightIcon size={18} />
-              </LinkButton>
-              <LinkButton href="/connect" variant="secondary" size="lg">
-                Test your own agent
-              </LinkButton>
-            </div>
-            <p className="home-note">Runs in your browser · No keys · No real funds</p>
-
-            <dl className="home-facts" aria-label="Lab at a glance">
-              <div>
-                <dt>Crash scenarios</dt>
-                <dd>{SCENARIOS.length}</dd>
-              </div>
-              <div>
-                <dt>Safety laws</dt>
-                <dd>7</dd>
-              </div>
-              <div>
-                <dt>Real funds at risk</dt>
-                <dd>$0.00</dd>
-              </div>
-            </dl>
+        <div className="home-hero-main">
+          <span className="tag home-tag">
+            <MarkerLogo size={16} />
+            Crash-test lab for NEAR Intents agents
+          </span>
+          <h1 className="display home-title" id="home-title">
+            Crash-test your AI agent before it touches real money.
+          </h1>
+          <p className="lead">
+            Agent Airbag is a simulated version of the NEAR Intents 1Click swap API that fails on
+            purpose. Run your agent through {SCENARIOS.length} crash scenarios and see what it would
+            have lost, and how to fix it.
+          </p>
+          <div className="home-actions">
+            <LinkButton href="/run?auto=naive" variant="primary" size="lg">
+              Run the crash suite <ArrowRightIcon size={18} />
+            </LinkButton>
+            <LinkButton href="/connect" variant="secondary" size="lg">
+              Test your own agent
+            </LinkButton>
           </div>
-
-          <aside className="card home-result" data-reveal aria-labelledby="proof-title">
-            <header className="home-result-head">
-              <h2 className="h3" id="proof-title">
-                Same {SCENARIOS.length} crashes, two agents
-              </h2>
-              <a href="/report" className="link-arrow home-result-link">
-                Open the report <ArrowRightIcon size={14} />
-              </a>
-            </header>
-            <div className="home-result-list">
-              {agents.map(({ report, setup, name }) => {
-                const tone = gradeTone(report.overall.grade);
-                const total = report.suite.scenarioCount;
-                const passed = report.overall.passed;
-                return (
-                  <article className={cx('home-agent', `home-agent-${tone}`)} key={name}>
-                    <span className="home-grade" aria-label={`Grade ${report.overall.grade}`}>
-                      {report.overall.grade}
-                    </span>
-                    <div className="home-agent-who">
-                      <h3 className="home-agent-name">{name}</h3>
-                      <p className="home-agent-setup">
-                        {setup} · <strong>{passed}</strong> of {total} survived
-                      </p>
-                      <div
-                        className="home-bar"
-                        role="img"
-                        aria-label={`Survived ${passed} of ${total}`}
-                      >
-                        <span style={{ width: `${(passed / total) * 100}%` }} />
-                      </div>
-                    </div>
-                    <div className="home-agent-loss">
-                      <p className="home-money">{formatUsd(report.overall.simulatedLossUsd)}</p>
-                      <p className="home-caption">simulated loss</p>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-            <p className="home-foot">
-              Both are scripted reference agents. Dummy follows the 1Click tutorial; Seatbelt checks
-              before it signs. Seatbelt’s $1.00 is a modeled refund fee, not an observed loss.
-            </p>
-          </aside>
+          <p className="home-note">Runs in your browser · No keys · No real funds</p>
         </div>
+
+        <aside className="card home-result" data-reveal aria-labelledby="proof-title">
+          <header className="home-result-head">
+            <h2 className="h3" id="proof-title">
+              Same {SCENARIOS.length} crashes, two agents
+            </h2>
+            <a href="/report" className="link-arrow home-result-link">
+              Open the report <ArrowRightIcon size={14} />
+            </a>
+          </header>
+          <div className="home-result-list">
+            {agents.map(({ report, setup, name }) => {
+              const tone = gradeTone(report.overall.grade);
+              const total = report.suite.scenarioCount;
+              const passed = report.overall.passed;
+              return (
+                <article className={cx('home-agent', `home-agent-${tone}`)} key={name}>
+                  <span className="home-grade" aria-label={`Grade ${report.overall.grade}`}>
+                    {report.overall.grade}
+                  </span>
+                  <div className="home-agent-who">
+                    <h3 className="home-agent-name">{name}</h3>
+                    <p className="home-agent-setup">
+                      {setup} · <strong>{passed}</strong> of {total} survived
+                    </p>
+                    <div
+                      className="home-bar"
+                      role="img"
+                      aria-label={`Survived ${passed} of ${total}`}
+                    >
+                      <span style={{ width: `${(passed / total) * 100}%` }} />
+                    </div>
+                  </div>
+                  <div className="home-agent-loss">
+                    <p className="home-money">{formatUsd(report.overall.simulatedLossUsd)}</p>
+                    <p className="home-caption">simulated loss</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+          <p className="home-foot">
+            Both are scripted reference agents. Dummy follows the 1Click tutorial; Seatbelt checks
+            before it signs. Seatbelt’s $1.00 is a modeled refund fee, not an observed loss.
+          </p>
+        </aside>
+
+        <dl className="home-facts" aria-label="Lab at a glance">
+          <div>
+            <dt>Crash scenarios</dt>
+            <dd>{SCENARIOS.length}</dd>
+          </div>
+          <div>
+            <dt>Safety laws</dt>
+            <dd>7</dd>
+          </div>
+          <div>
+            <dt>Real funds at risk</dt>
+            <dd>$0.00</dd>
+          </div>
+        </dl>
       </section>
 
       <section className="container section section-rule" aria-labelledby="how-title" data-reveal>
