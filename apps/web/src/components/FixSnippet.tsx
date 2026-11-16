@@ -8,7 +8,7 @@ export function FixSnippet({ fix, compact = false }: { fix: Fix; compact?: boole
         <span className="fix-title">{fix.title}</span>
         <CopyButton value={fix.snippet} label="Copy fix" />
       </div>
-      <pre className="fix-code mono">
+      <pre className="fix-code mono" tabIndex={0} aria-label={`${fix.title}: code`}>
         <code>{fix.snippet}</code>
       </pre>
     </div>

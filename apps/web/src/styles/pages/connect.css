@@ -1,0 +1,333 @@
+/*
+ * Connect page ("Test your agent"). Built on the theme primitives: .container .section
+ * .section-rule .split .tag .eyebrow .lead .callout .rows. Only what they do not cover lives here.
+ */
+
+.cnx-page {
+  padding-bottom: 0;
+}
+
+.cnx-hero {
+  display: grid;
+  justify-items: start;
+  gap: clamp(20px, 2.4vw, 32px);
+}
+
+.cnx-hero .lead {
+  margin-top: 0;
+}
+
+.cnx-title {
+  max-width: 14ch;
+}
+
+/* ---------- Numbers ---------- */
+
+.cnx-num {
+  color: var(--text-3);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.9;
+}
+
+/* ---------- Steps ---------- */
+
+.cnx-steps {
+  border-top: 1px solid var(--line);
+}
+
+.cnx-step {
+  display: grid;
+  grid-template-columns: clamp(40px, 5vw, 64px) minmax(0, 1fr);
+  gap: 0 clamp(8px, 2vw, 24px);
+  padding: clamp(28px, 3.4vw, 44px) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.cnx-step-body {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.cnx-step-body .h3 {
+  font-size: clamp(22px, 2.2vw, 28px);
+}
+
+.cnx-step-body p,
+.cnx-rule p {
+  max-width: 60ch;
+  color: var(--text-2);
+}
+
+.cnx-step-body .cnx-line,
+.cnx-step-body .cnx-code {
+  margin-top: 6px;
+}
+
+/* ---------- Code ---------- */
+
+.cnx-line,
+.cnx-code {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--code-bg);
+}
+
+.cnx-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 8px 20px;
+}
+
+.cnx-line code {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow-x: auto;
+  color: var(--text);
+  font-size: 14.5px;
+  line-height: 1.6;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+.cnx-line code::-webkit-scrollbar {
+  display: none;
+}
+
+.cnx-prompt {
+  margin-right: 4px;
+  color: var(--text-3);
+  user-select: none;
+}
+
+.cnx-code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  padding: 6px 8px 6px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.cnx-code-label {
+  color: var(--text-3);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cnx-code-label-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cnx-code pre {
+  margin: 0;
+  padding: 20px;
+  border: 0;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: transparent;
+  overflow-x: auto;
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.75;
+  tab-size: 2;
+}
+
+.cnx-code pre code {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: inherit;
+}
+
+.cnx-sample pre {
+  max-height: 560px;
+  overflow: auto;
+}
+
+/* The shared copy button, quieted to fit the code frames. */
+.cnx-copy {
+  flex: 0 0 auto;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  transition:
+    background 160ms var(--ease),
+    border-color 160ms var(--ease),
+    color 160ms var(--ease);
+}
+
+.cnx-copy:hover {
+  border-color: var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.cnx-copy .copy-label-text {
+  display: inline;
+}
+
+/* ---------- Contract ---------- */
+
+.cnx-contract {
+  display: grid;
+  gap: clamp(36px, 4vw, 56px);
+  min-width: 0;
+}
+
+.cnx-rules {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnx-rule {
+  display: grid;
+  grid-template-columns: clamp(40px, 5vw, 64px) minmax(0, 1fr);
+  gap: 0 clamp(8px, 2vw, 24px);
+  padding: clamp(22px, 2.6vw, 32px) 0;
+}
+
+.cnx-rule p {
+  font-size: clamp(17px, 1.5vw, 19px);
+  color: var(--text);
+}
+
+.cnx-rule code,
+.cnx-call-note code {
+  overflow-wrap: anywhere;
+}
+
+.cnx-table-label {
+  margin-bottom: -20px;
+}
+
+.cnx-calls {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnx-call {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1.25fr) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 4px clamp(12px, 2vw, 28px);
+  padding: 18px 0;
+}
+
+.cnx-method {
+  color: var(--tag-text);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.cnx-path {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 14.5px;
+  overflow-wrap: anywhere;
+}
+
+.cnx-call-note {
+  color: var(--text-2);
+  font-size: 15px;
+}
+
+/* ---------- Side notes in the split label ---------- */
+
+.cnx-side-note {
+  max-width: 34ch;
+  margin-top: 18px;
+  color: var(--text-2);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ---------- Closing callout ---------- */
+
+.cnx-limits {
+  max-width: 880px;
+  gap: 16px;
+}
+
+.cnx-limits .h3 {
+  font-size: clamp(24px, 2.4vw, 32px);
+}
+
+.cnx-limits p {
+  max-width: 62ch;
+}
+
+.cnx-limits-link {
+  justify-self: start;
+  min-height: 40px;
+}
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 640px) {
+  .cnx-step,
+  .cnx-rule {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnx-num {
+    margin-bottom: 10px;
+    line-height: 1;
+  }
+
+  .cnx-call {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .cnx-call-note {
+    grid-column: 2;
+  }
+
+  .cnx-line {
+    padding-left: 16px;
+  }
+
+  .cnx-code pre {
+    padding: 16px;
+    font-size: 13px;
+  }
+
+  .cnx-code-head {
+    padding-left: 16px;
+  }
+
+  .cnx-line code {
+    font-size: 13.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnx-copy {
+    transition: none;
+  }
+}

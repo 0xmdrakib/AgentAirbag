@@ -328,3 +328,21 @@ are: the `@airbag/*` packages, the `pnpm airbag` command, `AIRBAG_*` variables, 
 `airbag_session` cookie and the `tool` field inside report JSON, so no report hash changed. The
 social preview is `apps/web/public/og.png` (1200x630), rendered by `pnpm og`, because X and most
 unfurlers ignore SVG.
+
+## Editorial UI system
+
+**Redesign the components, not only the palette.** The maintainer supplied Eleken and VITA as
+references for an elegant, editorial interface. All six routes now use the same warm paper, ink,
+tan labels, typography and spacing foundation in `theme.css`. Home gets a full-width headline,
+reference-agent comparison, numbered method and law lists. Reports use a separate heading and
+action band, a numerical strip, and wide case files with the Judge's finding beside a copyable fix.
+The runner, replay, scenario library and agent setup page have their own responsive compositions.
+Wallet menus, pickers, sign-in confirmation, saved-run lists, details and feedback share those
+surfaces without changing authentication or server behaviour.
+
+**Keep the next page consistent.** `PageIntro` and the shared layout primitives are documented in
+`docs/DESIGN.md`, which AGENTS.md requires for UI work. Page-specific CSS lives in
+`styles/pages/`, not another appended layer in `global.css`. `pnpm ui:flows` checks alternate
+reports, completed runs, replay switches, drawers and saved-run states against a mocked wallet API;
+`pnpm ui:audit` remains the six-route, seven-width layout gate. No engine, scenario, report
+contract, signature check or database policy changes are part of this redesign.

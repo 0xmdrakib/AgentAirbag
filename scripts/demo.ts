@@ -307,7 +307,7 @@ server.listen(port, '127.0.0.1', async () => {
       const errors: string[] = [];
       page.on('pageerror', (error) => errors.push(error.message));
       await page.goto(reportUrl, { waitUntil: 'networkidle' });
-      await page.waitForSelector('.report-hero', { timeout: 15_000 });
+      await page.locator('.page-report header h1').waitFor({ timeout: 15_000 });
       const text = await page.locator('main').innerText();
       const checks: [string, boolean][] = [
         ['grade F headline', text.includes('$10,907.04')],

@@ -3,10 +3,18 @@ import type { ScenarioResult } from '@airbag/core';
 import { useAppState, type AgentId } from '../state/AppState';
 import { SCENARIOS, verdictWord } from '../lib/report';
 import { ScenarioCells } from '../components/ScenarioBoard';
-import { Button, Chip, CopyButton, LinkButton, VerdictPill } from '../components/Primitives';
+import {
+  Button,
+  Chip,
+  CopyButton,
+  LinkButton,
+  PageIntro,
+  VerdictPill,
+} from '../components/Primitives';
 import { ArrowRightIcon, PlayIcon, ShieldIcon } from '../components/Icons';
-import { cx } from '../lib/format';
+import { cx, formatUsd } from '../lib/format';
 import { navigate } from '../lib/router';
+import '../styles/pages/run.css';
 
 type Pick = AgentId | 'llm' | 'byo';
 
@@ -59,15 +67,12 @@ export function RunnerPage() {
 
   return (
     <div className="page container page-run">
-      <div className="page-head">
-        <div>
-          <h1 className="h1">Run the crash suite</h1>
-          <p className="page-sub">
-            Pick an agent and run all {SCENARIOS.length} scenarios in your browser. No keys and no
-            network calls. A virtual clock makes every run reproducible from its seed.
-          </p>
-        </div>
-      </div>
+      <PageIntro
+        className="runx-intro"
+        label="The crash lab"
+        title="Run the crash suite"
+        body={`Pick an agent and run all ${SCENARIOS.length} scenarios in your browser. No keys and no network calls. A virtual clock makes every run reproducible from its seed.`}
+      />
 
       <div className="run-layout">
         <aside className="run-sidebar" id="run-start">
@@ -134,13 +139,14 @@ export function RunnerPage() {
             <div className="run-note">
               {pick === 'llm' ? (
                 <>
-                  <strong>No model run bundled.</strong> This build has no NEAR AI Cloud API key, so no LLM
-                  run is included. The adapter and recorder ship; record one with a key. The scripted
-                  runs stay fully reproducible.
+                  <strong>No model run bundled.</strong> This build has no NEAR AI Cloud API key, so
+                  no LLM run is included. The adapter and recorder ship; record one with a key. The
+                  scripted runs stay fully reproducible.
                 </>
               ) : (
                 <>
-                  <strong>Bring your own agent.</strong> Your own agent runs use the local CLI or sandbox.
+                  <strong>Bring your own agent.</strong> Your own agent runs use the local CLI or
+                  sandbox.
                   <LinkButton href="/connect" size="sm" variant="ghost">
                     See the three steps <ArrowRightIcon size={14} />
                   </LinkButton>
@@ -207,15 +213,34 @@ export function RunnerPage() {
               <span className="run-legend-note">Tap any cell to replay it.</span>
             </div>
             {finished && currentReport && (
-              <a
-                href="/report"
-                className="btn btn-primary btn-md"
-                ref={reportRef}
-              >
+              <a href="/report" className="btn btn-primary btn-md" ref={reportRef}>
                 See the report card <ArrowRightIcon size={16} />
               </a>
             )}
           </div>
+          {finished && currentReport && (
+            <div className="runx-outcome">
+              <div>
+                <span className="label">Grade</span>
+                <p
+                  className={cx(
+                    'runx-grade',
+                    currentReport.overall.failed ? 'text-fail' : 'text-pass',
+                  )}
+                >
+                  {currentReport.overall.grade}
+                </p>
+              </div>
+              <div>
+                <span className="label">Simulated loss</span>
+                <p className="runx-loss">{formatUsd(currentReport.overall.simulatedLossUsd)}</p>
+              </div>
+              <p>
+                Survived {currentReport.overall.passed} of {currentReport.suite.scenarioCount}{' '}
+                crashes. No real funds moved.
+              </p>
+            </div>
+          )}
         </section>
       </div>
 

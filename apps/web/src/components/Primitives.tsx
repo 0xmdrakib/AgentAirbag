@@ -4,6 +4,27 @@ import { gradeTone, verdictWord } from '../lib/report';
 import type { Verdict } from '@airbag/core';
 import { AlertIcon, CheckIcon, CopyIcon, XIcon } from './Icons';
 
+/** The shared editorial introduction for a page, including future routes. */
+export function PageIntro({
+  label,
+  title,
+  body,
+  className,
+}: {
+  label: string;
+  title: string;
+  body: string;
+  className?: string;
+}) {
+  return (
+    <header className={cx('page-intro', className)}>
+      <span className="tag">{label}</span>
+      <h1 className="display">{title}</h1>
+      <p className="lead">{body}</p>
+    </header>
+  );
+}
+
 export function Button({
   variant = 'secondary',
   size = 'md',
@@ -44,11 +65,7 @@ export function LinkButton({
   'aria-label'?: string;
 }) {
   return (
-    <a
-      href={href}
-      className={cx('btn', `btn-${variant}`, `btn-${size}`, className)}
-      {...props}
-    >
+    <a href={href} className={cx('btn', `btn-${variant}`, `btn-${size}`, className)} {...props}>
       {children}
     </a>
   );
@@ -154,7 +171,9 @@ export function CopyField({
   return (
     <div className="copy-field">
       <span className="copy-label">{label}</span>
-      <span className={cx('copy-value', mono && 'mono')}>{href ? <a href={href}>{value}</a> : value}</span>
+      <span className={cx('copy-value', mono && 'mono')}>
+        {href ? <a href={href}>{value}</a> : value}
+      </span>
       <CopyButton value={value} />
     </div>
   );

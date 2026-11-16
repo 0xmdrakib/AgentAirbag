@@ -12,11 +12,20 @@ const NAV = [
 
 export function Layout({ route, children }: { route: string; children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMenuOpen(false);
   }, [route]);
+
+  // The header gains a hairline once the page has moved, so it reads as a bar only when needed.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return undefined;
@@ -35,17 +44,13 @@ export function Layout({ route, children }: { route: string; children: ReactNode
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      <header className="app-header">
+      <header className={cx('app-header', scrolled && 'is-scrolled')}>
         <div className="container header-inner">
           <a href="/" className="brand" aria-label="Agent Airbag home">
             <MarkerLogo size={28} />
             <span className="wordmark">Agent Airbag</span>
           </a>
-          <nav
-            className={cx('nav', menuOpen && 'nav-open')}
-            aria-label="Primary"
-            id="primary-nav"
-          >
+          <nav className={cx('nav', menuOpen && 'nav-open')} aria-label="Primary" id="primary-nav">
             {NAV.map((item) => (
               <a
                 key={item.href}
@@ -90,8 +95,8 @@ export function Layout({ route, children }: { route: string; children: ReactNode
               <span className="wordmark">Agent Airbag</span>
             </a>
             <p className="footer-note">
-              A crash-test lab for AI agents that move money. Everything here is simulated; no
-              real funds move.
+              A crash-test lab for AI agents that move money. Everything here is simulated; no real
+              funds move.
             </p>
           </div>
           <nav className="footer-links" aria-label="Footer">

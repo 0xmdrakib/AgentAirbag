@@ -5,6 +5,7 @@ import { MarkerLogo } from '../components/MarkerLogo';
 import { LinkButton } from '../components/Primitives';
 import { ArrowRightIcon } from '../components/Icons';
 import { cx, formatUsd } from '../lib/format';
+import '../styles/pages/home.css';
 
 const LAW_SENTENCES: Record<Law, string> = {
   1: 'Sign only the amount and destination you were quoted.',
@@ -46,29 +47,87 @@ export function LabPage() {
   ];
 
   return (
-    <div className="page page-lab">
-      <div className="landing-top container">
-        <section className="landing-hero">
-        <p className="landing-kicker">
+    <div className="page page-lab page-home">
+      <section className="container home-hero" aria-labelledby="home-title">
+        <span className="tag home-tag">
           <MarkerLogo size={16} />
           Crash-test lab for NEAR Intents agents
-        </p>
-        <h1 className="landing-title">Crash-test your AI agent before it touches real money.</h1>
-        <p className="landing-sub">
-          Agent Airbag is a simulated version of the NEAR Intents 1Click swap API that fails on
-          purpose. Run your agent through {SCENARIOS.length} crash scenarios and see what it would
-          have lost, and how to fix it.
-        </p>
-        <div className="landing-actions">
-          <LinkButton href="/run?auto=naive" variant="primary" size="lg">
-            Run the crash suite <ArrowRightIcon size={18} />
-          </LinkButton>
-          <LinkButton href="/connect" variant="secondary" size="lg">
-            Test your own agent
-          </LinkButton>
+        </span>
+        <h1 className="display home-title" id="home-title">
+          Crash-test your AI agent before it touches real money.
+        </h1>
+
+        <div className="home-hero-body">
+          <div className="home-hero-copy">
+            <p className="lead">
+              Agent Airbag is a simulated version of the NEAR Intents 1Click swap API that fails on
+              purpose. Run your agent through {SCENARIOS.length} crash scenarios and see what it
+              would have lost, and how to fix it.
+            </p>
+            <div className="home-actions">
+              <LinkButton href="/run?auto=naive" variant="primary" size="lg">
+                Run the crash suite <ArrowRightIcon size={18} />
+              </LinkButton>
+              <LinkButton href="/connect" variant="secondary" size="lg">
+                Test your own agent
+              </LinkButton>
+            </div>
+            <p className="home-note">Runs in your browser · No keys · No real funds</p>
+          </div>
+
+          <aside className="card home-result" data-reveal aria-labelledby="proof-title">
+            <header className="home-result-head">
+              <h2 className="h3" id="proof-title">
+                Same {SCENARIOS.length} crashes, two agents
+              </h2>
+              <a href="/report" className="link-arrow home-result-link">
+                Open the report <ArrowRightIcon size={14} />
+              </a>
+            </header>
+            <div className="home-result-list">
+              {agents.map(({ report, setup, name }) => {
+                const tone = gradeTone(report.overall.grade);
+                const total = report.suite.scenarioCount;
+                const passed = report.overall.passed;
+                return (
+                  <article className={cx('home-agent', `home-agent-${tone}`)} key={name}>
+                    <span className="home-grade" aria-label={`Grade ${report.overall.grade}`}>
+                      {report.overall.grade}
+                    </span>
+                    <div className="home-agent-who">
+                      <h3 className="home-agent-name">{name}</h3>
+                      <p className="home-agent-setup">{setup}</p>
+                    </div>
+                    <div className="home-agent-loss">
+                      <p className="home-money">{formatUsd(report.overall.simulatedLossUsd)}</p>
+                      <p className="home-caption">simulated loss</p>
+                    </div>
+                    <div className="home-survival">
+                      <div
+                        className="home-bar"
+                        role="img"
+                        aria-label={`Survived ${passed} of ${total}`}
+                      >
+                        <span style={{ width: `${(passed / total) * 100}%` }} />
+                      </div>
+                      <p className="home-count">
+                        <strong>{passed}</strong> of {total} survived
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+            <p className="home-foot">
+              Both are scripted reference agents. Dummy follows the 1Click tutorial; Seatbelt checks
+              before it signs. Seatbelt’s $1.00 is a modeled refund fee, not an observed loss.
+            </p>
+          </aside>
         </div>
-        <p className="landing-note">Runs in your browser · No keys · No real funds</p>
-        <dl className="hero-facts landing-facts">
+      </section>
+
+      <section className="container home-stats" data-reveal aria-label="Lab at a glance">
+        <dl className="stat-row">
           <div>
             <dt>Crash scenarios</dt>
             <dd>{SCENARIOS.length}</dd>
@@ -84,96 +143,54 @@ export function LabPage() {
         </dl>
       </section>
 
-      <section className="landing-proof" data-reveal aria-labelledby="proof-title">
-        <div className="result-card">
-          <header className="result-head">
-            <h2 className="result-title" id="proof-title">
-              Same {SCENARIOS.length} crashes, two agents
+      <section className="container section section-rule" aria-labelledby="how-title" data-reveal>
+        <div className="split">
+          <div className="split-label">
+            <p className="eyebrow">Method</p>
+            <h2 className="h2" id="how-title">
+              How it works
             </h2>
-            <a href="/report" className="proof-link">
-              Open the report <ArrowRightIcon size={14} />
-            </a>
-          </header>
-          <div className="result-rows">
-            {agents.map(({ report, setup, name }) => {
-              const tone = gradeTone(report.overall.grade);
-              const total = report.suite.scenarioCount;
-              const passed = report.overall.passed;
-              return (
-                <article className={cx('result-row', `result-${tone}`)} key={name}>
-                  <span className="result-grade" aria-label={`Grade ${report.overall.grade}`}>
-                    {report.overall.grade}
-                  </span>
-                  <div className="result-who">
-                    <h3 className="result-name">{name}</h3>
-                    <p className="result-setup">{setup}</p>
-                  </div>
-                  <div className="result-loss">
-                    <p className="result-money">{formatUsd(report.overall.simulatedLossUsd)}</p>
-                    <p className="result-caption">simulated loss</p>
-                  </div>
-                  <div className="result-survival">
-                    <div
-                      className="result-bar"
-                      role="img"
-                      aria-label={`Survived ${passed} of ${total}`}
-                    >
-                      <span style={{ width: `${(passed / total) * 100}%` }} />
-                    </div>
-                    <p className="result-count">
-                      <strong>{passed}</strong> of {total} survived
-                    </p>
-                  </div>
-                </article>
-              );
-            })}
           </div>
-          <p className="result-foot">
-            Both are scripted reference agents. Dummy follows the 1Click tutorial; Seatbelt checks
-            before it signs. Seatbelt’s $1.00 is a modeled refund fee, not an observed loss.
-          </p>
+          <ol className="rows home-steps">
+            {STEPS.map((step, index) => (
+              <li className="home-step" key={step.title}>
+                <span className="home-step-num" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div>
+                  <h3 className="h3">{step.title}</h3>
+                  <p>{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
-      </div>
 
-      <section className="container section" aria-labelledby="how-title" data-reveal>
-        <h2 className="h2 landing-h2" id="how-title">
-          How it works
-        </h2>
-        <ol className="how-grid">
-          {STEPS.map((step, index) => (
-            <li key={step.title}>
-              <span className="how-num">{index + 1}</span>
-              <h3 className="h3">{step.title}</h3>
-              <p>{step.body}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="container section" aria-labelledby="laws-title" data-reveal>
-        <div className="landing-section-head">
+      <section className="container section section-rule" aria-labelledby="laws-title" data-reveal>
+        <div className="home-head">
           <div>
-            <h2 className="h2 landing-h2" id="laws-title">
+            <p className="eyebrow">Rulebook</p>
+            <h2 className="h2" id="laws-title">
               The seven laws
             </h2>
-            <p className="section-sub">
+            <p className="lead">
               Seven laws for agents that move money. Each crash breaks one of them.
             </p>
           </div>
-          <a href="/scenarios" className="proof-link">
+          <a href="/scenarios" className="link-arrow home-head-link">
             All {SCENARIOS.length} scenarios <ArrowRightIcon size={14} />
           </a>
         </div>
-        <ol className="law-list">
+        <ol className="rows home-laws">
           {([1, 2, 3, 4, 5, 6, 7] as Law[]).map((law) => (
             <li key={law}>
-              <a href={`/scenarios?law=${law}`} className="law-row">
-                <span className="law-row-num">{law}</span>
-                <span className="law-row-name">{LAW_NAMES[law]}</span>
-                <span className="law-row-text">{LAW_SENTENCES[law]}</span>
-                <span className="law-row-link" aria-hidden="true">
-                  <ArrowRightIcon size={16} />
+              <a href={`/scenarios?law=${law}`} className="row-link home-law">
+                <span className="home-law-num">{law}</span>
+                <h3 className="h3 home-law-name">{LAW_NAMES[law]}</h3>
+                <span className="home-law-text">{LAW_SENTENCES[law]}</span>
+                <span className="home-law-arrow" aria-hidden="true">
+                  <ArrowRightIcon size={18} />
                 </span>
               </a>
             </li>
@@ -181,19 +198,19 @@ export function LabPage() {
         </ol>
       </section>
 
-      <section className="container section" aria-labelledby="near-title" data-reveal>
-        <div className="why-near">
-          <div className="why-near-intro">
-            <h2 className="h2 landing-h2" id="near-title">
+      <section className="container section section-rule" aria-labelledby="near-title" data-reveal>
+        <div className="split">
+          <div className="split-label">
+            <p className="eyebrow">Foundation</p>
+            <h2 className="h2" id="near-title">
               Why this is built on NEAR
             </h2>
-            <p className="section-sub">
-              NEAR Intents turns a cross-chain swap into one signed intent and one quote. That
-              makes it the natural rail for agents that move money, and the natural place to test
-              them.
+            <p className="lead">
+              NEAR Intents turns a cross-chain swap into one signed intent and one quote. That makes
+              it the natural rail for agents that move money, and the natural place to test them.
             </p>
             <a
-              className="proof-link"
+              className="link-arrow home-docs-link"
               href="https://docs.near-intents.org/integration/distribution-channels/1click-api/about-1click-api"
               target="_blank"
               rel="noreferrer"
@@ -201,7 +218,7 @@ export function LabPage() {
               Read the 1Click docs <ArrowRightIcon size={14} />
             </a>
           </div>
-          <ol className="why-near-list">
+          <ol className="rows home-points">
             <li>
               <h3 className="h3">One quote instead of five bridges</h3>
               <p>
@@ -229,40 +246,48 @@ export function LabPage() {
         </div>
       </section>
 
-      <section className="container section" aria-labelledby="truth-title" data-reveal>
-        <div className="truth-block">
-          <div>
-            <h2 className="h2 landing-h2" id="truth-title">
+      <section className="container section section-rule" aria-labelledby="truth-title" data-reveal>
+        <div className="split">
+          <div className="split-label">
+            <p className="eyebrow">Transparency</p>
+            <h2 className="h2" id="truth-title">
               What is real, what is simulated
             </h2>
-            <p className="section-sub">
+            <p className="lead">
               The report card never says “safe”. It says which crashes your agent survived.
             </p>
           </div>
-          <dl className="truth-list">
-            {TRUTH.map(([key, value]) => (
-              <div key={key}>
-                <dt>{key}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <div className="callout home-truth">
+            <span className="tag">Sources and limits</span>
+            <dl className="home-truth-list">
+              {TRUTH.map(([key, value]) => (
+                <div key={key}>
+                  <dt>{key}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </div>
       </section>
 
-      <section className="container section" data-reveal>
-        <div className="cta-band">
-          <div>
-            <h2 className="h2">A token name that carries an instruction</h2>
-            <p className="section-sub">
-              One of the {SCENARIOS.length} crashes. Watch it happen, then switch to Seatbelt.
-            </p>
-          </div>
-          <div className="cta-actions">
-            <LinkButton href="/replay/token-metadata-injection" variant="primary" size="lg">
-              Watch that crash <ArrowRightIcon size={16} />
-            </LinkButton>
-          </div>
+      <section className="container section" data-reveal aria-labelledby="cta-title">
+        <div className="home-cta">
+          <span className="tag">Law 5 · {LAW_NAMES[5]}</span>
+          <h2 className="h2" id="cta-title">
+            A token name that carries an instruction
+          </h2>
+          <p className="home-cta-sub">
+            One of the {SCENARIOS.length} crashes. Watch it happen, then switch to Seatbelt.
+          </p>
+          <LinkButton
+            href="/replay/token-metadata-injection"
+            variant="primary"
+            size="lg"
+            className="home-cta-btn"
+          >
+            Watch that crash <ArrowRightIcon size={16} />
+          </LinkButton>
         </div>
       </section>
     </div>

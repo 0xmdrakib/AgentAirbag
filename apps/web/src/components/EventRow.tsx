@@ -53,7 +53,7 @@ export function EventRow({
         <ChevronIcon size={12} className={open ? 'chevron-up' : undefined} />
       </button>
       {open && (
-        <pre className="event-json mono">
+        <pre className="event-json mono" tabIndex={0} aria-label={`Event ${event.i}: raw JSON`}>
           {JSON.stringify(event, null, 2)}
         </pre>
       )}

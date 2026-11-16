@@ -86,6 +86,9 @@ scripts/           demo server, builders, smoke tests, UI checks
 
 - TypeScript strict, ESM, Prettier defaults from `.prettierrc.json`.
 - Light theme only. Inter for text, JetBrains Mono for code. Icons are Lucide.
+- For all UI changes, read `docs/DESIGN.md`. Use `theme.css`, `PageIntro` and the shared primitives.
+  Check alternate flow states with `pnpm ui:flows`, not just the initial page. Keep page styles
+  under `apps/web/src/styles/pages/`; do not append another design layer to `global.css`.
 - No em dashes in prose or code comments.
 - Keep commits small and conventional (`feat(web):`, `fix(core):`, `docs:`).
 

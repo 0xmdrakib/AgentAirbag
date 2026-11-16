@@ -20,6 +20,7 @@ export const PUBLISHED_FILES: string[] = [
   'docs/VERIFIED_FACTS.md',
   'docs/DEPLOY.md',
   'docs/SECURITY.md',
+  'docs/DESIGN.md',
   'docs/DEMO_SCRIPT.md',
   'docs/HACKATHON.md',
   'docs/MASTER_PROMPT.md',

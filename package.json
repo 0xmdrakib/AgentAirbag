@@ -47,6 +47,8 @@
     "screenshots": "tsx scripts/screenshot.ts",
     "ui:interact": "tsx scripts/interact.ts",
     "ui:share": "tsx scripts/share-check.ts",
+    "ui:shots": "tsx scripts/ui-shots.ts",
+    "ui:flows": "tsx scripts/ui-flows.ts",
     "ui:seed": "tsx scripts/seed-check.ts",
     "ui:audit": "tsx scripts/ui-audit.ts",
     "ui:sheet": "tsx scripts/ui-sheet.ts",

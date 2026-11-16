@@ -19,6 +19,7 @@ Status: the demo is live at https://agentairbag.xyz (static app, one serverless 
 - [Verified facts](https://agentairbag.xyz/docs/VERIFIED_FACTS.md): what was checked against live NEAR Intents responses and when
 - [Deploy and wallet setup](https://agentairbag.xyz/docs/DEPLOY.md): static hosting, the API function, Neon, environment variables
 - [Security notes](https://agentairbag.xyz/docs/SECURITY.md): what is stored, rate limits, session and save controls, what is not covered
+- [Design system](https://agentairbag.xyz/docs/DESIGN.md): shared visual primitives, page structure and alternate-state UI checks
 
 ## Data
 

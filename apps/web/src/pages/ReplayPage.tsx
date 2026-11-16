@@ -1,18 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ScenarioResult } from '@airbag/core';
 import { useAppState } from '../state/AppState';
-import {
-  LAW_NAMES,
-  SCENARIOS,
-  SCENARIO_BY_ID,
-  scenariosForLaw,
-} from '../lib/report';
-import {
-  ledgerRows,
-  firstCrashIndex,
-  statusAt,
-  eventPlainText,
-} from '../lib/simulate';
+import { LAW_NAMES, SCENARIOS, SCENARIO_BY_ID, scenariosForLaw } from '../lib/report';
+import { ledgerRows, firstCrashIndex, statusAt, eventPlainText } from '../lib/simulate';
 import { cx, formatAmount, formatUsd, isTypingTarget } from '../lib/format';
 import { EventRow } from '../components/EventRow';
 import { FixSnippet } from '../components/FixSnippet';
@@ -28,6 +18,7 @@ import {
 } from '../components/Icons';
 import { tokenDecimals, tokenSymbol } from '../lib/report';
 import { navigate } from '../lib/router';
+import '../styles/pages/replay.css';
 
 type Pane = 'trace' | 'ledger' | 'violations';
 
@@ -42,11 +33,15 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
 
   const scenario = scenarioId ? SCENARIO_BY_ID.get(scenarioId) : undefined;
   const naive = useMemo(
-    () => reports.naive.laws.flatMap((law) => law.scenarios).find((result) => result.id === scenarioId),
+    () =>
+      reports.naive.laws.flatMap((law) => law.scenarios).find((result) => result.id === scenarioId),
     [reports.naive, scenarioId],
   );
   const hardened = useMemo(
-    () => reports.hardened.laws.flatMap((law) => law.scenarios).find((result) => result.id === scenarioId),
+    () =>
+      reports.hardened.laws
+        .flatMap((law) => law.scenarios)
+        .find((result) => result.id === scenarioId),
     [reports.hardened, scenarioId],
   );
   const result = agent === 'naive' ? naive : hardened;
@@ -76,7 +71,10 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
   }, [playing, speed, lastIndex]);
 
   useEffect(() => {
-    if (current && (current.kind === 'ledger.lost' || (current.kind === 'ledger.transfer' && current.lossUsd))) {
+    if (
+      current &&
+      (current.kind === 'ledger.lost' || (current.kind === 'ledger.transfer' && current.lossUsd))
+    ) {
       setImpact(true);
       const timer = window.setTimeout(() => setImpact(false), 700);
       return () => window.clearTimeout(timer);
@@ -96,7 +94,11 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
       if (isTypingTarget(event.target)) return;
       const target = event.target as Element | null;
       // Never steal keys from a focused control; arrow keys and Space belong to it.
-      if (target?.closest('button, a, input, textarea, select, [role="tab"], [role="radio"], [contenteditable="true"]')) {
+      if (
+        target?.closest(
+          'button, a, input, textarea, select, [role="tab"], [role="radio"], [contenteditable="true"]',
+        )
+      ) {
         return;
       }
       if (event.key === 'ArrowRight') {
@@ -113,7 +115,8 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
       } else if (event.key === '[' || event.key === ']') {
         const all = SCENARIOS;
         const cursor = all.findIndex((candidate) => candidate.id === scenarioId);
-        const nextIndex = event.key === ']' ? (cursor + 1) % all.length : (cursor - 1 + all.length) % all.length;
+        const nextIndex =
+          event.key === ']' ? (cursor + 1) % all.length : (cursor - 1 + all.length) % all.length;
         navigate(`/replay/${all[nextIndex]!.id}`);
       } else if (/^[1-7]$/.test(event.key)) {
         const law = Number(event.key) as 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -178,7 +181,9 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
           <div className="replay-title-row">
             <div>
               <div className="replay-kicker">
-                <span>Law {result.law} · {LAW_NAMES[result.law as 1]}</span>
+                <span className="tag">
+                  Law {result.law} · {LAW_NAMES[result.law as 1]}
+                </span>
                 {result.modeled && <span className="modeled-tag">modeled</span>}
               </div>
               <h1 className="h1">{result.title}</h1>
@@ -231,7 +236,11 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
               }}
               onClick={() => setPane(item)}
             >
-              {item === 'trace' ? 'Agent trace' : item === 'ledger' ? 'Swap & ledger' : 'Violations'}
+              {item === 'trace'
+                ? 'Agent trace'
+                : item === 'ledger'
+                  ? 'Swap & ledger'
+                  : 'Violations'}
             </button>
           ))}
         </div>
@@ -286,17 +295,25 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
                     stepIndex === statusStep && 'stepper-current',
                   )}
                 >
-                  <span className="stepper-dot">{stepIndex < statusStep ? '✓' : stepIndex + 1}</span>
+                  <span className="stepper-dot">
+                    {stepIndex < statusStep ? '✓' : stepIndex + 1}
+                  </span>
                   <span>{step}</span>
                 </li>
               ))}
             </ol>
             <div className="ledger-list">
               {ledger.map((row) => (
-                <div className={cx('ledger-row', `ledger-${row.tone}`)} key={`${row.account}|${row.assetId}`}>
+                <div
+                  className={cx('ledger-row', `ledger-${row.tone}`)}
+                  key={`${row.account}|${row.assetId}`}
+                >
                   <span className="ledger-label">
                     {row.label}
-                    <span className="ledger-account mono">{row.account.slice(0, 18)}{row.account.length > 18 ? '…' : ''}</span>
+                    <span className="ledger-account mono">
+                      {row.account.slice(0, 18)}
+                      {row.account.length > 18 ? '…' : ''}
+                    </span>
                   </span>
                   <span className={cx('ledger-amount mono', row.amount === 0n && 'ledger-zero')}>
                     {formatAmount(row.amount.toString(), tokenDecimals(row.assetId))}{' '}
@@ -334,10 +351,17 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
             ) : (
               <div className="violation-list">
                 {result.violations.map((violation, violationIndex) => (
-                  <article className="violation-card" key={`${violation.invariant}-${violationIndex}`}>
+                  <article
+                    className="violation-card"
+                    key={`${violation.invariant}-${violationIndex}`}
+                  >
                     <div className="violation-card-head">
                       <span className="violation-icon">
-                        {violation.severity === 'fail' ? <XIcon size={14} /> : <AlertIcon size={14} />}
+                        {violation.severity === 'fail' ? (
+                          <XIcon size={14} />
+                        ) : (
+                          <AlertIcon size={14} />
+                        )}
                       </span>
                       <span className="mono violation-code">{violation.invariant}</span>
                       {violation.falseClaim && <span className="modeled-tag">false claim</span>}
@@ -410,7 +434,8 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
               ))}
             </div>
             <span className="scrub-time mono">
-              {current ? `${Math.round(current.t / 100) / 10}s` : '0s'} / {events.length ? `${Math.round(events[lastIndex]!.t / 1000)}s` : '0s'}
+              {current ? `${Math.round(current.t / 100) / 10}s` : '0s'} /{' '}
+              {events.length ? `${Math.round(events[lastIndex]!.t / 1000)}s` : '0s'}
             </span>
           </div>
           <div className="timeline-wrap">
@@ -425,7 +450,9 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
                       (event.kind === 'ledger.transfer' && event.lossUsd)) &&
                       'tick-loss',
                   )}
-                  style={{ left: `${events.length <= 1 ? 0 : (event.i / (events.length - 1)) * 100}%` }}
+                  style={{
+                    left: `${events.length <= 1 ? 0 : (event.i / (events.length - 1)) * 100}%`,
+                  }}
                 />
               ))}
             </div>
@@ -448,9 +475,15 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
             />
           </div>
           <div className="scrubber-legend">
-            <span><i className="legend-dot legend-fault" /> airbag fault</span>
-            <span><i className="legend-dot legend-loss" /> loss</span>
-            <span><i className="legend-dot legend-api" /> api</span>
+            <span>
+              <i className="legend-dot legend-fault" /> airbag fault
+            </span>
+            <span>
+              <i className="legend-dot legend-loss" /> loss
+            </span>
+            <span>
+              <i className="legend-dot legend-api" /> api
+            </span>
           </div>
         </div>
       </div>
@@ -461,17 +494,29 @@ export function ReplayPage({ scenarioId }: { scenarioId?: string }) {
 function statusTone(status: string | undefined): string {
   if (!status) return 'idle';
   if (status === 'SUCCESS') return 'pass';
-  if (status === 'REFUNDED' || status === 'FAILED' || status === 'INCOMPLETE_DEPOSIT') return 'fail';
+  if (status === 'REFUNDED' || status === 'FAILED' || status === 'INCOMPLETE_DEPOSIT')
+    return 'fail';
   return 'warn';
 }
 
 function stepFor(status: string | undefined, result: ScenarioResult, index: number): number {
   const seen = result.events.filter((event) => event.i <= index);
-  if (status === 'SUCCESS' || status === 'REFUNDED' || status === 'FAILED' || status === 'INCOMPLETE_DEPOSIT') {
+  if (
+    status === 'SUCCESS' ||
+    status === 'REFUNDED' ||
+    status === 'FAILED' ||
+    status === 'INCOMPLETE_DEPOSIT'
+  ) {
     return 3;
   }
   if (status === 'PROCESSING') return 2;
-  if (seen.some((event) => event.kind === 'ledger.transfer' || (event.kind === 'api.request' && event.path.includes('wallet/transfer')))) {
+  if (
+    seen.some(
+      (event) =>
+        event.kind === 'ledger.transfer' ||
+        (event.kind === 'api.request' && event.path.includes('wallet/transfer')),
+    )
+  ) {
     return 1;
   }
   return 0;

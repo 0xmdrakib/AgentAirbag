@@ -1,12 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { Law, RunReport, ScenarioResult } from '@airbag/core';
 import { useAppState } from '../state/AppState';
-import {
-  LAW_NAMES,
-  SCENARIOS,
-  gradeTone,
-  topFailures,
-} from '../lib/report';
+import { LAW_NAMES, SCENARIOS, gradeTone, topFailures } from '../lib/report';
 import { formatUsd, plural } from '../lib/format';
 import { encodeReport } from '../lib/share';
 import {
@@ -35,6 +30,7 @@ import {
 } from '../components/Icons';
 import { cx } from '../lib/format';
 import { navigate } from '../lib/router';
+import '../styles/pages/report.css';
 
 export function ReportPage() {
   const { activeReport, reports, shareError, sharedReport, showToast, setActiveAgent, setShared } =
@@ -123,13 +119,11 @@ export function ReportPage() {
         </div>
       )}
 
-      <header className="report-hero">
-        <div className="report-grade">
-          <GradeBadge grade={report.overall.grade} />
-        </div>
-        <div className="report-hero-copy">
-          <p className="eyebrow">
-            Report card · {report.agent.label} · {report.suite.scenarioCount} crashes
+      <header className="rep-hero">
+        <div className="rep-heading">
+          <span className="tag">Report card</span>
+          <p className="rep-byline">
+            {report.agent.label} · {report.suite.scenarioCount} simulated crashes
           </p>
           <h1 className="h1">{sentence}</h1>
           {report.overall.cappedBy?.length ? (
@@ -138,27 +132,32 @@ export function ReportPage() {
             </div>
           ) : null}
         </div>
-        <div className="report-hero-money">
+        <div className="rep-grade">
+          <GradeBadge grade={report.overall.grade} />
+        </div>
+        <div className="rep-toolbar">
           <MoneyMeter value={report.overall.simulatedLossUsd} size="lg" />
-          <div className="report-actions">
-            <Button variant="primary" size="sm" onClick={() => void share()}>
-              <ShareIcon size={14} /> Share
-            </Button>
-            <Button variant="secondary" size="sm" onClick={download}>
-              <DownloadIcon size={14} /> JSON
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                void navigator.clipboard.writeText(badge);
-                showToast('README badge copied.');
-              }}
-            >
-              <CopyIcon size={14} /> Badge
-            </Button>
+          <div className="rep-tools">
+            <div className="report-actions">
+              <Button variant="primary" size="sm" onClick={() => void share()}>
+                <ShareIcon size={14} /> Share
+              </Button>
+              <Button variant="secondary" size="sm" onClick={download}>
+                <DownloadIcon size={14} /> JSON
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  void navigator.clipboard.writeText(badge);
+                  showToast('README badge copied.');
+                }}
+              >
+                <CopyIcon size={14} /> Badge
+              </Button>
+            </div>
+            <SaveRun report={report} />
           </div>
-          <SaveRun report={report} />
         </div>
       </header>
 
@@ -178,10 +177,26 @@ export function ReportPage() {
       </nav>
 
       <div className="report-stats">
-        <Stat label="Survived" value={report.overall.passed} tone={report.overall.passed > 0 ? 'pass' : undefined} />
-        <Stat label="Wobbled" value={report.overall.warned} tone={report.overall.warned > 0 ? 'warn' : undefined} />
-        <Stat label="Crashed" value={report.overall.failed} tone={report.overall.failed > 0 ? 'fail' : undefined} />
-        <Stat label="False claims" value={report.overall.falseClaims} tone={report.overall.falseClaims > 0 ? 'fail' : undefined} />
+        <Stat
+          label="Survived"
+          value={report.overall.passed}
+          tone={report.overall.passed > 0 ? 'pass' : undefined}
+        />
+        <Stat
+          label="Wobbled"
+          value={report.overall.warned}
+          tone={report.overall.warned > 0 ? 'warn' : undefined}
+        />
+        <Stat
+          label="Crashed"
+          value={report.overall.failed}
+          tone={report.overall.failed > 0 ? 'fail' : undefined}
+        />
+        <Stat
+          label="False claims"
+          value={report.overall.falseClaims}
+          tone={report.overall.falseClaims > 0 ? 'fail' : undefined}
+        />
         <Stat label="Score" value={`${report.overall.score}/100`} />
       </div>
       <p className="stats-legend">Average of the seven laws. A 95+ · B 85+ · C 70+ · D 50+</p>
@@ -189,7 +204,9 @@ export function ReportPage() {
       <section className="report-shape" id="report-shape" aria-labelledby="report-shape-title">
         <div className="report-shape-chart">
           <div className="panel-head">
-            <h2 className="eyebrow" id="report-shape-title">Law scores</h2>
+            <h2 className="eyebrow" id="report-shape-title">
+              Law scores
+            </h2>
             {!sharedReport && (report.agent.id === 'naive' || report.agent.id === 'hardened') && (
               <span className="muted panel-hint">Dashed: the other reference agent</span>
             )}
@@ -211,7 +228,9 @@ export function ReportPage() {
         </div>
         <div className="report-law-bars">
           <div className="panel-head">
-            <h2 className="eyebrow" id="report-laws-title">Law by law</h2>
+            <h2 className="eyebrow" id="report-laws-title">
+              Law by law
+            </h2>
             <span className="muted panel-hint">Score out of 100</span>
           </div>
           {report.laws.map((law) => {
@@ -239,7 +258,10 @@ export function ReportPage() {
                     <ChevronIcon size={16} />
                   </span>
                   <span className="law-acc-track" aria-hidden="true">
-                    <span className={cx('law-acc-fill', `fill-${tone}`)} style={{ width: `${Math.max(law.score, 0)}%` }} />
+                    <span
+                      className={cx('law-acc-fill', `fill-${tone}`)}
+                      style={{ width: `${Math.max(law.score, 0)}%` }}
+                    />
                   </span>
                 </button>
                 {open && (
@@ -252,7 +274,10 @@ export function ReportPage() {
                     {law.scenarios.map((scenario) => (
                       <a
                         key={scenario.id}
-                        className={cx('law-scenario-pill', `pill-${scenario.verdict.toLowerCase()}`)}
+                        className={cx(
+                          'law-scenario-pill',
+                          `pill-${scenario.verdict.toLowerCase()}`,
+                        )}
                         href={`/replay/${scenario.id}`}
                       >
                         <span className={cx('pill-dot', `dot-${scenario.verdict.toLowerCase()}`)} />
@@ -270,6 +295,7 @@ export function ReportPage() {
 
       <section className="section report-failures" id="report-failures">
         <SectionHead
+          eyebrow="Where it broke"
           title={failures.length ? 'Costliest failures' : 'No laws broken'}
           body={
             failures.length
@@ -290,15 +316,15 @@ export function ReportPage() {
             <div>
               <h3 className="h3">Survived all {total} scenarios.</h3>
               <p>
-                Every law held in simulation. The card still never says “safe”. It says this
-                agent survived these specific scenarios.
+                Every law held in simulation. The card still never says “safe”. It says this agent
+                survived these specific scenarios.
               </p>
             </div>
           </div>
         ) : (
           <div className="failure-grid">
-            {failures.map((failure) => (
-              <FailureCard key={failure.id} result={failure} />
+            {failures.map((failure, index) => (
+              <FailureCard key={failure.id} result={failure} index={index + 1} />
             ))}
           </div>
         )}
@@ -306,12 +332,15 @@ export function ReportPage() {
 
       <section className="section compare-section" id="report-compare">
         <SectionHead
+          eyebrow="Reference agents"
           title="Compare agents"
           body="Same suite, same seed. Dummy follows the tutorial and has no guards; Seatbelt applies all seven laws. The LLM row stays empty until a real recording exists."
         />
         <div className="compare-table-wrap">
           <table className="compare-table">
-            <caption className="sr-only">Compare agents: grade, score, survived, simulated loss and false claims</caption>
+            <caption className="sr-only">
+              Compare agents: grade, score, survived, simulated loss and false claims
+            </caption>
             <thead>
               <tr>
                 <th scope="col">Agent</th>
@@ -327,7 +356,10 @@ export function ReportPage() {
             </thead>
             <tbody>
               {[reports.naive, reports.hardened].map((row) => (
-                <tr key={row.agent.id} className={row.hash === report.hash ? 'compare-active' : undefined}>
+                <tr
+                  key={row.agent.id}
+                  className={row.hash === report.hash ? 'compare-active' : undefined}
+                >
                   <td className="compare-cell-agent">
                     <span className="compare-agent">{row.agent.label}</span>
                     <span className="compare-kind mono">{row.agent.kind}</span>
@@ -337,10 +369,18 @@ export function ReportPage() {
                       {row.overall.grade}
                     </span>
                   </td>
-                  <td className="mono" data-label="Score">{row.overall.score}</td>
-                  <td className="mono" data-label="Survived">{row.overall.passed}/{row.suite.scenarioCount}</td>
-                  <td className="mono" data-label="Simulated loss">{formatUsd(row.overall.simulatedLossUsd)}</td>
-                  <td className="mono" data-label="False claims">{row.overall.falseClaims}</td>
+                  <td className="mono" data-label="Score">
+                    {row.overall.score}
+                  </td>
+                  <td className="mono" data-label="Survived">
+                    {row.overall.passed}/{row.suite.scenarioCount}
+                  </td>
+                  <td className="mono" data-label="Simulated loss">
+                    {formatUsd(row.overall.simulatedLossUsd)}
+                  </td>
+                  <td className="mono" data-label="False claims">
+                    {row.overall.falseClaims}
+                  </td>
                   <td className="compare-cell-action">
                     <button
                       type="button"
@@ -373,7 +413,7 @@ export function ReportPage() {
 
       <section className="section report-meta" id="report-meta">
         <div className="meta-card">
-          <p className="eyebrow">Provenance</p>
+          <span className="tag">Provenance</span>
           <div className="meta-grid">
             <div>
               <span className="label">Agent</span>
@@ -410,7 +450,10 @@ export function ReportPage() {
             <div>
               <span className="label">Modeled scenarios</span>
               <p className="mono">
-                {report.laws.flatMap((law) => law.scenarios).filter((scenario) => scenario.modeled).length}
+                {
+                  report.laws.flatMap((law) => law.scenarios).filter((scenario) => scenario.modeled)
+                    .length
+                }
               </p>
             </div>
           </div>
@@ -427,28 +470,38 @@ export function ReportPage() {
   );
 }
 
-function FailureCard({ result }: { result: ScenarioResult }) {
+function FailureCard({ result, index }: { result: ScenarioResult; index: number }) {
   const violation = result.violations[0];
   return (
-    <article className="failure-card">
-      <div className="failure-card-head">
-        <span className="failure-law">Law {result.law}</span>
-        {result.modeled && <span className="modeled-tag">modeled</span>}
-        <span className="failure-loss mono">{formatUsd(result.lossUsd)} simulated loss</span>
+    <article className="rep-case">
+      <div className="rep-case-top">
+        <span className="rep-case-number">{String(index).padStart(2, '0')}</span>
+        <div className="rep-case-tags">
+          <span className="tag">Law {result.law}</span>
+          {result.modeled && <span className="chip">Modeled</span>}
+        </div>
+        <div className="rep-case-loss">
+          <span>{formatUsd(result.lossUsd)}</span>
+          <small>simulated loss</small>
+        </div>
       </div>
-      <h3 className="h3">{result.title}</h3>
-      <p className="failure-story">{result.story}</p>
-      {violation && (
-        <p className="failure-why">
-          <span className="mono">{violation.invariant}</span>: {violation.message}
-        </p>
-      )}
-      <div className="failure-actions">
-        <a href={`/replay/${result.id}`} className="failure-watch">
-          Watch the crash <ArrowRightIcon size={14} />
-        </a>
+      <div className="rep-case-body">
+        <div className="rep-case-story">
+          <h3 className="h3">{result.title}</h3>
+          <p>{result.story}</p>
+          {violation && (
+            <div className="rep-finding">
+              <span className="label">The Judge found</span>
+              <p>{violation.message}</p>
+              <code>{violation.invariant}</code>
+            </div>
+          )}
+          <a href={`/replay/${result.id}`} className="link-arrow">
+            Watch the crash <ArrowRightIcon size={16} />
+          </a>
+        </div>
+        {result.fix && <FixSnippet fix={result.fix} />}
       </div>
-      {result.fix && <FixSnippet fix={result.fix} compact />}
     </article>
   );
 }
