@@ -73,6 +73,21 @@ export function LabPage() {
               </LinkButton>
             </div>
             <p className="home-note">Runs in your browser · No keys · No real funds</p>
+
+            <dl className="home-facts" aria-label="Lab at a glance">
+              <div>
+                <dt>Crash scenarios</dt>
+                <dd>{SCENARIOS.length}</dd>
+              </div>
+              <div>
+                <dt>Safety laws</dt>
+                <dd>7</dd>
+              </div>
+              <div>
+                <dt>Real funds at risk</dt>
+                <dd>$0.00</dd>
+              </div>
+            </dl>
           </div>
 
           <aside className="card home-result" data-reveal aria-labelledby="proof-title">
@@ -124,23 +139,6 @@ export function LabPage() {
             </p>
           </aside>
         </div>
-      </section>
-
-      <section className="container home-stats" data-reveal aria-label="Lab at a glance">
-        <dl className="stat-row">
-          <div>
-            <dt>Crash scenarios</dt>
-            <dd>{SCENARIOS.length}</dd>
-          </div>
-          <div>
-            <dt>Safety laws</dt>
-            <dd>7</dd>
-          </div>
-          <div>
-            <dt>Real funds at risk</dt>
-            <dd>$0.00</dd>
-          </div>
-        </dl>
       </section>
 
       <section className="container section section-rule" aria-labelledby="how-title" data-reveal>

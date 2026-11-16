@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Home page. Built on the theme tokens and primitives (see docs/DESIGN.md); only the layout
  * that the primitives do not cover lives here.
  */
@@ -7,6 +7,9 @@
 
 .home-tag {
   max-width: 100%;
+  padding-block: 9px;
+  font-size: 12px;
+  letter-spacing: 0.11em;
   line-height: 1.35;
   white-space: normal;
 }
@@ -22,8 +25,44 @@
 
 .home-hero-body {
   display: grid;
-  gap: var(--block-gap);
-  margin-top: clamp(32px, 4vw, 56px);
+  gap: clamp(32px, 4vw, 56px);
+  margin-top: clamp(28px, 3.4vw, 48px);
+}
+
+.home-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* The three numbers close the left column, so the hero ends level with the card. */
+.home-facts {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: start;
+  gap: clamp(20px, 3vw, 48px);
+  width: 100%;
+  margin-top: auto;
+  padding-top: clamp(20px, 2.4vw, 28px);
+  border-top: 1px solid var(--line);
+}
+
+.home-facts dt {
+  order: 2;
+  margin-top: 6px;
+  color: var(--text-3);
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.home-facts dd {
+  order: 1;
+  margin: 0;
+  font-size: clamp(32px, 3.4vw, 48px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
 }
 
 .home-hero-copy .lead {
@@ -45,9 +84,9 @@
 
 @media (min-width: 1100px) {
   .home-hero-body {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-    gap: clamp(48px, 6vw, 112px);
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) minmax(420px, 0.86fr);
+    gap: clamp(48px, 5vw, 88px);
+    align-items: stretch;
   }
 }
 
@@ -55,12 +94,28 @@
   .home-actions .btn {
     flex: 1 1 100%;
   }
+
+  .home-facts {
+    gap: 14px;
+  }
+
+  .home-facts dd {
+    font-size: 30px;
+  }
+
+  .home-facts dt {
+    font-size: 12.5px;
+  }
+
+  .home-tag {
+    letter-spacing: 0.08em;
+  }
 }
 
 /* ---------- Result card ---------- */
 
 .home-result {
-  padding: clamp(22px, 2.6vw, 36px);
+  padding: clamp(20px, 2.2vw, 30px);
 }
 
 .home-result-head {
@@ -91,15 +146,15 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px clamp(14px, 2vw, 24px);
-  padding: clamp(20px, 2.4vw, 28px) 0;
+  padding: clamp(18px, 1.8vw, 24px) 0;
   border-top: 1px solid var(--line);
 }
 
 .home-grade {
   min-width: 0.7em;
-  font-size: clamp(56px, 6.4vw, 88px);
+  font-size: clamp(42px, 3.8vw, 58px);
   font-weight: 600;
-  line-height: 0.85;
+  line-height: 0.9;
   letter-spacing: -0.05em;
 }
 
@@ -134,7 +189,7 @@
 }
 
 .home-money {
-  font-size: clamp(28px, 3vw, 40px);
+  font-size: clamp(24px, 2.2vw, 32px);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -157,7 +212,7 @@
 
 .home-bar {
   flex: 1;
-  height: 8px;
+  height: 5px;
   overflow: hidden;
   border-radius: 999px;
   background: var(--surface-3);
@@ -195,52 +250,11 @@
 }
 
 .home-foot {
-  padding-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid var(--line);
   color: var(--text-3);
   font-size: 13.5px;
   line-height: 1.6;
-}
-
-/* ---------- Stat strip ---------- */
-
-.home-stats {
-  margin-top: calc(var(--block-gap) * 1.6);
-  padding-top: clamp(32px, 4vw, 56px);
-  border-top: 1px solid var(--line);
-}
-
-.home-stats .stat-row dd {
-  font-size: clamp(52px, 8vw, 120px);
-}
-
-@media (min-width: 640px) {
-  .home-stats .stat-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 639px) {
-  .home-stats .stat-row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-  }
-
-  .home-stats .stat-row > div {
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    padding-block: 18px;
-  }
-
-  .home-stats .stat-row > div + div {
-    border-top: 1px solid var(--line);
-  }
-
-  .home-stats .stat-row dt {
-    text-align: right;
-  }
 }
 
 /* ---------- Section heads and shared list text ---------- */
